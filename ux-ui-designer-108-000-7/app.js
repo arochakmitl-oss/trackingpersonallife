@@ -507,7 +507,7 @@ function renderDashboard() {
   ]);
   const moneyScore = hasRangeData ? average([
     progressValue(debtPaid, cfg.debtTotal),
-    inverseProgress(sum(entries, "nonEssential"), cfg.nonEssentialLimit),
+    inverseProgress(sum(entries, "sweetDrink"), cfg.nonEssentialLimit),
     inverseProgress(sum(entries, "sweetDrink"), cfg.sweetDrinkLimit)
   ]) : 0;
   const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
@@ -578,7 +578,7 @@ function renderDashboard() {
       <div class="trend-grid">
         ${trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว")}
         ${trendChart("ออกกำลังกาย", "exercise", trend.entries, cfg.trendExerciseTarget, "นาที")}
-        ${trendChart("รายจ่ายไม่จำเป็น", "nonEssential", trend.entries, cfg.trendNonEssentialLimit, "บาท", true)}
+        ${trendChart("รายจ่ายไม่จำเป็น", "sweetDrink", trend.entries, cfg.trendNonEssentialLimit, "บาท", true)}
       </div>
     </div>
 
@@ -691,7 +691,7 @@ function renderMoney() {
         <div class="summary-band" style="grid-template-columns:1fr;">
           ${miniSummary("รายรับ", `${money(sum(entries, "income"))} บาท`)}
           ${miniSummary("รายจ่ายจำเป็น", `${money(sum(entries, "essential"))} บาท`)}
-          ${miniSummary("รายจ่ายไม่จำเป็น", `${money(sum(entries, "nonEssential"))} บาท`)}
+          ${miniSummary("รายจ่ายไม่จำเป็น", `${money(sum(entries, "sweetDrink"))} บาท`)}
           ${miniSummary("ค่าน้ำหวาน", `${money(sum(entries, "sweetDrink"))} บาท`)}
         </div>
       </div>
@@ -1032,7 +1032,7 @@ function moneyMixChart(entries) {
     { key: "income", icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
     { key: "sideIncome", icon: "side", label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
     { key: "essential", icon: "expense", label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
-    { key: "nonEssential", icon: "money", label: "รายจ่ายไม่จำเป็น", value: sum(entries, "nonEssential"), color: "#f5a7c6" },
+    { key: "nonEssential", icon: "money", label: "รายจ่ายไม่จำเป็น", value: sum(entries, "sweetDrink"), color: "#f5a7c6" },
     { key: "sweetDrink", icon: "sweet", label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8", duplicateOf: "nonEssential" }
   ];
   const visualItems = items.filter((item) => !item.duplicateOf);
