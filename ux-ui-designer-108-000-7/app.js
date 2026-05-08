@@ -98,7 +98,7 @@ const settingGroups = {
   },
   language: {
     title: "แก้ไขเป้าฝึกภาษา",
-    description: "ใช้กับ dashboard ภาษาไทย/อาหรับ และ streak การฝึกภาษา",
+    description: "ใช้กับ dashboard ภาษาอังกฤษ/อาหรับ และ streak การฝึกภาษา",
     fields: [
       { key: "languageDailyTarget", label: "เป้าฝึกภาษาต่อวัน", suffix: "นาที" },
       { key: "languageWeeklyTarget", label: "เป้าฝึกภาษาต่อสัปดาห์", suffix: "นาที" }
@@ -128,7 +128,7 @@ const categoryIcons = {
   side: `<svg viewBox="0 0 24 24"><path class="fill" d="M14 4c2.6.6 4.6 2.6 5.2 5.2l-4.7 4.7-4.4-4.4L14 4Z"/><path d="M14 4c2.6.6 4.6 2.6 5.2 5.2l-7.8 7.8-4.4-4.4L14 4Z"/><path d="M7 12.6 4.5 15 9 15"/><path d="M11.4 17 11.4 21.5 14 19"/><circle cx="15" cy="8.6" r="1.2"/></svg>`,
   career: `<svg viewBox="0 0 24 24"><path class="fill" d="M5 19 7 13l9-9 4 4-9 9-6 2Z"/><path d="M5 19 7 13l9-9 4 4-9 9-6 2Z"/><path d="M14.5 5.5 18.5 9.5"/><path d="M7 13l4 4"/></svg>`,
   language: `<svg viewBox="0 0 24 24"><circle class="fill" cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2 2.2 3 4.8 3 8s-1 5.8-3 8"/><path d="M12 4c-2 2.2-3 4.8-3 8s1 5.8 3 8"/></svg>`,
-  thai: "🇹🇭",
+  thai: "🇬🇧",
   arabic: "ض",
   mood: `<svg viewBox="0 0 24 24"><circle class="fill" cx="12" cy="12" r="8"/><path d="M8.5 10h.01"/><path d="M15.5 10h.01"/><path d="M8.8 14c1.5 1.7 4.9 1.7 6.4 0"/><circle cx="12" cy="12" r="8"/></svg>`,
   win: `<svg viewBox="0 0 24 24"><path class="fill" d="m12 3 2.5 5.4 5.8.7-4.3 4 1.1 5.8-5.1-2.9-5.1 2.9L8 13.1l-4.3-4 5.8-.7L12 3Z"/><path d="m12 3 2.5 5.4 5.8.7-4.3 4 1.1 5.8-5.1-2.9-5.1 2.9L8 13.1l-4.3-4 5.8-.7L12 3Z"/></svg>`,
@@ -197,7 +197,7 @@ const modalConfigs = {
   },
   language: {
     title: "บันทึกการฝึกภาษา",
-    description: "ติดตามเวลาฝึกภาษาไทยและอาหรับ พร้อมโฟกัสของรอบฝึกวันนี้",
+    description: "ติดตามเวลาฝึกภาษาอังกฤษและอาหรับ พร้อมโฟกัสของรอบฝึกวันนี้",
     fields: ["thaiMinutes", "arabicMinutes", "languageFocus", "win"]
   }
 };
@@ -661,14 +661,95 @@ function renderGoals() {
         </div>
       </div>
       <div class="card">
-        <h2>โฟกัสสัปดาห์นี้</h2>
-        <div class="timeline">
-          <div class="timeline-item"><strong>สุขภาพ:</strong> น้ำ ${money(cfg.waterDailyTarget)} แก้ว + เดินอย่างน้อย ${money(cfg.exerciseDailyTarget)} นาที</div>
-          <div class="timeline-item"><strong>เงิน:</strong> แยกจำเป็น/ไม่จำเป็นก่อนจ่ายทุกครั้ง</div>
-          <div class="timeline-item"><strong>อาชีพ:</strong> เติม portfolio หรือ case study อย่างน้อย 3 วัน</div>
-          <div class="timeline-item"><strong>รายได้เสริม:</strong> วัดผล 1 ช่องทางที่ทำต่อได้จริง</div>
-        </div>
+        ${renderWeeklyFocus(goals)}
       </div>
+    </div>
+  `;
+}
+
+function renderWeeklyFocus(goals) {
+  const cfg = settings();
+  const week = entriesInRange("week");
+  const month = entriesInRange("month");
+  const today = getEntry();
+  const goalHealth = goals
+    .map((goal) => ({ ...goal, percent: progressValue(goal.progress, goal.target) }))
+    .sort((a, b) => a.percent - b.percent);
+  const weakest = goalHealth[0];
+  const exerciseWeek = sum(week, "exercise");
+  const sweetWeek = sum(week, "sweetDrink");
+  const sideMonth = sum(month, "sideIncome");
+  const englishWeek = sum(week, "thaiMinutes");
+  const arabicWeek = sum(week, "arabicMinutes");
+  const practicedSkills = [...new Set(week.flatMap(([, entry]) => entry.skills || []))];
+  const channelTotals = channels.map((channel) => ({
+    channel,
+    value: sum(month.filter(([, entry]) => entry.sideChannel === channel), "sideIncome")
+  })).sort((a, b) => b.value - a.value);
+  const bestChannel = channelTotals[0];
+  const insights = [];
+
+  if (weakest) {
+    insights.push({
+      icon: "debt",
+      title: "เป้าที่ควรดันก่อน",
+      text: `${weakest.name} ตอนนี้อยู่ที่ ${Math.round(weakest.percent)}% (${money(weakest.progress)} / ${money(weakest.target)})`
+    });
+  }
+
+  if (Number(today.water || 0) < Number(cfg.waterDailyTarget || 0)) {
+    insights.push({
+      icon: "health",
+      title: "สุขภาพวันนี้",
+      text: `น้ำยังขาด ${money(Math.max(0, cfg.waterDailyTarget - Number(today.water || 0)))} แก้ว จากเป้าวันนี้`
+    });
+  } else if (exerciseWeek < Number(cfg.exerciseWeeklyTarget || 0)) {
+    insights.push({
+      icon: "exercise",
+      title: "สุขภาพสัปดาห์นี้",
+      text: `ออกกำลังกายเพิ่มอีก ${money(Math.max(0, cfg.exerciseWeeklyTarget - exerciseWeek))} นาที จะถึงเป้าสัปดาห์`
+    });
+  }
+
+  insights.push({
+    icon: sweetWeek > Number(cfg.sweetDrinkLimit || 0) ? "sweet" : "money",
+    title: "เงินและรายจ่าย",
+    text: sweetWeek > 0
+      ? `น้ำหวานสัปดาห์นี้ ${money(sweetWeek)} บาท ใช้เป็นตัวแทนรายจ่ายไม่จำเป็นใน dashboard`
+      : "สัปดาห์นี้ยังไม่มีรายจ่ายน้ำหวาน เป็นจังหวะดีในการรักษาเพดานรายจ่ายไม่จำเป็น"
+  });
+
+  insights.push({
+    icon: "side",
+    title: "รายได้เสริม",
+    text: bestChannel?.value > 0
+      ? `${bestChannel.channel} ทำเงินนำอยู่ ${money(bestChannel.value)} บาท เดือนนี้ รวมรายได้เสริม ${money(sideMonth)} บาท`
+      : "ยังไม่มีรายได้เสริมเดือนนี้ เลือก 1 ช่องทางมาทดลองเล็ก ๆ ก่อน"
+  });
+
+  insights.push({
+    icon: "career",
+    title: "ทักษะและภาษา",
+    text: practicedSkills.length
+      ? `สัปดาห์นี้ฝึก ${practicedSkills.slice(0, 3).join(", ")} และภาษาอังกฤษ/อาหรับรวม ${money(englishWeek + arabicWeek)} นาที`
+      : `ยังไม่มี skill ที่บันทึกในสัปดาห์นี้ ลองเริ่ม 1 skill พร้อมภาษาอังกฤษ ${money(cfg.languageDailyTarget)} นาที`
+  });
+
+  return `
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Analysis from your data</p>
+        <h2>โฟกัสสัปดาห์นี้</h2>
+      </div>
+      <span class="pill">${week.length ? `${week.length} วันมีข้อมูล` : "รอข้อมูล"}</span>
+    </div>
+    <div class="timeline">
+      ${insights.slice(0, 5).map((item) => `
+        <div class="timeline-item focus-item">
+          <strong>${iconLabel(item.icon, item.title)}</strong>
+          <span>${item.text}</span>
+        </div>
+      `).join("")}
     </div>
   `;
 }
@@ -845,7 +926,7 @@ function renderSkills() {
       <div class="section-head">
         <div>
           <p class="eyebrow">Language learning</p>
-          <h2>${iconLabel("language", "ฝึกภาษาไทย & อาหรับ")}</h2>
+          <h2>${iconLabel("language", "ฝึกภาษาอังกฤษ & อาหรับ")}</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
@@ -853,7 +934,7 @@ function renderSkills() {
         </div>
       </div>
       <div class="progress-list">
-        ${renderProgress({ name: "ภาษาไทย", type: "สัปดาห์นี้", progress: thaiWeek, target: cfg.languageWeeklyTarget })}
+        ${renderProgress({ name: "ภาษาอังกฤษ", type: "สัปดาห์นี้", progress: thaiWeek, target: cfg.languageWeeklyTarget })}
         ${renderProgress({ name: "ภาษาอาหรับ", type: "สัปดาห์นี้", progress: arabicWeek, target: cfg.languageWeeklyTarget })}
         ${renderProgress({ name: "รวมการฝึกภาษา", type: `เป้ารวม ${money(cfg.languageWeeklyTarget)} นาที`, progress: thaiWeek + arabicWeek, target: cfg.languageWeeklyTarget })}
       </div>
@@ -930,7 +1011,7 @@ function renderDayDetail(iso) {
     ` : ""}
     <p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
     <p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>
-    <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${iconLabel("thai", `ไทย ${Number(entry.thaiMinutes || 0)} นาที`)} / ${iconLabel("arabic", `อาหรับ ${Number(entry.arabicMinutes || 0)} นาที`)} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
+    <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${iconLabel("thai", `อังกฤษ ${Number(entry.thaiMinutes || 0)} นาที`)} / ${iconLabel("arabic", `อาหรับ ${Number(entry.arabicMinutes || 0)} นาที`)} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
   `;
 }
 
@@ -962,7 +1043,7 @@ function languageDashboard(entries) {
       <div class="section-head">
         <div>
           <p class="eyebrow">Language practice</p>
-          <h2>ฝึกภาษาไทย & อาหรับ</h2>
+          <h2>ฝึกภาษาอังกฤษ & อาหรับ</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
@@ -975,11 +1056,11 @@ function languageDashboard(entries) {
             <strong>${money(total)}</strong>
             <span>นาที</span>
           </div>
-          <span class="language-badge thai">${iconLabel("thai", "ไทย")}</span>
+          <span class="language-badge thai">${iconLabel("thai", "อังกฤษ")}</span>
           <span class="language-badge arabic">${iconLabel("arabic", "عربي")}</span>
         </div>
         <div class="language-progress">
-          ${languageProgress(iconLabel("thai", "ไทย"), thai, cfg.languageWeeklyTarget, "#a9dcc5")}
+          ${languageProgress(iconLabel("thai", "อังกฤษ"), thai, cfg.languageWeeklyTarget, "#a9dcc5")}
           ${languageProgress(iconLabel("arabic", "อาหรับ"), arabic, cfg.languageWeeklyTarget, "#c6b2f2")}
           ${languageProgress(iconLabel("language", "รวมสัปดาห์นี้"), weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
         </div>
@@ -1292,7 +1373,7 @@ function renderField(field) {
     expenseRows: renderExpenseRows(),
     debtPaid: textInput("debtPaid", "จ่ายหนี้วันนี้", "decimal"),
     sideIncome: textInput("sideIncome", "รายได้เสริม", "decimal"),
-    thaiMinutes: textInput("thaiMinutes", "ฝึกภาษาไทย (นาที)", "numeric", "[0-9]*"),
+    thaiMinutes: textInput("thaiMinutes", "ฝึกภาษาอังกฤษ (นาที)", "numeric", "[0-9]*"),
     arabicMinutes: textInput("arabicMinutes", "ฝึกภาษาอาหรับ (นาที)", "numeric", "[0-9]*"),
     languageFocus: `
       <label>

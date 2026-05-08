@@ -1032,6 +1032,20 @@ h3 {
   background: rgba(255, 255, 255, 0.62);
 }
 
+.focus-item {
+  display: grid;
+  gap: 7px;
+}
+
+.focus-item strong {
+  color: var(--ink);
+}
+
+.focus-item > span {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .modal {
   border: 0;
   padding: 0;
