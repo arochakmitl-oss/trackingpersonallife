@@ -1141,13 +1141,15 @@ textarea:focus {
   width: auto;
 }
 
-.expense-editor {
+.expense-editor,
+.skill-editor {
   padding: 14px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.58);
 }
 
-.expense-editor-head {
+.expense-editor-head,
+.skill-editor-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -1156,23 +1158,28 @@ textarea:focus {
 }
 
 .expense-editor-head span,
-.expense-editor-head small {
+.expense-editor-head small,
+.skill-editor-head span,
+.skill-editor-head small {
   display: block;
 }
 
-.expense-editor-head span {
+.expense-editor-head span,
+.skill-editor-head span {
   color: var(--ink);
   font-weight: 900;
 }
 
-.expense-editor-head small {
+.expense-editor-head small,
+.skill-editor-head small {
   margin-top: 3px;
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.35;
 }
 
-.expense-rows {
+.expense-rows,
+.skill-rows {
   display: grid;
   gap: 10px;
 }
@@ -1184,7 +1191,15 @@ textarea:focus {
   align-items: end;
 }
 
-.expense-remove {
+.skill-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  gap: 10px;
+  align-items: center;
+}
+
+.expense-remove,
+.skill-remove {
   width: 42px;
   height: 42px;
   box-shadow: none;
@@ -1192,7 +1207,8 @@ textarea:focus {
   color: var(--muted);
 }
 
-.expense-remove:disabled {
+.expense-remove:disabled,
+.skill-remove:disabled {
   cursor: not-allowed;
   opacity: 0.35;
   transform: none;
@@ -1276,15 +1292,18 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
-  .expense-editor-head {
+  .expense-editor-head,
+  .skill-editor-head {
     display: grid;
   }
 
-  .expense-row {
+  .expense-row,
+  .skill-row {
     grid-template-columns: 1fr;
   }
 
-  .expense-remove {
+  .expense-remove,
+  .skill-remove {
     width: 100%;
   }
 

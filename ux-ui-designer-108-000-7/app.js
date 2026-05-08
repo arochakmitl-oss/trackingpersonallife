@@ -33,7 +33,7 @@ const pages = [
   { id: "skills", label: "ทักษะ & อาชีพ", icon: "▧", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" }
 ];
 
-const skillNames = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
+const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
 const channels = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
 const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ"];
 const settingGroups = {
@@ -54,13 +54,31 @@ const settingGroups = {
     ]
   },
   dashboard: {
-    title: "แก้ไขค่า dashboard",
-    description: "ค่า fix สำหรับวงแหวนและกราฟแนวโน้ม ไม่ใช่ยอดที่บันทึกประจำวัน",
+    title: "แก้ไขเป้าสมดุลชีวิต",
+    description: "ค่าเหล่านี้ผูกกับกราฟแมงมุม 4 แกน: สุขภาพ เงิน รายได้เสริม และอาชีพ",
     fields: [
-      { key: "nonEssentialLimit", label: "เพดานรายจ่ายไม่จำเป็นต่อช่วง", suffix: "บาท" },
-      { key: "sweetDrinkLimit", label: "เพดานค่าน้ำหวานต่อช่วง", suffix: "บาท" },
-      { key: "trendExerciseTarget", label: "เป้ากราฟออกกำลังต่อวัน", suffix: "นาที" },
-      { key: "trendNonEssentialLimit", label: "เพดานกราฟรายจ่ายไม่จำเป็นต่อวัน", suffix: "บาท" }
+      { key: "waterDailyTarget", label: "สุขภาพ: น้ำต่อวัน", suffix: "แก้ว" },
+      { key: "exerciseDailyTarget", label: "สุขภาพ: ออกกำลังกายต่อวัน", suffix: "นาที" },
+      { key: "sleepTarget", label: "สุขภาพ: นอนต่อวัน", suffix: "ชั่วโมง" },
+      { key: "confidenceTarget", label: "สุขภาพ: ความมั่นใจ", suffix: "คะแนน" },
+      { key: "debtTotal", label: "เงิน: หนี้ทั้งหมด", suffix: "บาท" },
+      { key: "nonEssentialLimit", label: "เงิน: เพดานรายจ่ายไม่จำเป็น", suffix: "บาท" },
+      { key: "sweetDrinkLimit", label: "เงิน: เพดานค่าน้ำหวาน", suffix: "บาท" },
+      { key: "sideIncomeWeeklyTarget", label: "รายได้เสริม: เป้าสัปดาห์", suffix: "บาท" },
+      { key: "sideIncomeMonthlyTarget", label: "รายได้เสริม: เป้าเดือน", suffix: "บาท" },
+      { key: "sideIncomeYearlyTarget", label: "รายได้เสริม: เป้าปี", suffix: "บาท" },
+      { key: "skillTargetDays", label: "อาชีพ: เป้าวันต่อ skill", suffix: "วัน" }
+    ]
+  },
+  health: {
+    title: "แก้ไขเป้าสุขภาพ",
+    description: "เป้าสุขภาพใช้กับหน้า Health & Beauty และคะแนนสมดุลชีวิต",
+    fields: [
+      { key: "waterDailyTarget", label: "น้ำต่อวัน", suffix: "แก้ว" },
+      { key: "exerciseDailyTarget", label: "ออกกำลังกายต่อวัน", suffix: "นาที" },
+      { key: "exerciseWeeklyTarget", label: "ออกกำลังกายต่อสัปดาห์", suffix: "นาที" },
+      { key: "sleepTarget", label: "นอนต่อวัน", suffix: "ชั่วโมง" },
+      { key: "confidenceTarget", label: "เป้าความมั่นใจ", suffix: "คะแนน" }
     ]
   },
   side: {
@@ -75,7 +93,7 @@ const settingGroups = {
   },
   skills: {
     title: "แก้ไขเป้าทักษะ",
-    description: "ใช้กับ progress ของ skill UX/UI แต่ละหมวด",
+    description: "เพิ่ม/ลด skill ที่อยากติดตาม และตั้งเป้าจำนวนวันต่อ skill",
     fields: [{ key: "skillTargetDays", label: "เป้าจำนวนวันต่อทักษะ", suffix: "วัน" }]
   },
   language: {
@@ -133,6 +151,14 @@ function iconLabel(key, label) {
   return `<span class="icon-label">${categoryIcon(key)}<span>${label}</span></span>`;
 }
 
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
 const modalConfigs = {
   dashboard: {
     title: "บันทึกภาพรวมวันนี้",
@@ -147,7 +173,7 @@ const modalConfigs = {
   checkin: {
     title: "เช็คอินชีวิตวันนี้",
     description: "บันทึกความรู้สึก ค่าใช้จ่าย สุขภาพ ชัยชนะเล็กๆ และ streak ของวันนี้",
-    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "skills", "win"]
+    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "thaiMinutes", "arabicMinutes", "languageFocus", "skills", "win"]
   },
   money: {
     title: "บันทึกเงิน & หนี้",
@@ -195,7 +221,15 @@ function normalizeState(saved = {}) {
 
 function settings() {
   state.settings = { ...DEFAULT_SETTINGS, ...(state.settings || {}) };
+  if (!Array.isArray(state.settings.skillNames)) {
+    state.settings.skillNames = [...DEFAULT_SKILLS];
+  }
   return state.settings;
+}
+
+function skillsList() {
+  const list = settings().skillNames;
+  return Array.isArray(list) ? list.filter(Boolean) : [...DEFAULT_SKILLS];
 }
 
 function saveState() {
@@ -511,7 +545,8 @@ function renderDashboard() {
     inverseProgress(sum(entries, "sweetDrink"), cfg.sweetDrinkLimit)
   ]) : 0;
   const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
-  const careerScore = progressValue(skillNames.reduce((total, skill) => total + countSkillDays(skill), 0), skillNames.length * cfg.skillTargetDays);
+  const careerSkills = skillsList();
+  const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
   return `
     <div class="section-head">
       <div class="segmented" aria-label="ตัวกรองช่วงเวลา">
@@ -527,7 +562,7 @@ function renderDashboard() {
             <p class="eyebrow">Life balance</p>
             <h2>ภาพรวมสมดุลชีวิต</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-setting="dashboard">แก้เป้าหมาย</button>
+          <button class="tiny-button" type="button" data-open-setting="dashboard">แก้เป้ากราฟ</button>
         </div>
         ${lifeRadarChart([
           { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" },
@@ -561,7 +596,7 @@ function renderDashboard() {
             <p class="eyebrow">${dateLabel(selectedDate)}</p>
             <h2>ข้อมูลย้อนหลัง</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-entry>แก้ไข</button>
+          <button class="tiny-button" type="button" data-open-entry data-modal="checkin">แก้ไข</button>
         </div>
         ${renderDayDetail(selectedDate)}
       </div>
@@ -767,7 +802,7 @@ function renderHealth() {
           <h2>🔥 streak การดูแลตัวเอง</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="goals">แก้เป้าสุขภาพ</button>
+          <button class="tiny-button" type="button" data-open-setting="health">แก้เป้าสุขภาพ</button>
           <button class="primary-button" type="button" data-open-entry>บันทึกสุขภาพ</button>
         </div>
       </div>
@@ -783,12 +818,13 @@ function renderHealth() {
 
 function renderSkills() {
   const cfg = settings();
+  const skills = skillsList();
   const week = entriesInRange("week");
   const thaiWeek = sum(week, "thaiMinutes");
   const arabicWeek = sum(week, "arabicMinutes");
   return `
     <div class="grid three">
-      ${skillNames.map((skill) => statCard(skill, `${countSkillDays(skill)} วัน`, "จำนวนวันที่ฝึกทั้งหมด")).join("")}
+      ${skills.map((skill) => statCard(skill, `${countSkillDays(skill)} วัน`, "จำนวนวันที่ฝึกทั้งหมด")).join("")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -802,7 +838,7 @@ function renderSkills() {
         </div>
       </div>
       <div class="progress-list">
-        ${skillNames.map((skill) => renderProgress({ name: skill, type: `เป้าหมาย ${money(cfg.skillTargetDays)} วัน`, progress: countSkillDays(skill), target: cfg.skillTargetDays })).join("")}
+        ${skills.map((skill) => renderProgress({ name: skill, type: `เป้าหมาย ${money(cfg.skillTargetDays)} วัน`, progress: countSkillDays(skill), target: cfg.skillTargetDays })).join("")}
       </div>
     </div>
     <div class="card">
@@ -1291,7 +1327,7 @@ function renderField(field) {
     skills: `
       <div class="skill-checks">
         <span>ทักษะที่ฝึกวันนี้</span>
-        ${skillNames.map((skill) => `<label><input type="checkbox" name="skills" value="${skill}" /> ${skill}</label>`).join("")}
+        ${skillsList().map((skill) => `<label><input type="checkbox" name="skills" value="${escapeHTML(skill)}" /> ${escapeHTML(skill)}</label>`).join("")}
       </div>
     `
   };
@@ -1332,6 +1368,63 @@ function renderExpenseRow(item = { category: "น้ำหวาน", amount: 0 
       <button class="icon-button expense-remove" type="button" data-remove-expense-row aria-label="ลบแถว">×</button>
     </div>
   `;
+}
+
+function renderSkillEditor() {
+  const skills = skillsList();
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>รายการ skill ที่ติดตาม</span>
+          <small>เพิ่ม skill ใหม่หรือลบ skill ที่ไม่อยากโชว์บนหน้าอาชีพได้ ข้อมูลเก่าจะยังอยู่ในบันทึกเดิม</small>
+        </div>
+        <button class="tiny-button" type="button" data-add-skill-row>เพิ่ม skill</button>
+      </div>
+      <div class="skill-rows" data-skill-rows>
+        ${skills.map((skill) => renderSkillRow(skill)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderSkillRow(skill = "") {
+  return `
+    <div class="skill-row">
+      <input name="skillName" type="text" value="${escapeHTML(skill)}" placeholder="เช่น UX Writing" />
+      <button class="icon-button skill-remove" type="button" data-remove-skill-row aria-label="ลบ skill">×</button>
+    </div>
+  `;
+}
+
+function bindSkillRows() {
+  const rows = $("[data-skill-rows]");
+  if (!rows) return;
+  const syncRemoveButtons = () => {
+    const buttons = [...rows.querySelectorAll("[data-remove-skill-row]")];
+    buttons.forEach((button) => {
+      button.disabled = buttons.length <= 1;
+    });
+  };
+
+  const addButton = $("[data-add-skill-row]");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      rows.insertAdjacentHTML("beforeend", renderSkillRow());
+      const lastInput = rows.querySelector(".skill-row:last-child input");
+      if (lastInput) lastInput.focus();
+      syncRemoveButtons();
+    });
+  }
+
+  rows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-skill-row]");
+    if (!button || rows.children.length <= 1) return;
+    button.closest(".skill-row").remove();
+    syncRemoveButtons();
+  });
+
+  syncRemoveButtons();
 }
 
 function bindExpenseRows() {
@@ -1376,13 +1469,15 @@ function openSettingModal(group = "debt") {
   settingGroup = group;
   $("#settingTitle").textContent = config.title;
   $("#settingDescription").textContent = config.description;
-  $("#settingFields").innerHTML = config.fields.map((field) => `
+  const genericFields = config.fields.map((field) => `
     <label>
       ${field.label}
       <input name="${field.key}" type="text" inputmode="decimal" value="${settings()[field.key] ?? 0}" />
       <span class="field-hint">${field.suffix}</span>
     </label>
   `).join("");
+  $("#settingFields").innerHTML = `${genericFields}${group === "skills" ? renderSkillEditor() : ""}`;
+  if (group === "skills") bindSkillRows();
   $("#settingModal").showModal();
 }
 
@@ -1393,6 +1488,10 @@ function handleSettingSubmit(event) {
   config.fields.forEach((field) => {
     settings()[field.key] = Number(data.get(field.key) || 0);
   });
+  if (settingGroup === "skills") {
+    const nextSkills = [...new Set(data.getAll("skillName").map((skill) => skill.trim()).filter(Boolean))];
+    settings().skillNames = nextSkills;
+  }
   saveState();
   syncSettings();
   $("#settingModal").close();
@@ -1404,6 +1503,9 @@ function resetSettingGroup() {
   config.fields.forEach((field) => {
     settings()[field.key] = DEFAULT_SETTINGS[field.key];
   });
+  if (settingGroup === "skills") {
+    settings().skillNames = [...DEFAULT_SKILLS];
+  }
   saveState();
   syncSettings();
   $("#settingModal").close();
