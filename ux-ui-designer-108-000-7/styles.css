@@ -1046,6 +1046,135 @@ h3 {
   line-height: 1.5;
 }
 
+.feed-card {
+  display: grid;
+  gap: 16px;
+}
+
+.feed-suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.feed-news {
+  display: grid;
+  gap: 10px;
+}
+
+.feed-subhead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.feed-subhead strong {
+  color: var(--ink);
+}
+
+.feed-suggestion,
+.saved-link {
+  display: grid;
+  gap: 7px;
+  padding: 13px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.feed-suggestion span,
+.saved-link span {
+  color: var(--muted);
+  line-height: 1.48;
+}
+
+.saved-link a {
+  color: var(--ink);
+  font-weight: 900;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.saved-link a:hover {
+  text-decoration: underline;
+}
+
+.news-link {
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: center;
+  border-left: 4px solid var(--lavender);
+}
+
+.news-thumb {
+  width: 82px;
+  height: 62px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.generated-thumb {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.8), transparent 30%),
+    linear-gradient(135deg, rgba(245, 167, 198, 0.34), rgba(198, 178, 242, 0.42)),
+    #fff;
+  box-shadow: inset 0 0 0 1px rgba(108, 79, 99, 0.08);
+}
+
+.generated-thumb .category-icon {
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.86);
+  z-index: 1;
+}
+
+.generated-thumb strong {
+  z-index: 1;
+  padding: 0 7px 7px;
+  color: rgba(53, 43, 52, 0.72);
+  font-size: 0.64rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.thumb-glow {
+  position: absolute;
+  inset: auto -16px -28px auto;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  background: rgba(255, 195, 157, 0.46);
+}
+
+.thumb-money {
+  background: linear-gradient(135deg, rgba(255, 195, 157, 0.46), rgba(169, 220, 197, 0.42)), #fff;
+}
+
+.thumb-side,
+.thumb-skills {
+  background: linear-gradient(135deg, rgba(198, 178, 242, 0.46), rgba(154, 199, 232, 0.36)), #fff;
+}
+
+.thumb-health,
+.thumb-checkin {
+  background: linear-gradient(135deg, rgba(169, 220, 197, 0.48), rgba(245, 167, 198, 0.34)), #fff;
+}
+
+.thumb-goals {
+  background: linear-gradient(135deg, rgba(255, 241, 215, 0.88), rgba(245, 167, 198, 0.32)), #fff;
+}
+
+.link-list {
+  display: grid;
+  gap: 10px;
+}
+
 .modal {
   border: 0;
   padding: 0;
@@ -1293,6 +1422,7 @@ textarea:focus {
   .grid.three,
   .grid.four,
   .trend-grid,
+  .feed-suggestions,
   .life-radar,
   .money-mix-layout,
   .language-layout,
@@ -1314,6 +1444,15 @@ textarea:focus {
   .expense-row,
   .skill-row {
     grid-template-columns: 1fr;
+  }
+
+  .news-link {
+    grid-template-columns: 1fr;
+  }
+
+  .news-thumb {
+    width: 100%;
+    height: 132px;
   }
 
   .expense-remove,

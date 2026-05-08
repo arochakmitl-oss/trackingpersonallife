@@ -114,6 +114,7 @@ let calendarCursor = new Date();
 let modalCategory = "checkin";
 let settingGroup = "debt";
 let pendingConfirmAction = null;
+let dailyNewsItems = [];
 let supabaseClient = null;
 let currentUser = null;
 let isCloudLoading = false;
@@ -157,6 +158,18 @@ function escapeHTML(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+function safeURL(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const url = new URL(normalized);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 const modalConfigs = {
@@ -269,6 +282,18 @@ async function initSupabase() {
     if (currentUser) await loadCloudState();
     render();
   });
+}
+
+async function loadDailyNews() {
+  try {
+    const response = await fetch("assets/daily-feed.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    dailyNewsItems = Array.isArray(payload.items) ? payload.items : [];
+    render();
+  } catch {
+    dailyNewsItems = [];
+  }
 }
 
 async function loadCloudState() {
@@ -520,7 +545,7 @@ function render() {
     skills: renderSkills
   }[activePage]();
 
-  $("#pageContent").innerHTML = content;
+  $("#pageContent").innerHTML = `${content}${renderDailyFeed(page.id)}`;
   bindPageEvents();
 }
 
@@ -752,6 +777,154 @@ function renderWeeklyFocus(goals) {
       `).join("")}
     </div>
   `;
+}
+
+function renderDailyFeed(pageId) {
+  const page = pages.find((item) => item.id === pageId);
+  const suggestions = feedSuggestions(pageId);
+  const news = matchedDailyNews(pageId).slice(0, 4);
+  return `
+    <div class="card feed-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Personal feed</p>
+          <h2>Feed ที่ควรอ่านวันนี้</h2>
+          <p class="muted">ข่าวจากเว็บไทยที่อัปเดตทุกวัน 9:00 และคัดให้เข้ากับพฤติกรรมในเมนู ${page?.label || "นี้"}</p>
+        </div>
+      </div>
+      <div class="feed-suggestions">
+        ${suggestions.map((item) => `
+          <article class="feed-suggestion">
+            <strong>${iconLabel(item.icon, item.title)}</strong>
+            <span>${item.reason}</span>
+          </article>
+        `).join("")}
+      </div>
+      <div class="feed-news">
+        <div class="feed-subhead">
+          <strong>ข่าว/บทความที่อัปเดตตอน 9:00</strong>
+          <span>${dailyNewsItems.length ? `${dailyNewsItems.length} รายการใน feed กลาง` : "ยังไม่มีไฟล์ข่าวล่าสุด"}</span>
+        </div>
+        <div class="link-list">
+          ${news.length ? news.map((item) => `
+            <article class="saved-link news-link">
+              ${newsThumbnail(item)}
+              <div>
+                <a href="${safeURL(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.title)}</a>
+                <span>${escapeHTML(item.source || "Daily feed")} • ${escapeHTML(item.reason || item.category || "matched with this page")}</span>
+              </div>
+            </article>
+          `).join("") : `<p class="muted">ยังไม่มีข่าวที่ match กับเมนูนี้ ระบบจะเติมหลัง GitHub Actions รันตอน 9:00 น.</p>`}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function newsThumbnail(item) {
+  const tone = item.pageId || "dashboard";
+  return `
+    <div class="news-thumb generated-thumb thumb-${tone}">
+      <span class="thumb-glow"></span>
+      ${categoryIcon(item.icon || "language")}
+      <strong>${escapeHTML(newsThumbnailLabel(item))}</strong>
+    </div>
+  `;
+}
+
+function newsThumbnailLabel(item) {
+  const text = `${item.title || ""} ${item.category || ""}`.toLowerCase();
+  const keywordLabels = [
+    { keys: ["หนี้", "การเงิน", "ออม", "เงิน", "debt", "budget"], label: "Money" },
+    { keys: ["สุขภาพ", "นอน", "ออกกำลัง", "skincare", "sleep"], label: "Care" },
+    { keys: ["เป้าหมาย", "วางแผน", "habit", "goal"], label: "Plan" },
+    { keys: ["ux", "ui", "design", "portfolio", "ai"], label: "Design" },
+    { keys: ["รายได้", "creator", "tiktok", "youtube", "affiliate"], label: "Side" },
+    { keys: ["ภาษา", "english", "arabic"], label: "Lang" }
+  ];
+  return keywordLabels.find((item) => item.keys.some((key) => text.includes(key)))?.label || {
+    dashboard: "Bloom",
+    goals: "Goal",
+    checkin: "Mood",
+    money: "Money",
+    side: "Side",
+    health: "Care",
+    skills: "Skill"
+  }[item.pageId] || "Read";
+}
+
+function matchedDailyNews(pageId) {
+  const topics = feedTopicKeywords(pageId);
+  const pageNews = dailyNewsItems.filter((item) => item.pageId === pageId);
+  const behaviorNews = dailyNewsItems.filter((item) => {
+    const text = `${item.title || ""} ${item.category || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
+    return topics.some((topic) => text.includes(topic));
+  });
+  return [...pageNews, ...behaviorNews].filter((item, index, array) => (
+    item.url && array.findIndex((candidate) => candidate.url === item.url) === index
+  ));
+}
+
+function feedTopicKeywords(pageId) {
+  const week = entriesInRange("week");
+  const today = getEntry();
+  const topics = {
+    dashboard: ["habit", "productivity", "personal finance", "wellness"],
+    goals: ["goal", "planning", "habit", "weekly review"],
+    checkin: ["journal", "mood", "reflection", "mindfulness"],
+    money: ["debt", "budget", "saving", "spending"],
+    side: ["creator", "affiliate", "youtube", "tiktok", "resale"],
+    health: ["sleep", "hydration", "fitness", "skincare"],
+    skills: ["ux", "ui", "design system", "ai tools", "portfolio", "english"]
+  }[pageId] || [];
+  if (sum(week, "sweetDrink") > 0) topics.push("spending", "sugar", "budget");
+  if (Number(today.sleep || 0) < settings().sleepTarget) topics.push("sleep");
+  if (sum(week, "exercise") < settings().exerciseWeeklyTarget) topics.push("fitness");
+  if (sum(week, "thaiMinutes") + sum(week, "arabicMinutes") > 0) topics.push("language", "english", "arabic");
+  return [...new Set(topics.map((topic) => topic.toLowerCase()))];
+}
+
+function feedSuggestions(pageId) {
+  const cfg = settings();
+  const week = entriesInRange("week");
+  const month = entriesInRange("month");
+  const today = getEntry();
+  const sweetWeek = sum(week, "sweetDrink");
+  const exerciseWeek = sum(week, "exercise");
+  const sideMonth = sum(month, "sideIncome");
+  const languageWeek = sum(week, "thaiMinutes") + sum(week, "arabicMinutes");
+  const skillCount = week.filter(([, entry]) => (entry.skills || []).length).length;
+  const suggestions = {
+    dashboard: [
+      { icon: "health", title: "ระบบพลังงานส่วนตัว", reason: Number(today.water || 0) < cfg.waterDailyTarget ? "น้ำวันนี้ยังต่ำกว่าเป้า ลองอ่านเรื่อง habit loop หรือ hydration routine" : "สุขภาพวันนี้โอเค ลองอ่านเรื่อง weekly review เพื่อรักษาจังหวะ" },
+      { icon: "money", title: "การเงินที่ลด friction", reason: sweetWeek > 0 ? `สัปดาห์นี้น้ำหวาน ${money(sweetWeek)} บาท เหมาะกับบทความลด impulse spending` : "รายจ่ายไม่จำเป็นยังนิ่ง เหมาะกับบทความ money system หรือ debt payoff" }
+    ],
+    goals: [
+      { icon: "debt", title: "Goal review", reason: "หา reference เรื่อง weekly planning, OKR ส่วนตัว หรือ habit tracking เพื่อปรับเป้ารายสัปดาห์" },
+      { icon: "calendar", title: "Trend ที่ควรทดลอง", reason: exerciseWeek < cfg.exerciseWeeklyTarget ? `ออกกำลังยังขาด ${money(Math.max(0, cfg.exerciseWeeklyTarget - exerciseWeek))} นาที ลองหา routine สั้น 10-15 นาที` : "เป้าออกกำลังเดินดี ลองหา trend เรื่อง recovery หรือ sleep quality" }
+    ],
+    checkin: [
+      { icon: "mood", title: "Mood journaling", reason: "เหมาะกับบทความ emotional check-in, reflection prompts หรือ tiny wins" },
+      { icon: "win", title: "Small wins", reason: today.win ? "วันนี้มีชัยชนะแล้ว ลองเก็บบทความที่ช่วยต่อยอด momentum" : "ยังไม่มีชัยชนะวันนี้ ลองหา prompt สั้น ๆ สำหรับ reflection" }
+    ],
+    money: [
+      { icon: "sweet", title: "ลดรายจ่ายไม่จำเป็น", reason: sweetWeek > 0 ? `น้ำหวานคือรายจ่ายไม่จำเป็นหลักของสัปดาห์นี้ (${money(sweetWeek)} บาท)` : "ยังไม่มีน้ำหวานสัปดาห์นี้ ลองเก็บไอเดีย no-spend หรือ budget template" },
+      { icon: "debt", title: "Debt payoff", reason: "เหมาะกับลิงก์เรื่อง snowball/avalanche หรือวิธีทำ debt tracker ที่อ่านง่าย" }
+    ],
+    side: [
+      { icon: "side", title: "ทดลองช่องทางที่ทำเงินจริง", reason: sideMonth > 0 ? `เดือนนี้รายได้เสริม ${money(sideMonth)} บาท ลองหา case study การ scale ช่องทางที่เริ่มติด` : "ยังไม่มีรายได้เสริมเดือนนี้ ลอง feed ไอเดียสินค้าหรือ affiliate content ที่ทำได้เร็ว" },
+      { icon: "income", title: "Content monetization", reason: "เหมาะกับลิงก์ YouTube/TikTok affiliate hooks และ pricing ของของมือสอง" }
+    ],
+    health: [
+      { icon: "sleep", title: "Sleep & recovery", reason: Number(today.sleep || 0) < cfg.sleepTarget ? "นอนวันนี้ต่ำกว่าเป้า ลองอ่านเรื่อง sleep hygiene" : "การนอนโอเค ลองอ่านเรื่อง skincare consistency หรือ strength training เบา ๆ" },
+      { icon: "confidence", title: "Confidence habit", reason: "หา reference เรื่อง body confidence, skincare streak หรือ self-care routine ที่ทำซ้ำง่าย" }
+    ],
+    skills: [
+      { icon: "career", title: "UX/UI growth", reason: skillCount ? `สัปดาห์นี้มีวันฝึก skill ${skillCount} วัน ลองหา case study teardown หรือ design system pattern` : "ยังไม่มี skill log สัปดาห์นี้ ลองเริ่มจาก UX Research หรือ AI tools แบบ micro-learning" },
+      { icon: "language", title: "ภาษาอังกฤษ & อาหรับ", reason: languageWeek > 0 ? `ฝึกภาษารวม ${money(languageWeek)} นาที เหมาะกับลิงก์ vocabulary หรือ speaking practice` : `ลอง feed บทเรียนภาษาอังกฤษ ${money(cfg.languageDailyTarget)} นาทีวันนี้` }
+    ]
+  };
+  return suggestions[pageId] || suggestions.dashboard;
 }
 
 function renderCheckin() {
@@ -1719,3 +1892,4 @@ $("#exportButton").addEventListener("click", exportData);
 
 render();
 initSupabase();
+loadDailyNews();
