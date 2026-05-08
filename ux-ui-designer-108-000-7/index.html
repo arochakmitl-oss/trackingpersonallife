@@ -30,6 +30,7 @@
             <h1 id="pageTitle">แดชบอร์ด</h1>
           </div>
           <div class="top-actions">
+            <button class="soft-button auth-status-button" id="authButton" type="button">เชื่อม DB</button>
             <button class="icon-button" id="quickAddButton" type="button" title="บันทึกวันนี้" aria-label="บันทึกวันนี้">＋</button>
             <button class="icon-button" id="clearEntriesButton" type="button" title="ล้างค่าข้อมูล" aria-label="ล้างค่าข้อมูล">⌫</button>
             <button class="icon-button" id="clearTargetsButton" type="button" title="ล้างค่าเป้าหมาย" aria-label="ล้างค่าเป้าหมาย">◎</button>
@@ -105,6 +106,38 @@
       </form>
     </dialog>
 
+    <dialog id="authModal" class="modal">
+      <form method="dialog" class="modal-card" id="authForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Supabase sync</p>
+            <h2>เชื่อมฐานข้อมูล</h2>
+            <p class="modal-note" id="authDescription">เข้าสู่ระบบเพื่อบันทึกข้อมูลลง Supabase และ sync ข้ามอุปกรณ์</p>
+          </div>
+          <button class="icon-button" value="cancel" type="button" id="closeAuthButton" aria-label="ปิด">×</button>
+        </div>
+        <div class="form-grid auth-fields">
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" />
+          </label>
+        </div>
+        <p class="modal-note" id="authMessage"></p>
+        <div class="modal-actions">
+          <button class="ghost-button" type="button" id="signOutButton">ออกจากระบบ</button>
+          <div class="button-row">
+            <button class="ghost-button" type="button" id="signUpButton">สมัคร</button>
+            <button class="primary-button" type="submit">เข้าสู่ระบบ</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
   </body>
 </html>

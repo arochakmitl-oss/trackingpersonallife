@@ -10,6 +10,14 @@
 
 ไฟล์ `netlify.toml` ตั้งค่า publish directory ไว้แล้ว
 
+## Supabase
+
+แอปเชื่อม Supabase ด้วย public publishable key และใช้ email/password auth
+
+- ถ้ายังไม่ login: ข้อมูลอยู่ใน `localStorage`
+- ถ้า login แล้ว: ข้อมูล sync กับตาราง `daily_entries` และ `user_settings`
+- ถ้าเปิด email confirmation ใน Supabase ให้เพิ่ม Netlify URL ใน Auth redirect URLs
+
 ## Local Preview
 
 เปิด `index.html` ได้โดยตรง หรือรัน local server:

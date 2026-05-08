@@ -176,6 +176,9 @@ h3 {
 .top-actions {
   display: flex;
   gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .icon-button,
@@ -237,6 +240,14 @@ h3 {
   min-height: 34px;
   padding: 0 12px;
   font-size: 0.88rem;
+}
+
+.auth-status-button {
+  min-height: 42px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cover {
@@ -918,6 +929,11 @@ textarea:focus {
 
   .top-actions {
     flex-shrink: 0;
+  }
+
+  .auth-status-button {
+    max-width: 96px;
+    padding: 0 10px;
   }
 
   .day {

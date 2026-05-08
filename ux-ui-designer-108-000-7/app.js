@@ -1,4 +1,6 @@
 const STORAGE_KEY = "bloom-ux-life-tracker-v2";
+const SUPABASE_URL = "https://rxbipastbsfmxyyksdxm.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_N1cDxWxXCS8nlXS7iZg8DQ_gJNvboZz";
 const DEFAULT_SETTINGS = {
   debtTotal: 108000,
   waterDailyTarget: 8,
@@ -83,6 +85,9 @@ let calendarCursor = new Date();
 let modalCategory = "checkin";
 let settingGroup = "debt";
 let pendingConfirmAction = null;
+let supabaseClient = null;
+let currentUser = null;
+let isCloudLoading = false;
 
 const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
@@ -151,6 +156,96 @@ function settings() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function setAuthMessage(message, isError = false) {
+  const authMessage = $("#authMessage");
+  if (!authMessage) return;
+  authMessage.textContent = message || "";
+  authMessage.style.color = isError ? "#b94b62" : "";
+}
+
+function updateAuthUI() {
+  const authButton = $("#authButton");
+  if (!authButton) return;
+  if (isCloudLoading) {
+    authButton.textContent = "กำลัง sync...";
+    return;
+  }
+  authButton.textContent = currentUser ? `DB: ${currentUser.email}` : "เชื่อม DB";
+}
+
+async function initSupabase() {
+  if (!window.supabase?.createClient) {
+    setAuthMessage("โหลด Supabase client ไม่สำเร็จ ใช้ localStorage ชั่วคราว", true);
+    return;
+  }
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const { data } = await supabaseClient.auth.getSession();
+  currentUser = data.session?.user || null;
+  updateAuthUI();
+  if (currentUser) await loadCloudState();
+  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    currentUser = session?.user || null;
+    updateAuthUI();
+    if (currentUser) await loadCloudState();
+    render();
+  });
+}
+
+async function loadCloudState() {
+  if (!supabaseClient || !currentUser) return;
+  isCloudLoading = true;
+  updateAuthUI();
+  const [{ data: rows, error: entriesError }, { data: settingsRow, error: settingsError }] = await Promise.all([
+    supabaseClient.from("daily_entries").select("entry_date,data").eq("user_id", currentUser.id),
+    supabaseClient.from("user_settings").select("settings").eq("user_id", currentUser.id).maybeSingle()
+  ]);
+  isCloudLoading = false;
+  updateAuthUI();
+  if (entriesError || settingsError) {
+    setAuthMessage(entriesError?.message || settingsError?.message || "โหลดข้อมูลจาก DB ไม่สำเร็จ", true);
+    return;
+  }
+  state.entries = Object.fromEntries((rows || []).map((row) => [row.entry_date, row.data || {}]));
+  state.settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.settings || {}) };
+  saveState();
+  render();
+}
+
+async function syncEntry(iso) {
+  if (!supabaseClient || !currentUser) return;
+  const entry = state.entries[iso];
+  if (!entry) return;
+  const { error } = await supabaseClient.from("daily_entries").upsert({
+    user_id: currentUser.id,
+    entry_date: iso,
+    data: entry,
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id,entry_date" });
+  if (error) setAuthMessage(error.message, true);
+}
+
+async function deleteCloudEntry(iso) {
+  if (!supabaseClient || !currentUser) return;
+  const { error } = await supabaseClient.from("daily_entries").delete().eq("user_id", currentUser.id).eq("entry_date", iso);
+  if (error) setAuthMessage(error.message, true);
+}
+
+async function clearCloudEntries() {
+  if (!supabaseClient || !currentUser) return;
+  const { error } = await supabaseClient.from("daily_entries").delete().eq("user_id", currentUser.id);
+  if (error) setAuthMessage(error.message, true);
+}
+
+async function syncSettings() {
+  if (!supabaseClient || !currentUser) return;
+  const { error } = await supabaseClient.from("user_settings").upsert({
+    user_id: currentUser.id,
+    settings: settings(),
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id" });
+  if (error) setAuthMessage(error.message, true);
 }
 
 function toISO(date) {
@@ -796,6 +891,7 @@ function handleSubmit(event) {
 
   state.entries[selectedDate] = nextEntry;
   saveState();
+  syncEntry(selectedDate);
   $("#entryModal").close();
   render();
 }
@@ -896,6 +992,7 @@ function handleSettingSubmit(event) {
     settings()[field.key] = Number(data.get(field.key) || 0);
   });
   saveState();
+  syncSettings();
   $("#settingModal").close();
   render();
 }
@@ -906,6 +1003,7 @@ function resetSettingGroup() {
     settings()[field.key] = DEFAULT_SETTINGS[field.key];
   });
   saveState();
+  syncSettings();
   $("#settingModal").close();
   render();
 }
@@ -917,6 +1015,7 @@ function clearEntryData() {
     () => {
       state.entries = {};
       saveState();
+      clearCloudEntries();
       selectedDate = toISO(new Date());
       calendarCursor = new Date();
       render();
@@ -931,6 +1030,7 @@ function clearTargetValues() {
     () => {
       state.settings = Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((key) => [key, 0]));
       saveState();
+      syncSettings();
       render();
     }
   );
@@ -960,8 +1060,61 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
+function openAuthModal() {
+  setAuthMessage(currentUser ? `กำลังเชื่อมกับ ${currentUser.email}` : "ยังไม่ได้เข้าสู่ระบบ ข้อมูลจะอยู่ในเครื่องนี้จนกว่าจะ login");
+  $("#authModal").showModal();
+}
+
+async function handleAuthSubmit(event) {
+  event.preventDefault();
+  if (!supabaseClient) {
+    setAuthMessage("Supabase client ยังไม่พร้อม", true);
+    return;
+  }
+  const data = new FormData(event.currentTarget);
+  const email = (data.get("email") || "").trim();
+  const password = data.get("password") || "";
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    setAuthMessage(error.message, true);
+    return;
+  }
+  setAuthMessage("เข้าสู่ระบบสำเร็จ กำลังโหลดข้อมูลจาก DB...");
+}
+
+async function signUpUser() {
+  if (!supabaseClient) {
+    setAuthMessage("Supabase client ยังไม่พร้อม", true);
+    return;
+  }
+  const form = $("#authForm");
+  const data = new FormData(form);
+  const email = (data.get("email") || "").trim();
+  const password = data.get("password") || "";
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) {
+    setAuthMessage(error.message, true);
+    return;
+  }
+  setAuthMessage("สมัครแล้ว เช็กอีเมลเพื่อยืนยันบัญชี ถ้า Supabase ปิด confirm email จะ login ได้ทันที");
+}
+
+async function signOutUser() {
+  if (!supabaseClient) return;
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  setAuthMessage("ออกจากระบบแล้ว ข้อมูลใหม่จะบันทึกในเครื่องนี้");
+  $("#authModal").close();
+}
+
 $("#entryForm").addEventListener("submit", handleSubmit);
 $("#settingForm").addEventListener("submit", handleSettingSubmit);
+$("#authForm").addEventListener("submit", handleAuthSubmit);
+$("#authButton").addEventListener("click", openAuthModal);
+$("#closeAuthButton").addEventListener("click", () => $("#authModal").close());
+$("#signUpButton").addEventListener("click", signUpUser);
+$("#signOutButton").addEventListener("click", signOutUser);
 $("#quickAddButton").addEventListener("click", () => openEntryModal(activePage));
 $("#closeModalButton").addEventListener("click", () => $("#entryModal").close());
 $("#closeSettingButton").addEventListener("click", () => $("#settingModal").close());
@@ -971,6 +1124,7 @@ $("#resetSettingsButton").addEventListener("click", resetSettingGroup);
 $("#clearDayButton").addEventListener("click", () => {
   delete state.entries[selectedDate];
   saveState();
+  deleteCloudEntry(selectedDate);
   $("#entryModal").close();
   render();
 });
@@ -979,3 +1133,4 @@ $("#clearTargetsButton").addEventListener("click", clearTargetValues);
 $("#exportButton").addEventListener("click", exportData);
 
 render();
+initSupabase();
