@@ -463,50 +463,139 @@ h3 {
   align-items: stretch;
 }
 
-.balance-grid {
+.life-radar {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 14px;
+  grid-template-columns: minmax(230px, 0.9fr) minmax(260px, 1fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 12px;
 }
 
-.balance-ring-card {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  min-height: 116px;
-  padding: 14px;
-  border-radius: 22px;
+.radar-panel {
+  min-height: 310px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(255, 255, 255, 0.96), transparent 31%),
+    linear-gradient(145deg, rgba(255, 241, 215, 0.72), rgba(247, 216, 232, 0.72));
+}
+
+.radar-panel svg {
+  width: min(300px, 100%);
+  overflow: visible;
+}
+
+.radar-grid {
+  fill: rgba(255, 255, 255, 0.42);
+  stroke: rgba(128, 111, 123, 0.22);
+  stroke-width: 2;
+}
+
+.radar-grid.inner {
+  fill: transparent;
+}
+
+.radar-grid.faint {
+  stroke-dasharray: 5 7;
+}
+
+.radar-axis {
+  stroke: rgba(128, 111, 123, 0.25);
+  stroke-width: 2;
+}
+
+.radar-area {
+  fill: rgba(198, 178, 242, 0.38);
+  stroke: none;
+}
+
+.radar-line {
+  fill: none;
+  stroke: #9f84e8;
+  stroke-linejoin: round;
+  stroke-width: 5;
+}
+
+.radar-point {
+  fill: var(--point-color);
+  stroke: #fffaf7;
+  stroke-width: 4;
+}
+
+.radar-label {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  text-anchor: middle;
+}
+
+.radar-label.left {
+  text-anchor: start;
+}
+
+.radar-label.right {
+  text-anchor: end;
+}
+
+.radar-score {
+  position: absolute;
+  inset: auto auto 18px 18px;
+  display: grid;
+  gap: 0;
+  padding: 10px 13px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--soft-shadow);
+}
+
+.radar-score strong {
+  font-size: 1.38rem;
+}
+
+.radar-score span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.radar-metrics {
+  display: grid;
+  gap: 12px;
+}
+
+.radar-metric {
+  padding: 13px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.62);
 }
 
-.balance-ring {
-  flex: 0 0 72px;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: conic-gradient(#e874a8 var(--ring), #efe1e9 0);
-  position: relative;
+.radar-metric-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-weight: 900;
 }
 
-.balance-ring::before {
-  content: "";
-  position: absolute;
-  inset: 9px;
+.radar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #f0e1e8;
+  overflow: hidden;
+}
+
+.radar-track span {
+  display: block;
+  width: var(--metric);
+  height: 100%;
   border-radius: inherit;
-  background: #fffaf7;
+  background: linear-gradient(90deg, var(--metric-color), #fff1d7);
 }
 
-.balance-ring strong {
-  position: relative;
-  font-size: 1rem;
-}
-
-.balance-ring-card h3,
-.balance-ring-card p {
-  margin-bottom: 3px;
+.radar-metric p {
+  margin: 8px 0 0;
 }
 
 .debt-visual-card {
@@ -549,13 +638,15 @@ h3 {
 
 .trend-bars {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(var(--trend-count, 7), minmax(18px, 1fr));
   align-items: end;
   gap: 8px;
   height: 128px;
   margin-top: 20px;
   padding-top: 10px;
   border-top: 1px solid rgba(234, 221, 229, 0.8);
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .trend-bar-item {
@@ -583,19 +674,149 @@ h3 {
   font-size: 0.72rem;
 }
 
-.visual-summary .mini-summary {
-  position: relative;
-  overflow: hidden;
+.money-mix-layout {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.8fr) minmax(230px, 1fr) minmax(190px, 0.8fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
 }
 
-.visual-summary .mini-summary::before {
+.money-donut {
+  width: min(240px, 100%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  background: conic-gradient(var(--money-mix));
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.58);
+}
+
+.money-donut::before {
   content: "";
   position: absolute;
-  inset: auto 12px 10px 12px;
-  height: 5px;
+  inset: 24px;
+  border-radius: inherit;
+  background: #fffaf7;
+}
+
+.money-donut div {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.money-donut strong {
+  font-size: 1.8rem;
+}
+
+.money-legend,
+.money-insight {
+  display: grid;
+  gap: 10px;
+}
+
+.money-legend-item {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.language-layout {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.75fr) minmax(260px, 1fr) minmax(190px, 0.8fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.language-orbit {
+  width: min(230px, 100%);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background:
+    conic-gradient(from -90deg, #a9dcc5 0 var(--thai), #c6b2f2 var(--thai) calc(var(--thai) + var(--arabic)), #efe1e9 0),
+    radial-gradient(circle, #fffaf7 0 58%, transparent 59%);
+  box-shadow: var(--soft-shadow);
+}
+
+.language-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 28px;
+  border-radius: inherit;
+  background: #fffaf7;
+}
+
+.language-core {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.language-core strong {
+  font-size: 2rem;
+}
+
+.language-core span,
+.language-badge {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.language-badge {
+  position: absolute;
+  min-height: 32px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--pink), var(--lavender), var(--mint));
-  opacity: 0.75;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--soft-shadow);
+}
+
+.language-badge.thai {
+  top: 18px;
+  left: 18px;
+}
+
+.language-badge.arabic {
+  right: 18px;
+  bottom: 18px;
+}
+
+.language-progress,
+.language-stats {
+  display: grid;
+  gap: 12px;
+}
+
+.language-progress-item {
+  padding: 13px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.language-progress-item .bar span {
+  width: var(--language-progress);
+  background: linear-gradient(90deg, var(--language-color), #fff1d7);
 }
 
 .progress-item {
@@ -845,6 +1066,9 @@ textarea:focus {
   .grid.three,
   .grid.four,
   .trend-grid,
+  .life-radar,
+  .money-mix-layout,
+  .language-layout,
   .summary-band,
   .money-split,
   .form-grid {
@@ -941,8 +1165,8 @@ textarea:focus {
     font-size: 0.82rem;
   }
 
-  .balance-grid {
-    grid-template-columns: 1fr;
+  .radar-panel {
+    min-height: 270px;
   }
 
   .trend-card {

@@ -15,6 +15,8 @@ const DEFAULT_SETTINGS = {
   sideChannelMonthlyTarget: 3000,
   careerTargetDays: 20,
   skillTargetDays: 20,
+  languageDailyTarget: 20,
+  languageWeeklyTarget: 140,
   nonEssentialLimit: 6000,
   sweetDrinkLimit: 1200,
   trendExerciseTarget: 45,
@@ -74,6 +76,14 @@ const settingGroups = {
     title: "แก้ไขเป้าทักษะ",
     description: "ใช้กับ progress ของ skill UX/UI แต่ละหมวด",
     fields: [{ key: "skillTargetDays", label: "เป้าจำนวนวันต่อทักษะ", suffix: "วัน" }]
+  },
+  language: {
+    title: "แก้ไขเป้าฝึกภาษา",
+    description: "ใช้กับ dashboard ภาษาไทย/อาหรับ และ streak การฝึกภาษา",
+    fields: [
+      { key: "languageDailyTarget", label: "เป้าฝึกภาษาต่อวัน", suffix: "นาที" },
+      { key: "languageWeeklyTarget", label: "เป้าฝึกภาษาต่อสัปดาห์", suffix: "นาที" }
+    ]
   }
 };
 
@@ -92,7 +102,7 @@ let isCloudLoading = false;
 const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-const numericFields = ["water", "exercise", "sleep", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "sideIncome", "confidence"];
+const numericFields = ["water", "exercise", "sleep", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "sideIncome", "confidence", "thaiMinutes", "arabicMinutes"];
 
 const modalConfigs = {
   dashboard: {
@@ -129,6 +139,11 @@ const modalConfigs = {
     title: "บันทึกทักษะ & อาชีพ",
     description: "เลือกทักษะ UX/UI ที่ฝึกวันนี้และบันทึกความคืบหน้าของ portfolio/case study",
     fields: ["skills", "win"]
+  },
+  language: {
+    title: "บันทึกการฝึกภาษา",
+    description: "ติดตามเวลาฝึกภาษาไทยและอาหรับ พร้อมโฟกัสของรอบฝึกวันนี้",
+    fields: ["thaiMinutes", "arabicMinutes", "languageFocus", "win"]
   }
 };
 
@@ -290,8 +305,55 @@ function lastDays(count) {
   });
 }
 
+function trendPeriod() {
+  const selected = new Date(`${selectedDate}T00:00:00`);
+  if (filter === "year") {
+    const labels = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+    const entries = Array.from({ length: 12 }, (_, month) => {
+      const monthEntries = Object.entries(state.entries).filter(([iso]) => {
+        const day = new Date(`${iso}T00:00:00`);
+        return day.getFullYear() === selected.getFullYear() && day.getMonth() === month;
+      });
+      return [`${selected.getFullYear()}-${String(month + 1).padStart(2, "0")}`, mergeEntries(monthEntries), labels[month], `${labels[month]} ${selected.getFullYear()}`];
+    });
+    return { title: "แนวโน้มปีนี้", eyebrow: "Year trend", entries, mode: "month" };
+  }
+
+  if (filter === "month") {
+    const daysInMonth = new Date(selected.getFullYear(), selected.getMonth() + 1, 0).getDate();
+    const todayIso = toISO(selected);
+    const entries = Array.from({ length: daysInMonth }, (_, index) => {
+      const day = new Date(selected.getFullYear(), selected.getMonth(), index + 1);
+      const iso = toISO(day);
+      const entry = iso <= todayIso ? state.entries[iso] || {} : {};
+      return [iso, entry, String(index + 1), dateLabel(iso, "medium")];
+    });
+    return { title: "แนวโน้มเดือนนี้", eyebrow: "Month trend", entries, mode: "day" };
+  }
+
+  return {
+    title: "แนวโน้ม 7 วันล่าสุด",
+    eyebrow: "Week trend",
+    entries: lastDays(7).map(([iso, entry]) => [iso, entry, new Intl.DateTimeFormat("th-TH", { weekday: "short" }).format(new Date(`${iso}T00:00:00`)), dateLabel(iso, "medium")]),
+    mode: "day"
+  };
+}
+
+function mergeEntries(entries) {
+  return entries.reduce((merged, [, entry]) => {
+    numericFields.forEach((field) => {
+      merged[field] = Number(merged[field] || 0) + Number(entry[field] || 0);
+    });
+    return merged;
+  }, {});
+}
+
 function sum(entries, key) {
   return entries.reduce((total, [, entry]) => total + Number(entry[key] || 0), 0);
+}
+
+function languageTotal(entry) {
+  return Number(entry?.thaiMinutes || 0) + Number(entry?.arabicMinutes || 0);
 }
 
 function progressValue(value, target) {
@@ -374,7 +436,7 @@ function renderDashboard() {
   const debtPaid = sum(Object.entries(state.entries), "debtPaid");
   const sideIncome = sum(entries, "sideIncome");
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
-  const weekEntries = lastDays(7);
+  const trend = trendPeriod();
   const hasRangeData = entries.length > 0;
   const healthScore = average([
     progressValue(Number(today.water || 0), cfg.waterDailyTarget),
@@ -406,12 +468,12 @@ function renderDashboard() {
           </div>
           <button class="tiny-button" type="button" data-open-setting="dashboard">แก้เป้าหมาย</button>
         </div>
-        <div class="balance-grid">
-          ${balanceRing("สุขภาพ", healthScore, "น้ำ นอน ออกกำลัง")}
-          ${balanceRing("เงิน", moneyScore, "หนี้ + ค่าใช้จ่าย")}
-          ${balanceRing("รายได้เสริม", sideScore, `${money(sideIncome)} บาท`)}
-          ${balanceRing("อาชีพ", careerScore, "skill days")}
-        </div>
+        ${lifeRadarChart([
+          { key: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" },
+          { key: "money", label: "เงิน", score: moneyScore, note: "หนี้ + ค่าใช้จ่าย", color: "#ffc39d" },
+          { key: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" },
+          { key: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" }
+        ])}
       </div>
 
       <div class="card debt-visual-card">
@@ -447,25 +509,21 @@ function renderDashboard() {
     <div class="card">
       <div class="section-head">
         <div>
-          <p class="eyebrow">7-day trend</p>
-          <h2>แนวโน้ม 7 วันล่าสุด</h2>
+          <p class="eyebrow">${trend.eyebrow}</p>
+          <h2>${trend.title}</h2>
         </div>
-        <span class="pill">visual summary</span>
+        <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
       </div>
       <div class="trend-grid">
-        ${trendChart("น้ำ", "water", weekEntries, cfg.waterDailyTarget, "แก้ว")}
-        ${trendChart("ออกกำลังกาย", "exercise", weekEntries, cfg.trendExerciseTarget, "นาที")}
-        ${trendChart("รายจ่ายไม่จำเป็น", "nonEssential", weekEntries, cfg.trendNonEssentialLimit, "บาท", true)}
+        ${trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว")}
+        ${trendChart("ออกกำลังกาย", "exercise", trend.entries, cfg.trendExerciseTarget, "นาที")}
+        ${trendChart("รายจ่ายไม่จำเป็น", "nonEssential", trend.entries, cfg.trendNonEssentialLimit, "บาท", true)}
       </div>
     </div>
 
-    <div class="summary-band visual-summary">
-      ${miniSummary("รายรับ", `${money(sum(entries, "income"))} บาท`)}
-      ${miniSummary("รายจ่ายจำเป็น", `${money(sum(entries, "essential"))} บาท`)}
-      ${miniSummary("ไม่จำเป็น", `${money(sum(entries, "nonEssential"))} บาท`)}
-      ${miniSummary("น้ำหวาน", `${money(sum(entries, "sweetDrink"))} บาท`)}
-      ${miniSummary("รายได้เสริม", `${money(sideIncome)} บาท`)}
-    </div>
+    ${languageDashboard(entries)}
+
+    ${moneyMixChart(entries)}
   `;
 }
 
@@ -663,6 +721,9 @@ function renderHealth() {
 
 function renderSkills() {
   const cfg = settings();
+  const week = entriesInRange("week");
+  const thaiWeek = sum(week, "thaiMinutes");
+  const arabicWeek = sum(week, "arabicMinutes");
   return `
     <div class="grid three">
       ${skillNames.map((skill) => statCard(skill, `${countSkillDays(skill)} วัน`, "จำนวนวันที่ฝึกทั้งหมด")).join("")}
@@ -680,6 +741,23 @@ function renderSkills() {
       </div>
       <div class="progress-list">
         ${skillNames.map((skill) => renderProgress({ name: skill, type: `เป้าหมาย ${money(cfg.skillTargetDays)} วัน`, progress: countSkillDays(skill), target: cfg.skillTargetDays })).join("")}
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Language learning</p>
+          <h2>ฝึกภาษาไทย & อาหรับ</h2>
+        </div>
+        <div class="button-row">
+          <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
+          <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
+        </div>
+      </div>
+      <div class="progress-list">
+        ${renderProgress({ name: "ภาษาไทย", type: "สัปดาห์นี้", progress: thaiWeek, target: cfg.languageWeeklyTarget })}
+        ${renderProgress({ name: "ภาษาอาหรับ", type: "สัปดาห์นี้", progress: arabicWeek, target: cfg.languageWeeklyTarget })}
+        ${renderProgress({ name: "รวมการฝึกภาษา", type: `เป้ารวม ${money(cfg.languageWeeklyTarget)} นาที`, progress: thaiWeek + arabicWeek, target: cfg.languageWeeklyTarget })}
       </div>
     </div>
   `;
@@ -741,9 +819,11 @@ function renderDayDetail(iso) {
       <span class="pill">รายรับ ${money(entry.income)} บาท</span>
       <span class="pill">รายได้เสริม ${money(entry.sideIncome)} บาท</span>
       <span class="pill">จ่ายหนี้ ${money(entry.debtPaid)} บาท</span>
+      <span class="pill">ภาษา ${languageTotal(entry)} นาที</span>
     </div>
     <p style="margin:14px 0 0;"><strong>ชัยชนะเล็กๆ:</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
     <p class="muted" style="margin:8px 0 0;">ทักษะ: ${(entry.skills || []).join(", ") || "-"}</p>
+    <p class="muted" style="margin:8px 0 0;">ภาษา: ไทย ${Number(entry.thaiMinutes || 0)} นาที / อาหรับ ${Number(entry.arabicMinutes || 0)} นาที ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
   `;
 }
 
@@ -761,15 +841,172 @@ function miniSummary(label, value) {
   return `<div class="mini-summary"><span class="stat-label">${label}</span><strong class="stat-value">${value}</strong></div>`;
 }
 
-function balanceRing(label, percent, note) {
+function languageDashboard(entries) {
+  const cfg = settings();
+  const thai = sum(entries, "thaiMinutes");
+  const arabic = sum(entries, "arabicMinutes");
+  const total = thai + arabic;
+  const week = entriesInRange("week");
+  const weekTotal = sum(week, "thaiMinutes") + sum(week, "arabicMinutes");
+  const streak = currentStreak((entry) => languageTotal(entry) > 0);
+
   return `
-    <div class="balance-ring-card">
-      <div class="balance-ring" style="--ring:${percent}%">
-        <strong>${Math.round(percent)}%</strong>
+    <div class="card language-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Language practice</p>
+          <h2>ฝึกภาษาไทย & อาหรับ</h2>
+        </div>
+        <div class="button-row">
+          <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
+          <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
+        </div>
       </div>
-      <div>
-        <h3>${label}</h3>
-        <p class="muted">${note}</p>
+      <div class="language-layout">
+        <div class="language-orbit" style="--thai:${progressValue(thai, total || cfg.languageWeeklyTarget)}%;--arabic:${progressValue(arabic, total || cfg.languageWeeklyTarget)}%">
+          <div class="language-core">
+            <strong>${money(total)}</strong>
+            <span>นาที</span>
+          </div>
+          <span class="language-badge thai">ไทย</span>
+          <span class="language-badge arabic">عربي</span>
+        </div>
+        <div class="language-progress">
+          ${languageProgress("ไทย", thai, cfg.languageWeeklyTarget, "#a9dcc5")}
+          ${languageProgress("อาหรับ", arabic, cfg.languageWeeklyTarget, "#c6b2f2")}
+          ${languageProgress("รวมสัปดาห์นี้", weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
+        </div>
+        <div class="language-stats">
+          ${miniSummary("streak ภาษา", `${streak} วัน`)}
+          ${miniSummary("เป้าต่อวัน", `${money(cfg.languageDailyTarget)} นาที`)}
+          ${miniSummary("เป้าต่อสัปดาห์", `${money(cfg.languageWeeklyTarget)} นาที`)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function languageProgress(label, progress, target, color) {
+  const percent = progressValue(progress, target);
+  return `
+    <div class="language-progress-item" style="--language-color:${color};--language-progress:${percent}%">
+      <div class="progress-meta">
+        <span>${label}</span>
+        <span>${money(progress)} นาที</span>
+      </div>
+      <div class="bar"><span></span></div>
+    </div>
+  `;
+}
+
+function lifeRadarChart(items) {
+  const points = items.map((item, index) => radarPoint(index, clamp(item.score, 0, 100))).join(" ");
+  const averageScore = average(items.map((item) => item.score));
+  return `
+    <div class="life-radar">
+      <div class="radar-panel" aria-label="กราฟแมงมุมพลังชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
+        <svg viewBox="0 0 320 320" role="img" aria-hidden="true">
+          <polygon class="radar-grid" points="160,36 284,160 160,284 36,160" />
+          <polygon class="radar-grid inner" points="160,72 248,160 160,248 72,160" />
+          <polygon class="radar-grid inner faint" points="160,108 212,160 160,212 108,160" />
+          <line class="radar-axis" x1="160" y1="160" x2="160" y2="36" />
+          <line class="radar-axis" x1="160" y1="160" x2="284" y2="160" />
+          <line class="radar-axis" x1="160" y1="160" x2="160" y2="284" />
+          <line class="radar-axis" x1="160" y1="160" x2="36" y2="160" />
+          <polygon class="radar-area" points="${points}" />
+          <polyline class="radar-line" points="${points} ${points.split(" ")[0]}" />
+          ${items.map((item, index) => {
+            const point = radarPoint(index, clamp(item.score, 0, 100));
+            const [x, y] = point.split(",");
+            return `<circle class="radar-point" cx="${x}" cy="${y}" r="7" style="--point-color:${item.color}" />`;
+          }).join("")}
+          <text class="radar-label top" x="160" y="22">${items[0].label}</text>
+          <text class="radar-label right" x="296" y="166">${items[2].label}</text>
+          <text class="radar-label bottom" x="160" y="310">${items[3].label}</text>
+          <text class="radar-label left" x="24" y="166">${items[1].label}</text>
+        </svg>
+        <div class="radar-score">
+          <strong>${averageScore}%</strong>
+          <span>สมดุลรวม</span>
+        </div>
+      </div>
+      <div class="radar-metrics">
+        ${items.map((item) => `
+          <div class="radar-metric" style="--metric:${clamp(item.score, 0, 100)}%;--metric-color:${item.color}">
+            <div class="radar-metric-head">
+              <span>${item.label}</span>
+              <strong>${Math.round(item.score)}%</strong>
+            </div>
+            <div class="radar-track"><span></span></div>
+            <p class="muted">${item.note}</p>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function radarPoint(index, score) {
+  const center = 160;
+  const radius = 124 * (score / 100);
+  const angles = [-90, 180, 0, 90];
+  const angle = (angles[index] * Math.PI) / 180;
+  const x = Math.round(center + Math.cos(angle) * radius);
+  const y = Math.round(center + Math.sin(angle) * radius);
+  return `${x},${y}`;
+}
+
+function moneyMixChart(entries) {
+  const items = [
+    { label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
+    { label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
+    { label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
+    { label: "รายจ่ายไม่จำเป็น", value: sum(entries, "nonEssential"), color: "#f5a7c6" },
+    { label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8" }
+  ];
+  const total = items.reduce((amount, item) => amount + item.value, 0);
+  let cursor = 0;
+  const stops = items.map((item) => {
+    const start = cursor;
+    const size = total ? (item.value / total) * 100 : 0;
+    cursor += size;
+    return `${item.color} ${start}% ${cursor}%`;
+  }).join(", ");
+  const incomeTotal = items[0].value + items[1].value;
+  const expenseTotal = items[2].value + items[3].value + items[4].value;
+  const net = incomeTotal - expenseTotal;
+
+  return `
+    <div class="card money-mix-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Money mix</p>
+          <h2>สัดส่วนเงินในช่วงที่เลือก</h2>
+        </div>
+        <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
+      </div>
+      <div class="money-mix-layout">
+        <div class="money-donut" style="--money-mix:${total ? stops : "#efe1e9 0 100%"}">
+          <div>
+            <span class="muted">คงเหลือสุทธิ</span>
+            <strong>${money(net)}</strong>
+            <span class="muted">บาท</span>
+          </div>
+        </div>
+        <div class="money-legend">
+          ${items.map((item) => `
+            <div class="money-legend-item">
+              <span class="legend-dot" style="background:${item.color}"></span>
+              <span>${item.label}</span>
+              <strong>${money(item.value)} บาท</strong>
+            </div>
+          `).join("")}
+        </div>
+        <div class="money-insight">
+          ${miniSummary("เงินเข้า", `${money(incomeTotal)} บาท`)}
+          ${miniSummary("เงินออก", `${money(expenseTotal)} บาท`)}
+          ${miniSummary(net >= 0 ? "เหลือเก็บ" : "ติดลบ", `${money(Math.abs(net))} บาท`)}
+        </div>
       </div>
     </div>
   `;
@@ -777,14 +1014,13 @@ function balanceRing(label, percent, note) {
 
 function trendChart(label, key, entries, target, unit, inverse = false) {
   const maxValue = Math.max(target, ...entries.map(([, entry]) => Number(entry[key] || 0)));
-  const bars = entries.map(([iso, entry]) => {
+  const bars = entries.map(([iso, entry, labelText, tooltip]) => {
     const raw = Number(entry[key] || 0);
     const height = clamp((raw / Math.max(maxValue, 1)) * 100, raw > 0 ? 8 : 3, 100);
-    const day = new Intl.DateTimeFormat("th-TH", { weekday: "short" }).format(new Date(`${iso}T00:00:00`));
     return `
-      <div class="trend-bar-item" title="${dateLabel(iso, "medium")}: ${money(raw)} ${unit}">
+      <div class="trend-bar-item" title="${tooltip || iso}: ${money(raw)} ${unit}">
         <span class="trend-bar ${inverse ? "inverse" : ""}" style="height:${height}%"></span>
-        <small>${day}</small>
+        <small>${labelText || iso}</small>
       </div>
     `;
   }).join("");
@@ -798,7 +1034,7 @@ function trendChart(label, key, entries, target, unit, inverse = false) {
         </div>
         <span class="pill">${inverse ? "ยิ่งต่ำยิ่งดี" : "เป้าหมาย"}</span>
       </div>
-      <div class="trend-bars">${bars}</div>
+      <div class="trend-bars" style="--trend-count:${entries.length}">${bars}</div>
     </div>
   `;
 }
@@ -933,6 +1169,21 @@ function renderField(field) {
     sweetDrink: textInput("sweetDrink", "ค่าน้ำหวาน", "decimal"),
     debtPaid: textInput("debtPaid", "จ่ายหนี้วันนี้", "decimal"),
     sideIncome: textInput("sideIncome", "รายได้เสริม", "decimal"),
+    thaiMinutes: textInput("thaiMinutes", "ฝึกภาษาไทย (นาที)", "numeric", "[0-9]*"),
+    arabicMinutes: textInput("arabicMinutes", "ฝึกภาษาอาหรับ (นาที)", "numeric", "[0-9]*"),
+    languageFocus: `
+      <label>
+        โฟกัสการฝึก
+        <select name="languageFocus">
+          <option value="คำศัพท์">คำศัพท์</option>
+          <option value="อ่าน">อ่าน</option>
+          <option value="เขียน">เขียน</option>
+          <option value="ฟัง">ฟัง</option>
+          <option value="พูด">พูด</option>
+          <option value="ทบทวน">ทบทวน</option>
+        </select>
+      </label>
+    `,
     sideChannel: `
       <label>
         ช่องทางรายได้เสริม
