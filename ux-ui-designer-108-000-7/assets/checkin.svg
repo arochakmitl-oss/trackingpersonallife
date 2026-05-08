@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="ภาพปกเช็คอินวันนี้">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff1f5"/><stop offset=".5" stop-color="#fff2d7"/><stop offset="1" stop-color="#eef8f2"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#77576b" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <g filter="url(#s)">
+    <rect x="196" y="96" width="508" height="328" rx="38" fill="#fffaf7"/>
+    <rect x="252" y="150" width="120" height="120" rx="34" fill="#f5a7c6"/>
+    <rect x="398" y="150" width="252" height="26" rx="13" fill="#eadde5"/>
+    <rect x="398" y="198" width="190" height="26" rx="13" fill="#c6b2f2" opacity=".75"/>
+    <path d="M280 329l42 42 105-110" fill="none" stroke="#a9dcc5" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="456" y="310" width="194" height="30" rx="15" fill="#ffc39d"/>
+    <rect x="456" y="362" width="126" height="30" rx="15" fill="#eadde5"/>
+  </g>
+  <circle cx="748" cy="126" r="58" fill="#c6b2f2" opacity=".45"/>
+</svg>

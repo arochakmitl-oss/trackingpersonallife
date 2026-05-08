@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="ภาพปกเป้าหมาย">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f7f0ff"/><stop offset=".55" stop-color="#fff9f5"/><stop offset="1" stop-color="#ffe1cf"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#77576b" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <g filter="url(#s)">
+    <circle cx="454" cy="258" r="154" fill="#fffaf7"/>
+    <circle cx="454" cy="258" r="116" fill="none" stroke="#eadde5" stroke-width="34"/>
+    <path d="M454 142a116 116 0 0 1 109 156" fill="none" stroke="#9f84e8" stroke-width="34" stroke-linecap="round"/>
+    <circle cx="454" cy="258" r="54" fill="#ffc39d"/>
+    <path d="M444 258l-70-88M467 246l120-28" stroke="#352b34" stroke-width="16" stroke-linecap="round"/>
+  </g>
+  <rect x="112" y="352" width="190" height="52" rx="26" fill="#f5a7c6" opacity=".65"/>
+  <rect x="596" y="112" width="190" height="52" rx="26" fill="#a9dcc5" opacity=".65"/>
+</svg>

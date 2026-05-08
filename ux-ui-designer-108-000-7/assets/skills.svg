@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="ภาพปกทักษะและอาชีพ">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff9f5"/><stop offset=".52" stop-color="#f0ebff"/><stop offset="1" stop-color="#e7f6ef"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#77576b" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <g filter="url(#s)">
+    <rect x="128" y="116" width="644" height="304" rx="38" fill="#fffaf7"/>
+    <rect x="182" y="166" width="158" height="108" rx="24" fill="#c6b2f2"/>
+    <rect x="374" y="166" width="158" height="108" rx="24" fill="#ffc39d"/>
+    <rect x="566" y="166" width="158" height="108" rx="24" fill="#a9dcc5"/>
+    <rect x="182" y="322" width="542" height="26" rx="13" fill="#eadde5"/>
+    <rect x="182" y="366" width="330" height="26" rx="13" fill="#f5a7c6"/>
+    <path d="M252 222h18v-18h24v18h18v24h-18v18h-24v-18h-18z" fill="#fffaf7"/>
+    <path d="M426 226l30 30 48-62" fill="none" stroke="#fffaf7" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="645" cy="220" r="28" fill="#fffaf7"/>
+  </g>
+</svg>

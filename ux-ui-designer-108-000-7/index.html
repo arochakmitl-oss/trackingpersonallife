@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bloom UX Life Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-nav" aria-label="เมนูหลัก">
+        <div class="brand">
+          <span class="brand-mark">B</span>
+          <div>
+            <strong>Bloom UX</strong>
+            <small>Life Tracker</small>
+          </div>
+        </div>
+        <nav id="desktopNav" class="nav-list"></nav>
+        <button class="soft-button export-button" id="exportButton" type="button" aria-label="ส่งออกข้อมูล">
+          <span aria-hidden="true">⇩</span>
+          ส่งออกข้อมูล
+        </button>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="todayLabel"></p>
+            <h1 id="pageTitle">แดชบอร์ด</h1>
+          </div>
+          <div class="top-actions">
+            <button class="icon-button" id="quickAddButton" type="button" title="บันทึกวันนี้" aria-label="บันทึกวันนี้">＋</button>
+            <button class="icon-button" id="clearEntriesButton" type="button" title="ล้างค่าข้อมูล" aria-label="ล้างค่าข้อมูล">⌫</button>
+            <button class="icon-button" id="clearTargetsButton" type="button" title="ล้างค่าเป้าหมาย" aria-label="ล้างค่าเป้าหมาย">◎</button>
+          </div>
+        </header>
+
+        <section class="cover" id="pageCover">
+          <img id="coverImage" src="assets/dashboard.svg" alt="" />
+          <div>
+            <p id="pageKicker">ภาพรวมวันนี้</p>
+            <h2 id="coverTitle">ค่อยๆ โตอย่างมีทิศทาง</h2>
+            <blockquote id="pageQuote">ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง</blockquote>
+          </div>
+        </section>
+
+        <section id="pageContent" class="page-content"></section>
+      </main>
+
+      <nav id="mobileNav" class="bottom-nav" aria-label="เมนูมือถือ"></nav>
+    </div>
+
+    <dialog id="entryModal" class="modal">
+      <form method="dialog" class="modal-card" id="entryForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow" id="modalDateLabel"></p>
+            <h2 id="modalTitle">เช็คอินชีวิตวันนี้</h2>
+            <p class="modal-note" id="modalDescription"></p>
+          </div>
+          <button class="icon-button" value="cancel" type="button" id="closeModalButton" aria-label="ปิด">×</button>
+        </div>
+
+        <div id="modalFields"></div>
+
+        <div class="modal-actions">
+          <button class="ghost-button" type="button" id="clearDayButton">ล้างข้อมูลวันที่นี้</button>
+          <button class="primary-button" value="default" type="submit">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="settingModal" class="modal">
+      <form method="dialog" class="modal-card" id="settingForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">ค่าเป้าหมาย / ค่า fix</p>
+            <h2 id="settingTitle">แก้ไขค่า</h2>
+            <p class="modal-note" id="settingDescription"></p>
+          </div>
+          <button class="icon-button" value="cancel" type="button" id="closeSettingButton" aria-label="ปิด">×</button>
+        </div>
+        <div id="settingFields" class="form-grid"></div>
+        <div class="modal-actions">
+          <button class="ghost-button" type="button" id="resetSettingsButton">คืนค่าเริ่มต้น</button>
+          <button class="primary-button" value="default" type="submit">บันทึกค่า</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="confirmModal" class="modal confirm-modal">
+      <form method="dialog" class="modal-card">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">ยืนยันการล้างค่า</p>
+            <h2 id="confirmTitle">ล้างข้อมูล</h2>
+            <p class="modal-note" id="confirmDescription"></p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="ghost-button" type="button" id="cancelConfirmButton">ยกเลิก</button>
+          <button class="primary-button" type="button" id="confirmActionButton">ยืนยัน</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
