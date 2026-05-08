@@ -103,6 +103,34 @@ const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const numericFields = ["water", "exercise", "sleep", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "sideIncome", "confidence", "thaiMinutes", "arabicMinutes"];
+const categoryIcons = {
+  health: `<svg viewBox="0 0 24 24"><path class="fill" d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M9.3 15.4c1.1 1.5 3.2 2 4.9.9"/></svg>`,
+  money: `<svg viewBox="0 0 24 24"><rect class="fill" x="4" y="7" width="16" height="11" rx="3"/><path d="M5 7h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1Z"/><path d="M15 12h4v3h-4a1.5 1.5 0 0 1 0-3Z"/><path d="M7 7l8-3 2 3"/></svg>`,
+  side: `<svg viewBox="0 0 24 24"><path class="fill" d="M14 4c2.6.6 4.6 2.6 5.2 5.2l-4.7 4.7-4.4-4.4L14 4Z"/><path d="M14 4c2.6.6 4.6 2.6 5.2 5.2l-7.8 7.8-4.4-4.4L14 4Z"/><path d="M7 12.6 4.5 15 9 15"/><path d="M11.4 17 11.4 21.5 14 19"/><circle cx="15" cy="8.6" r="1.2"/></svg>`,
+  career: `<svg viewBox="0 0 24 24"><path class="fill" d="M5 19 7 13l9-9 4 4-9 9-6 2Z"/><path d="M5 19 7 13l9-9 4 4-9 9-6 2Z"/><path d="M14.5 5.5 18.5 9.5"/><path d="M7 13l4 4"/></svg>`,
+  language: `<svg viewBox="0 0 24 24"><circle class="fill" cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2 2.2 3 4.8 3 8s-1 5.8-3 8"/><path d="M12 4c-2 2.2-3 4.8-3 8s1 5.8 3 8"/></svg>`,
+  thai: "🇹🇭",
+  arabic: "ض",
+  mood: `<svg viewBox="0 0 24 24"><circle class="fill" cx="12" cy="12" r="8"/><path d="M8.5 10h.01"/><path d="M15.5 10h.01"/><path d="M8.8 14c1.5 1.7 4.9 1.7 6.4 0"/><circle cx="12" cy="12" r="8"/></svg>`,
+  win: `<svg viewBox="0 0 24 24"><path class="fill" d="m12 3 2.5 5.4 5.8.7-4.3 4 1.1 5.8-5.1-2.9-5.1 2.9L8 13.1l-4.3-4 5.8-.7L12 3Z"/><path d="m12 3 2.5 5.4 5.8.7-4.3 4 1.1 5.8-5.1-2.9-5.1 2.9L8 13.1l-4.3-4 5.8-.7L12 3Z"/></svg>`,
+  debt: `<svg viewBox="0 0 24 24"><circle class="fill" cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3"/><path d="M22 12h-3"/><path d="M12 22v-3"/><path d="M2 12h3"/></svg>`,
+  income: `<svg viewBox="0 0 24 24"><circle class="fill" cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>`,
+  expense: `<svg viewBox="0 0 24 24"><path class="fill" d="M7 4h10v16l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2V4Z"/><path d="M7 4h10v16l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2V4Z"/><path d="M9.5 9h5"/><path d="M9.5 13h4"/></svg>`,
+  sweet: `<svg viewBox="0 0 24 24"><path class="fill" d="M7 8h10l-1 12H8L7 8Z"/><path d="M7 8h10l-1 12H8L7 8Z"/><path d="M6 8h12"/><path d="M14 8l3-5"/><path d="M9 12h6"/></svg>`,
+  sleep: `<svg viewBox="0 0 24 24"><path class="fill" d="M18 16.4A8 8 0 0 1 7.6 6c.4-.6 1.2-.2 1.1.5-.5 4.2 3.1 7.8 7.3 7.3.7-.1 1.1.7.5 1.1Z"/><path d="M18 16.4A8 8 0 0 1 7.6 6c.4-.6 1.2-.2 1.1.5-.5 4.2 3.1 7.8 7.3 7.3.7-.1 1.1.7.5 1.1Z"/></svg>`,
+  exercise: `<svg viewBox="0 0 24 24"><path class="fill" d="M8 8h8v8H8z"/><path d="M5 9v6"/><path d="M19 9v6"/><path d="M8 12h8"/><path d="M3 11v2"/><path d="M21 11v2"/></svg>`,
+  confidence: `<svg viewBox="0 0 24 24"><path class="fill" d="M12 20s-7-4.5-8.2-9.3C3 7.3 5.2 5 8 5c1.7 0 3 1 4 2.2C13 6 14.3 5 16 5c2.8 0 5 2.3 4.2 5.7C19 15.5 12 20 12 20Z"/><path d="M12 20s-7-4.5-8.2-9.3C3 7.3 5.2 5 8 5c1.7 0 3 1 4 2.2C13 6 14.3 5 16 5c2.8 0 5 2.3 4.2 5.7C19 15.5 12 20 12 20Z"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24"><rect class="fill" x="4" y="5" width="16" height="15" rx="3"/><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M4 10h16"/></svg>`
+};
+
+function categoryIcon(key) {
+  const icon = categoryIcons[key] || categoryIcons.win;
+  return `<span class="category-icon category-icon-${key}" aria-hidden="true">${icon}</span>`;
+}
+
+function iconLabel(key, label) {
+  return `<span class="icon-label">${categoryIcon(key)}<span>${label}</span></span>`;
+}
 
 const modalConfigs = {
   dashboard: {
@@ -469,10 +497,10 @@ function renderDashboard() {
           <button class="tiny-button" type="button" data-open-setting="dashboard">แก้เป้าหมาย</button>
         </div>
         ${lifeRadarChart([
-          { key: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" },
-          { key: "money", label: "เงิน", score: moneyScore, note: "หนี้ + ค่าใช้จ่าย", color: "#ffc39d" },
-          { key: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" },
-          { key: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" }
+          { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" },
+          { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: "หนี้ + ค่าใช้จ่าย", color: "#ffc39d" },
+          { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" },
+          { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" }
         ])}
       </div>
 
@@ -580,9 +608,9 @@ function renderGoals() {
 function renderCheckin() {
   return `
     <div class="grid three">
-      ${statCard("เช็คอินต่อเนื่อง", `${currentStreak()} วัน`, "นับจากวันที่มีบันทึก")}
-      ${statCard("skincare streak", `${currentStreak((entry) => Number(entry?.confidence || 0) >= 6)} วัน`, "ใช้ความมั่นใจเป็น proxy")}
-      ${statCard("ชัยชนะวันนี้", getEntry().win || "ยังรอชัยชนะเล็กๆ", "คลิกบันทึกเพื่อเติมเรื่องดีๆ")}
+      ${statCard("🔥 เช็คอินต่อเนื่อง", `${currentStreak()} วัน`, "นับจากวันที่มีบันทึก")}
+      ${statCard("🔥 skincare streak", `${currentStreak((entry) => Number(entry?.confidence || 0) >= 6)} วัน`, "ใช้ความมั่นใจเป็น proxy")}
+      ${statCard(iconLabel("win", "ชัยชนะวันนี้"), getEntry().win || "ยังรอชัยชนะเล็กๆ", "คลิกบันทึกเพื่อเติมเรื่องดีๆ")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -693,16 +721,16 @@ function renderHealth() {
   const cfg = settings();
   return `
     <div class="grid four">
-      ${statCard("น้ำวันนี้", `${Number(entry.water || 0)}/${money(cfg.waterDailyTarget)}`, "แก้ว")}
-      ${statCard("นอน", `${Number(entry.sleep || 0)} ชม.`, `เป้าหมาย ${money(cfg.sleepTarget)} ชม.`)}
-      ${statCard("ออกกำลังกายสัปดาห์นี้", `${sum(week, "exercise")} นาที`, `เป้าหมาย ${money(cfg.exerciseWeeklyTarget)} นาที`)}
-      ${statCard("ความมั่นใจ", `${Number(entry.confidence || 0)}/${money(cfg.confidenceTarget)}`, "เช็คอินภาพรวมใจ")}
+      ${statCard(iconLabel("health", "น้ำวันนี้"), `${Number(entry.water || 0)}/${money(cfg.waterDailyTarget)}`, "แก้ว")}
+      ${statCard(iconLabel("sleep", "นอน"), `${Number(entry.sleep || 0)} ชม.`, `เป้าหมาย ${money(cfg.sleepTarget)} ชม.`)}
+      ${statCard(iconLabel("exercise", "ออกกำลังกายสัปดาห์นี้"), `${sum(week, "exercise")} นาที`, `เป้าหมาย ${money(cfg.exerciseWeeklyTarget)} นาที`)}
+      ${statCard(iconLabel("confidence", "ความมั่นใจ"), `${Number(entry.confidence || 0)}/${money(cfg.confidenceTarget)}`, "เช็คอินภาพรวมใจ")}
     </div>
     <div class="card">
       <div class="section-head">
         <div>
           <p class="eyebrow">Health & Beauty rhythm</p>
-          <h2>streak การดูแลตัวเอง</h2>
+          <h2>🔥 streak การดูแลตัวเอง</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="goals">แก้เป้าสุขภาพ</button>
@@ -747,7 +775,7 @@ function renderSkills() {
       <div class="section-head">
         <div>
           <p class="eyebrow">Language learning</p>
-          <h2>ฝึกภาษาไทย & อาหรับ</h2>
+          <h2>${iconLabel("language", "ฝึกภาษาไทย & อาหรับ")}</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
@@ -813,17 +841,17 @@ function renderDayDetail(iso) {
   if (!Object.keys(entry).length) return `<p class="muted">ยังไม่มีข้อมูลของวันที่นี้ กดบันทึกเพื่อเพิ่มย้อนหลังได้</p>`;
   return `
     <div class="day-detail">
-      <span class="pill">อารมณ์ ${entry.mood || "-"}</span>
-      <span class="pill">น้ำ ${Number(entry.water || 0)} แก้ว</span>
-      <span class="pill">ออกกำลัง ${Number(entry.exercise || 0)} นาที</span>
-      <span class="pill">รายรับ ${money(entry.income)} บาท</span>
-      <span class="pill">รายได้เสริม ${money(entry.sideIncome)} บาท</span>
-      <span class="pill">จ่ายหนี้ ${money(entry.debtPaid)} บาท</span>
-      <span class="pill">ภาษา ${languageTotal(entry)} นาที</span>
+      <span class="pill">${iconLabel("mood", `อารมณ์ ${entry.mood || "-"}`)}</span>
+      <span class="pill">${iconLabel("health", `น้ำ ${Number(entry.water || 0)} แก้ว`)}</span>
+      <span class="pill">${iconLabel("exercise", `ออกกำลัง ${Number(entry.exercise || 0)} นาที`)}</span>
+      <span class="pill">${iconLabel("income", `รายรับ ${money(entry.income)} บาท`)}</span>
+      <span class="pill">${iconLabel("side", `รายได้เสริม ${money(entry.sideIncome)} บาท`)}</span>
+      <span class="pill">${iconLabel("debt", `จ่ายหนี้ ${money(entry.debtPaid)} บาท`)}</span>
+      <span class="pill">${iconLabel("language", `ภาษา ${languageTotal(entry)} นาที`)}</span>
     </div>
-    <p style="margin:14px 0 0;"><strong>ชัยชนะเล็กๆ:</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
-    <p class="muted" style="margin:8px 0 0;">ทักษะ: ${(entry.skills || []).join(", ") || "-"}</p>
-    <p class="muted" style="margin:8px 0 0;">ภาษา: ไทย ${Number(entry.thaiMinutes || 0)} นาที / อาหรับ ${Number(entry.arabicMinutes || 0)} นาที ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
+    <p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
+    <p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>
+    <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${iconLabel("thai", `ไทย ${Number(entry.thaiMinutes || 0)} นาที`)} / ${iconLabel("arabic", `อาหรับ ${Number(entry.arabicMinutes || 0)} นาที`)} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
   `;
 }
 
@@ -868,18 +896,18 @@ function languageDashboard(entries) {
             <strong>${money(total)}</strong>
             <span>นาที</span>
           </div>
-          <span class="language-badge thai">ไทย</span>
-          <span class="language-badge arabic">عربي</span>
+          <span class="language-badge thai">${iconLabel("thai", "ไทย")}</span>
+          <span class="language-badge arabic">${iconLabel("arabic", "عربي")}</span>
         </div>
         <div class="language-progress">
-          ${languageProgress("ไทย", thai, cfg.languageWeeklyTarget, "#a9dcc5")}
-          ${languageProgress("อาหรับ", arabic, cfg.languageWeeklyTarget, "#c6b2f2")}
-          ${languageProgress("รวมสัปดาห์นี้", weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
+          ${languageProgress(iconLabel("thai", "ไทย"), thai, cfg.languageWeeklyTarget, "#a9dcc5")}
+          ${languageProgress(iconLabel("arabic", "อาหรับ"), arabic, cfg.languageWeeklyTarget, "#c6b2f2")}
+          ${languageProgress(iconLabel("language", "รวมสัปดาห์นี้"), weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
         </div>
         <div class="language-stats">
-          ${miniSummary("streak ภาษา", `${streak} วัน`)}
-          ${miniSummary("เป้าต่อวัน", `${money(cfg.languageDailyTarget)} นาที`)}
-          ${miniSummary("เป้าต่อสัปดาห์", `${money(cfg.languageWeeklyTarget)} นาที`)}
+          ${miniSummary("🔥 streak ภาษา", `${streak} วัน`)}
+          ${miniSummary(iconLabel("debt", "เป้าต่อวัน"), `${money(cfg.languageDailyTarget)} นาที`)}
+          ${miniSummary(iconLabel("calendar", "เป้าต่อสัปดาห์"), `${money(cfg.languageWeeklyTarget)} นาที`)}
         </div>
       </div>
     </div>
@@ -934,7 +962,7 @@ function lifeRadarChart(items) {
         ${items.map((item) => `
           <div class="radar-metric" style="--metric:${clamp(item.score, 0, 100)}%;--metric-color:${item.color}">
             <div class="radar-metric-head">
-              <span>${item.label}</span>
+              <span>${iconLabel(item.icon, item.label)}</span>
               <strong>${Math.round(item.score)}%</strong>
             </div>
             <div class="radar-track"><span></span></div>
@@ -958,11 +986,11 @@ function radarPoint(index, score) {
 
 function moneyMixChart(entries) {
   const items = [
-    { label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
-    { label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
-    { label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
-    { label: "รายจ่ายไม่จำเป็น", value: sum(entries, "nonEssential"), color: "#f5a7c6" },
-    { label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8" }
+    { icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
+    { icon: "side", label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
+    { icon: "expense", label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
+    { icon: "money", label: "รายจ่ายไม่จำเป็น", value: sum(entries, "nonEssential"), color: "#f5a7c6" },
+    { icon: "sweet", label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8" }
   ];
   const total = items.reduce((amount, item) => amount + item.value, 0);
   let cursor = 0;
@@ -997,15 +1025,15 @@ function moneyMixChart(entries) {
           ${items.map((item) => `
             <div class="money-legend-item">
               <span class="legend-dot" style="background:${item.color}"></span>
-              <span>${item.label}</span>
+              <span>${iconLabel(item.icon, item.label)}</span>
               <strong>${money(item.value)} บาท</strong>
             </div>
           `).join("")}
         </div>
         <div class="money-insight">
-          ${miniSummary("เงินเข้า", `${money(incomeTotal)} บาท`)}
-          ${miniSummary("เงินออก", `${money(expenseTotal)} บาท`)}
-          ${miniSummary(net >= 0 ? "เหลือเก็บ" : "ติดลบ", `${money(Math.abs(net))} บาท`)}
+          ${miniSummary(iconLabel("income", "เงินเข้า"), `${money(incomeTotal)} บาท`)}
+          ${miniSummary(iconLabel("expense", "เงินออก"), `${money(expenseTotal)} บาท`)}
+          ${miniSummary(iconLabel(net >= 0 ? "win" : "debt", net >= 0 ? "เหลือเก็บ" : "ติดลบ"), `${money(Math.abs(net))} บาท`)}
         </div>
       </div>
     </div>

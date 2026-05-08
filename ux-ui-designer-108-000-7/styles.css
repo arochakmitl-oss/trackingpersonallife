@@ -339,6 +339,106 @@ h3 {
   font-size: 0.9rem;
 }
 
+.icon-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  vertical-align: middle;
+}
+
+.category-icon {
+  --icon-color: #9f84e8;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 8px;
+  color: var(--icon-color);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: inset 0 0 0 1px rgba(108, 79, 99, 0.1);
+  font-size: 0.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.category-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.category-icon .fill {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0.16;
+}
+
+.category-icon text {
+  fill: currentColor;
+  stroke: none;
+  font-size: 8px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.category-icon-health,
+.category-icon-thai {
+  --icon-color: #4f9f80;
+}
+
+.category-icon-money,
+.category-icon-expense,
+.category-icon-sweet {
+  --icon-color: #d98658;
+}
+
+.category-icon-income {
+  --icon-color: #4caa84;
+}
+
+.category-icon-side,
+.category-icon-language,
+.category-icon-arabic,
+.category-icon-calendar {
+  --icon-color: #8d73d8;
+}
+
+.category-icon-thai {
+  background: transparent;
+  box-shadow: none;
+  font-size: 1rem;
+}
+
+.category-icon-arabic {
+  font-size: 0.95rem;
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+}
+
+.category-icon-career,
+.category-icon-mood,
+.category-icon-confidence,
+.category-icon-win {
+  --icon-color: #d96f9e;
+}
+
+.category-icon-debt {
+  --icon-color: #cc7b3f;
+}
+
+.stat-label .category-icon,
+.radar-metric-head .category-icon,
+.money-legend-item .category-icon,
+.language-progress-item .category-icon {
+  background: rgba(255, 255, 255, 0.88);
+}
+
 .chip-row,
 .segmented,
 .progress-list,
@@ -721,7 +821,7 @@ h3 {
 
 .money-legend-item {
   display: grid;
-  grid-template-columns: 14px 1fr auto;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   padding: 11px 12px;
@@ -784,8 +884,8 @@ h3 {
 .language-badge {
   position: absolute;
   min-height: 32px;
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
   padding: 0 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.86);
@@ -897,6 +997,7 @@ h3 {
 .pill {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   min-height: 30px;
   padding: 0 10px;
   border-radius: 999px;
@@ -904,6 +1005,19 @@ h3 {
   color: var(--muted);
   font-size: 0.85rem;
   font-weight: 800;
+}
+
+.pill .category-icon,
+.language-badge .category-icon {
+  width: 17px;
+  height: 17px;
+  border-radius: 7px;
+}
+
+.pill .category-icon svg,
+.language-badge .category-icon svg {
+  width: 14px;
+  height: 14px;
 }
 
 .timeline {
