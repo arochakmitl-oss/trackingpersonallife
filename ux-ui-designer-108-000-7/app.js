@@ -395,7 +395,7 @@ function getExpenseItems(entry = {}) {
       .filter((item) => item.amount > 0);
   }
   const fallback = [];
-  if (Number(entry.nonEssential || 0) > 0) fallback.push({ category: "กาแฟ", amount: Number(entry.nonEssential || 0) });
+  if (Number(entry.nonEssential || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.nonEssential || 0) });
   if (Number(entry.sweetDrink || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.sweetDrink || 0) });
   if (Number(entry.essential || 0) > 0) fallback.push({ category: "ข้าวเที่ยง", amount: Number(entry.essential || 0) });
   return fallback;
@@ -405,15 +405,16 @@ function expenseTotals(items = []) {
   return items.reduce((totals, item) => {
     const amount = Number(item.amount || 0);
     if (["ข้าวเที่ยง", "ข้าวเย็น", "ค่ารถ"].includes(item.category)) totals.essential += amount;
-    if (item.category === "กาแฟ") totals.nonEssential += amount;
-    if (item.category === "น้ำหวาน") totals.sweetDrink += amount;
+    if (item.category === "น้ำหวาน") {
+      totals.nonEssential += amount;
+      totals.sweetDrink += amount;
+    }
     return totals;
   }, { essential: 0, nonEssential: 0, sweetDrink: 0 });
 }
 
 function expenseTotal(entry = {}) {
-  const totals = expenseTotals(getExpenseItems(entry));
-  return totals.essential + totals.nonEssential + totals.sweetDrink;
+  return getExpenseItems(entry).reduce((total, item) => total + Number(item.amount || 0), 0);
 }
 
 function progressValue(value, target) {
@@ -1028,22 +1029,23 @@ function radarPoint(index, score) {
 
 function moneyMixChart(entries) {
   const items = [
-    { icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
-    { icon: "side", label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
-    { icon: "expense", label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
-    { icon: "money", label: "รายจ่ายไม่จำเป็น", value: sum(entries, "nonEssential"), color: "#f5a7c6" },
-    { icon: "sweet", label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8" }
+    { key: "income", icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
+    { key: "sideIncome", icon: "side", label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
+    { key: "essential", icon: "expense", label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
+    { key: "nonEssential", icon: "money", label: "รายจ่ายไม่จำเป็น", value: sum(entries, "nonEssential"), color: "#f5a7c6" },
+    { key: "sweetDrink", icon: "sweet", label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8", duplicateOf: "nonEssential" }
   ];
-  const total = items.reduce((amount, item) => amount + item.value, 0);
+  const visualItems = items.filter((item) => !item.duplicateOf);
+  const total = visualItems.reduce((amount, item) => amount + item.value, 0);
   let cursor = 0;
-  const stops = items.map((item) => {
+  const stops = visualItems.map((item) => {
     const start = cursor;
     const size = total ? (item.value / total) * 100 : 0;
     cursor += size;
     return `${item.color} ${start}% ${cursor}%`;
   }).join(", ");
   const incomeTotal = items[0].value + items[1].value;
-  const expenseTotal = items[2].value + items[3].value + items[4].value;
+  const expenseTotal = items[2].value + items[3].value;
   const net = incomeTotal - expenseTotal;
 
   return `
@@ -1297,7 +1299,7 @@ function renderField(field) {
 }
 
 function renderExpenseRows(items = getExpenseItems(getEntry())) {
-  const rows = items.length ? items : [{ category: "กาแฟ", amount: 0 }];
+  const rows = items.length ? items : [{ category: "น้ำหวาน", amount: 0 }];
   return `
     <section class="expense-editor wide-label">
       <div class="expense-editor-head">
@@ -1314,7 +1316,7 @@ function renderExpenseRows(items = getExpenseItems(getEntry())) {
   `;
 }
 
-function renderExpenseRow(item = { category: "กาแฟ", amount: 0 }) {
+function renderExpenseRow(item = { category: "น้ำหวาน", amount: 0 }) {
   return `
     <div class="expense-row">
       <label>
