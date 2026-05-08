@@ -1141,6 +1141,89 @@ textarea:focus {
   width: auto;
 }
 
+.expense-editor {
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.expense-editor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.expense-editor-head span,
+.expense-editor-head small {
+  display: block;
+}
+
+.expense-editor-head span {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.expense-editor-head small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.expense-rows {
+  display: grid;
+  gap: 10px;
+}
+
+.expense-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) 46px;
+  gap: 10px;
+  align-items: end;
+}
+
+.expense-remove {
+  width: 42px;
+  height: 42px;
+  box-shadow: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.expense-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+  transform: none;
+}
+
+.expense-list,
+.timeline-expenses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.expense-list span,
+.timeline-expenses span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.expense-list strong {
+  color: var(--ink);
+}
+
 .modal-actions {
   margin-top: 18px;
 }
@@ -1191,6 +1274,18 @@ textarea:focus {
 
   .debt-visual-card {
     grid-template-columns: 1fr;
+  }
+
+  .expense-editor-head {
+    display: grid;
+  }
+
+  .expense-row {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-remove {
+    width: 100%;
   }
 
   .dashboard-debt {

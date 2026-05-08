@@ -35,6 +35,7 @@ const pages = [
 
 const skillNames = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
 const channels = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
+const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ"];
 const settingGroups = {
   debt: {
     title: "แก้ไขค่าหนี้",
@@ -136,7 +137,7 @@ const modalConfigs = {
   dashboard: {
     title: "บันทึกภาพรวมวันนี้",
     description: "รวมข้อมูลสำคัญของวันเดียวในฟอร์มเดียว เหมาะกับการอัปเดตเร็วจาก dashboard",
-    fields: ["mood", "water", "exercise", "income", "essential", "debtPaid", "sideIncome", "win"]
+    fields: ["mood", "water", "exercise", "income", "expenseRows", "debtPaid", "sideIncome", "win"]
   },
   goals: {
     title: "อัปเดตเป้าหมาย",
@@ -146,12 +147,12 @@ const modalConfigs = {
   checkin: {
     title: "เช็คอินชีวิตวันนี้",
     description: "บันทึกความรู้สึก ค่าใช้จ่าย สุขภาพ ชัยชนะเล็กๆ และ streak ของวันนี้",
-    fields: ["mood", "water", "exercise", "sleep", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "sideIncome", "sideChannel", "confidence", "skills", "win"]
+    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "skills", "win"]
   },
   money: {
     title: "บันทึกเงิน & หนี้",
-    description: "แยกรายรับ รายจ่ายจำเป็น/ไม่จำเป็น ค่าน้ำหวาน และเงินที่จ่ายหนี้",
-    fields: ["income", "essential", "nonEssential", "sweetDrink", "debtPaid", "win"]
+    description: "แยกรายรับ รายจ่ายเป็นแถวตามหมวด และเงินที่จ่ายหนี้",
+    fields: ["income", "expenseRows", "debtPaid", "win"]
   },
   side: {
     title: "บันทึกรายได้เสริม",
@@ -382,6 +383,37 @@ function sum(entries, key) {
 
 function languageTotal(entry) {
   return Number(entry?.thaiMinutes || 0) + Number(entry?.arabicMinutes || 0);
+}
+
+function getExpenseItems(entry = {}) {
+  if (Array.isArray(entry.expenseItems) && entry.expenseItems.length) {
+    return entry.expenseItems
+      .map((item) => ({
+        category: expenseCategories.includes(item.category) ? item.category : expenseCategories[0],
+        amount: Number(item.amount || 0)
+      }))
+      .filter((item) => item.amount > 0);
+  }
+  const fallback = [];
+  if (Number(entry.nonEssential || 0) > 0) fallback.push({ category: "กาแฟ", amount: Number(entry.nonEssential || 0) });
+  if (Number(entry.sweetDrink || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.sweetDrink || 0) });
+  if (Number(entry.essential || 0) > 0) fallback.push({ category: "ข้าวเที่ยง", amount: Number(entry.essential || 0) });
+  return fallback;
+}
+
+function expenseTotals(items = []) {
+  return items.reduce((totals, item) => {
+    const amount = Number(item.amount || 0);
+    if (["ข้าวเที่ยง", "ข้าวเย็น", "ค่ารถ"].includes(item.category)) totals.essential += amount;
+    if (item.category === "กาแฟ") totals.nonEssential += amount;
+    if (item.category === "น้ำหวาน") totals.sweetDrink += amount;
+    return totals;
+  }, { essential: 0, nonEssential: 0, sweetDrink: 0 });
+}
+
+function expenseTotal(entry = {}) {
+  const totals = expenseTotals(getExpenseItems(entry));
+  return totals.essential + totals.nonEssential + totals.sweetDrink;
 }
 
 function progressValue(value, target) {
@@ -668,7 +700,8 @@ function renderMoney() {
       <div class="timeline">
         ${all.slice(-8).reverse().map(([iso, entry]) => `
           <div class="timeline-item">
-            <strong>${dateLabel(iso, "medium")}</strong> รายรับ ${money(entry.income)} / จำเป็น ${money(entry.essential)} / ไม่จำเป็น ${money(entry.nonEssential)} / น้ำหวาน ${money(entry.sweetDrink)} / จ่ายหนี้ ${money(entry.debtPaid)}
+            <strong>${dateLabel(iso, "medium")}</strong> รายรับ ${money(entry.income)} / รายจ่าย ${money(expenseTotal(entry))} / จ่ายหนี้ ${money(entry.debtPaid)}
+            ${getExpenseItems(entry).length ? `<div class="timeline-expenses">${getExpenseItems(entry).map((item) => `<span>${item.category} ${money(item.amount)}</span>`).join("")}</div>` : ""}
           </div>
         `).join("") || `<p class="muted">ยังไม่มีข้อมูลการเงิน</p>`}
       </div>
@@ -838,6 +871,7 @@ function dayIntensity(entry) {
 
 function renderDayDetail(iso) {
   const entry = getEntry(iso);
+  const expenses = getExpenseItems(entry);
   if (!Object.keys(entry).length) return `<p class="muted">ยังไม่มีข้อมูลของวันที่นี้ กดบันทึกเพื่อเพิ่มย้อนหลังได้</p>`;
   return `
     <div class="day-detail">
@@ -845,10 +879,18 @@ function renderDayDetail(iso) {
       <span class="pill">${iconLabel("health", `น้ำ ${Number(entry.water || 0)} แก้ว`)}</span>
       <span class="pill">${iconLabel("exercise", `ออกกำลัง ${Number(entry.exercise || 0)} นาที`)}</span>
       <span class="pill">${iconLabel("income", `รายรับ ${money(entry.income)} บาท`)}</span>
+      <span class="pill">${iconLabel("expense", `รายจ่าย ${money(expenseTotal(entry))} บาท`)}</span>
       <span class="pill">${iconLabel("side", `รายได้เสริม ${money(entry.sideIncome)} บาท`)}</span>
       <span class="pill">${iconLabel("debt", `จ่ายหนี้ ${money(entry.debtPaid)} บาท`)}</span>
       <span class="pill">${iconLabel("language", `ภาษา ${languageTotal(entry)} นาที`)}</span>
     </div>
+    ${expenses.length ? `
+      <div class="expense-list">
+        ${expenses.map((item) => `
+          <span>${item.category}<strong>${money(item.amount)} บาท</strong></span>
+        `).join("")}
+      </div>
+    ` : ""}
     <p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
     <p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>
     <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${iconLabel("thai", `ไทย ${Number(entry.thaiMinutes || 0)} นาที`)} / ${iconLabel("arabic", `อาหรับ ${Number(entry.arabicMinutes || 0)} นาที`)} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
@@ -1118,9 +1160,10 @@ function openEntryModal(category = activePage) {
   $("#modalTitle").textContent = config.title;
   $("#modalDescription").textContent = config.description;
   $("#modalFields").innerHTML = renderModalFields(config.fields);
+  bindExpenseRows();
   form.reset();
   Object.entries(entry).forEach(([key, value]) => {
-    if (key === "skills") return;
+    if (["skills", "expenseItems"].includes(key)) return;
     const input = form.elements[key];
     if (input) input.value = value;
   });
@@ -1140,6 +1183,20 @@ function handleSubmit(event) {
   config.fields.forEach((field) => {
     if (field === "skills") {
       nextEntry.skills = data.getAll("skills");
+      return;
+    }
+    if (field === "expenseRows") {
+      const categories = data.getAll("expenseCategory");
+      const amounts = data.getAll("expenseAmount");
+      const items = categories.map((category, index) => ({
+        category: expenseCategories.includes(category) ? category : expenseCategories[0],
+        amount: Number(amounts[index] || 0)
+      })).filter((item) => item.amount > 0);
+      const totals = expenseTotals(items);
+      nextEntry.expenseItems = items;
+      nextEntry.essential = totals.essential;
+      nextEntry.nonEssential = totals.nonEssential;
+      nextEntry.sweetDrink = totals.sweetDrink;
       return;
     }
     if (numericFields.includes(field)) {
@@ -1162,13 +1219,15 @@ function handleSubmit(event) {
 
 function renderModalFields(fields) {
   const fieldHTML = fields
-    .filter((field) => !["win", "skills"].includes(field))
+    .filter((field) => !["win", "skills", "expenseRows"].includes(field))
     .map(renderField)
     .join("");
+  const expenseHTML = fields.includes("expenseRows") ? renderField("expenseRows") : "";
   const winHTML = fields.includes("win") ? renderField("win") : "";
   const skillsHTML = fields.includes("skills") ? renderField("skills") : "";
   return `
     ${fieldHTML ? `<div class="form-grid">${fieldHTML}</div>` : ""}
+    ${expenseHTML}
     ${winHTML}
     ${skillsHTML}
   `;
@@ -1192,9 +1251,7 @@ function renderField(field) {
     exercise: textInput("exercise", "ออกกำลังกาย (นาที)", "numeric", "[0-9]*"),
     sleep: textInput("sleep", "นอน (ชั่วโมง)", "decimal"),
     income: textInput("income", "รายรับ", "decimal"),
-    essential: textInput("essential", "รายจ่ายจำเป็น", "decimal"),
-    nonEssential: textInput("nonEssential", "รายจ่ายไม่จำเป็น", "decimal"),
-    sweetDrink: textInput("sweetDrink", "ค่าน้ำหวาน", "decimal"),
+    expenseRows: renderExpenseRows(),
     debtPaid: textInput("debtPaid", "จ่ายหนี้วันนี้", "decimal"),
     sideIncome: textInput("sideIncome", "รายได้เสริม", "decimal"),
     thaiMinutes: textInput("thaiMinutes", "ฝึกภาษาไทย (นาที)", "numeric", "[0-9]*"),
@@ -1237,6 +1294,70 @@ function renderField(field) {
     `
   };
   return fields[field] || "";
+}
+
+function renderExpenseRows(items = getExpenseItems(getEntry())) {
+  const rows = items.length ? items : [{ category: "กาแฟ", amount: 0 }];
+  return `
+    <section class="expense-editor wide-label">
+      <div class="expense-editor-head">
+        <div>
+          <span>รายจ่ายเป็นรายการ</span>
+          <small>เลือกหมวดแล้วใส่จำนวนเงิน ระบบจะรวมให้ dashboard อัตโนมัติ</small>
+        </div>
+        <button class="tiny-button" type="button" data-add-expense-row>เพิ่มแถว</button>
+      </div>
+      <div class="expense-rows" data-expense-rows>
+        ${rows.map((item) => renderExpenseRow(item)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderExpenseRow(item = { category: "กาแฟ", amount: 0 }) {
+  return `
+    <div class="expense-row">
+      <label>
+        หมวดหมู่
+        <select name="expenseCategory">
+          ${expenseCategories.map((category) => `<option value="${category}" ${category === item.category ? "selected" : ""}>${category}</option>`).join("")}
+        </select>
+      </label>
+      <label>
+        จำนวนเงิน
+        <input name="expenseAmount" type="text" inputmode="decimal" value="${Number(item.amount || 0) || ""}" placeholder="0" />
+      </label>
+      <button class="icon-button expense-remove" type="button" data-remove-expense-row aria-label="ลบแถว">×</button>
+    </div>
+  `;
+}
+
+function bindExpenseRows() {
+  const rows = $("[data-expense-rows]");
+  if (!rows) return;
+  const syncRemoveButtons = () => {
+    const buttons = [...rows.querySelectorAll("[data-remove-expense-row]")];
+    buttons.forEach((button) => {
+      button.disabled = buttons.length <= 1;
+    });
+  };
+
+  const addButton = $("[data-add-expense-row]");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      rows.insertAdjacentHTML("beforeend", renderExpenseRow());
+      syncRemoveButtons();
+    });
+  }
+
+  rows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-expense-row]");
+    if (!button || rows.children.length <= 1) return;
+    button.closest(".expense-row").remove();
+    syncRemoveButtons();
+  });
+
+  syncRemoveButtons();
 }
 
 function textInput(name, label, inputMode, pattern = "") {
