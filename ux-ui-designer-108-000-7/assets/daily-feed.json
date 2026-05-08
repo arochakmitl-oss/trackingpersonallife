@@ -1,475 +1,1332 @@
 {
-  "updatedAt": "2026-05-08T18:34:17.950Z",
+  "updatedAt": "2026-05-08T18:40:32.031Z",
   "timezone": "Asia/Bangkok",
   "schedule": "Daily at 09:00 Asia/Bangkok",
   "items": [
     {
       "pageId": "dashboard",
+      "queryId": "energy-habit",
       "icon": "health",
-      "category": "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ",
+      "category": "habit hydration routine พลังงาน นิสัย สุขภาพ",
       "tags": [
         "habit",
-        "productivity",
-        "wellness",
+        "hydration",
+        "routine",
+        "พลังงาน",
         "นิสัย",
-        "ผลิตภาพ",
         "สุขภาพ"
       ],
-      "title": "Longevity ต้องเริ่มตั้งแต่ในห้องเรียน - ThaiPublica",
-      "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBWVmJwcDV4VEVHOGlFV0pVaXhJR3liTEJBOHFQTmdfT0FtR1RCazRXWVJoajFCQ0d5ekJ4aFFkMjRwSVBiRXpINUFXZ3FndXExLUlYSnpjYnBpVHEzWklGcEFaaDc?oc=5",
-      "source": "ThaiPublica",
-      "sourceUrl": "https://thaipublica.org",
-      "publishedAt": "Thu, 26 Feb 2026 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ habit productivity wellness นิสัย ผลิตภาพ สุขภาพ"
+      "title": "ผู้หญิง - ฉลองวันสตรีสากล 2026 ชวนผู้หญิงดูแลสุขภาพแบบ ‘GiveToGain’ - แนวหน้า",
+      "url": "https://news.google.com/rss/articles/CBMiSkFVX3lxTE5vQTk2LXhlTVVaTFA3cFF1SWR3blVwRHJOa20zVHhqRkVQbFZlaUhfVHJxOGd1eHc1aHdHTU5FXzlkZk9zMUlHNjB3?oc=5",
+      "source": "แนวหน้า",
+      "sourceUrl": "https://www.naewna.com",
+      "publishedAt": "Tue, 17 Mar 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ habit hydration routine พลังงาน นิสัย สุขภาพ"
     },
     {
       "pageId": "dashboard",
+      "queryId": "energy-habit",
       "icon": "health",
-      "category": "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ",
+      "category": "habit hydration routine พลังงาน นิสัย สุขภาพ",
       "tags": [
         "habit",
-        "productivity",
-        "wellness",
+        "hydration",
+        "routine",
+        "พลังงาน",
         "นิสัย",
-        "ผลิตภาพ",
         "สุขภาพ"
       ],
-      "title": "วันนี้เด็กไทยมีความสุขดีไหม? ฟังความคิด ตรวจสุขภาพใจเยาวชนเจเนอเรชันใหม่ - The101.world",
-      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5FU2JpTFdSVHlXTVZZVi1yU21Na20taTFocVVtWk1CVElRM0xyVVVPWjZuSXNxZ1hfNmhkZGFBTGk0UFhVaEdPeEI2NWlnVVB1aVhCR0dR?oc=5",
-      "source": "The101.world",
-      "sourceUrl": "https://www.the101.world",
-      "publishedAt": "Tue, 26 Aug 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ habit productivity wellness นิสัย ผลิตภาพ สุขภาพ"
+      "title": "กินน้ำตาลได้วันละกี่กรัม เช็กปริมาณที่เหมาะสมแต่ละช่วงวัย ลดเสี่ยงโรคร้าย - Thairath",
+      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE85Z3NSQ3Qwd19vbzdhd0c2eVA1M29HYzZkeUE4TjNlZGpQSktqVW1NaXA2U050ekhfelA5Z0lodEhHSC0wQlQ0QXB3S21HNFlNdTB6UXdya2RtZWVqb2pzUHRyV2VVUDVlb21uSVlaZw?oc=5",
+      "source": "Thairath",
+      "sourceUrl": "https://www.thairath.co.th",
+      "publishedAt": "Wed, 25 Mar 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ habit hydration routine พลังงาน นิสัย สุขภาพ"
     },
     {
       "pageId": "dashboard",
+      "queryId": "energy-habit",
       "icon": "health",
-      "category": "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ",
+      "category": "habit hydration routine พลังงาน นิสัย สุขภาพ",
       "tags": [
         "habit",
-        "productivity",
-        "wellness",
+        "hydration",
+        "routine",
+        "พลังงาน",
         "นิสัย",
-        "ผลิตภาพ",
         "สุขภาพ"
       ],
-      "title": "ความเครียดดันความสำเร็จ? กระตุ้นสมองเฉียบคม คิดไว อาชีพก้าวหน้า - bangkokbiznews",
-      "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE84RTljaDJEZXpRaS1ZcGRjYWZSUGlseWNTU2lkc3VzUm8ybVFZYXpQT01kRXhaNmxoTFVPeUt4bGFVejNzazVsT2lSaEtmNWVLMlp1SXRiNjVoVGg3?oc=5",
+      "title": "5 พฤติกรรมเล็กๆ ที่ช่วยให้สุขภาพดีขึ้นอย่างเห็นผล - กรมประชาสัมพันธ์",
+      "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5lR1ZqMk5IVHhjX1ZCcXEtUVZpMVUwQWxIcXA0VHFlcHFnQWk1OUFOTjJVOW5oODFfZlZIOHdCQ053UXlYOFpwVUlKWmc1TzFwMDVwcEdOMG9ZT1paSHhyMWcydFZaX0M0UkxNV3FZeXJRVjg?oc=5",
+      "source": "กรมประชาสัมพันธ์",
+      "sourceUrl": "https://www.prd.go.th",
+      "publishedAt": "Wed, 13 Aug 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ habit hydration routine พลังงาน นิสัย สุขภาพ"
+    },
+    {
+      "pageId": "dashboard",
+      "queryId": "energy-habit",
+      "icon": "health",
+      "category": "habit hydration routine พลังงาน นิสัย สุขภาพ",
+      "tags": [
+        "habit",
+        "hydration",
+        "routine",
+        "พลังงาน",
+        "นิสัย",
+        "สุขภาพ"
+      ],
+      "title": "ดื่มน้ำตอนท้องว่าง \"อันตรายกว่า\" งดอาหารเช้า จริงหรือ? เตือนชัด 3 น้ำพังกระเพาะ! - Sanook",
+      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE5yOGJ6VGNhd0dOMUFXdmtKT2M3a1NBb1JyU3IxQ2l3X0NISzRjSllwYW5MbnZxV09NVEgzeFhRMjMwMU1lalVXVXdSdG0?oc=5",
+      "source": "Sanook",
+      "sourceUrl": "https://www.sanook.com",
+      "publishedAt": "Fri, 12 Sep 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ habit hydration routine พลังงาน นิสัย สุขภาพ"
+    },
+    {
+      "pageId": "dashboard",
+      "queryId": "energy-habit",
+      "icon": "health",
+      "category": "habit hydration routine พลังงาน นิสัย สุขภาพ",
+      "tags": [
+        "habit",
+        "hydration",
+        "routine",
+        "พลังงาน",
+        "นิสัย",
+        "สุขภาพ"
+      ],
+      "title": "ปรับนิสัยเล็กๆ เปลี่ยนชีวิต | อาหารสมอง - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1PbWlmQlFxblkzbDc4R3dwdGl2SkpRQ1ozWmFORkc0bzZoY3E1MjZDazFRQmczVGVzc3ZVc2JXRWx5TXR6ODFUX190TVBNbDVQaVVaSERybHdKQQ?oc=5",
       "source": "bangkokbiznews",
       "sourceUrl": "https://www.bangkokbiznews.com",
-      "publishedAt": "Wed, 09 Jul 2025 07:55:29 GMT",
-      "reason": "อัปเดตสำหรับ habit productivity wellness นิสัย ผลิตภาพ สุขภาพ"
+      "publishedAt": "Tue, 20 Jan 2026 03:36:52 GMT",
+      "reason": "อัปเดตสำหรับ habit hydration routine พลังงาน นิสัย สุขภาพ"
     },
     {
       "pageId": "dashboard",
+      "queryId": "energy-habit",
       "icon": "health",
-      "category": "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ",
+      "category": "habit hydration routine พลังงาน นิสัย สุขภาพ",
       "tags": [
         "habit",
-        "productivity",
-        "wellness",
+        "hydration",
+        "routine",
+        "พลังงาน",
         "นิสัย",
-        "ผลิตภาพ",
         "สุขภาพ"
       ],
-      "title": "PMAT โชว์วิสัยทัศน์ เดินหน้า 3 P ฉลองครบ 60 ปี ผนึก 3 บิ๊กเนม เพิ่มศักยภาพ-สุขภาวะคนทำงาน - ผู้จัดการออนไลน์",
-      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE04WFhIRU9pdnQ0TWlXempid2EtS1hmbkhfRF9hQmVma0lyUF9LelZFN0EtSnd5bnc5VDZPR2thWWtyRnJFTDAzT2RYemZ0WTlPTDM0b0RES1dJTFU1UzJiTjJucw?oc=5",
-      "source": "ผู้จัดการออนไลน์",
-      "sourceUrl": "https://mgronline.com",
-      "publishedAt": "Thu, 14 Aug 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ habit productivity wellness นิสัย ผลิตภาพ สุขภาพ"
+      "title": "รวมเครื่องดื่ม 0 แคลอรี่ ไม่มีน้ำตาล แต่มีรสหวานจากสารสกัดธรรมชาติ - Vogue Thailand",
+      "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1aV2Vmemc4TzVBR253VUlRYklxSl9EVkQ5WmZlQWVBQnM5eHFBWjFYby1JOFR2elNsbGVSZnBaU0VUcVZzZUV3dUFqeUJ2dUNPczdvMHNzd1Via2xEN2xtbURSUGU?oc=5",
+      "source": "Vogue Thailand",
+      "sourceUrl": "https://vogue.co.th",
+      "publishedAt": "Thu, 15 Jan 2026 13:21:55 GMT",
+      "reason": "อัปเดตสำหรับ habit hydration routine พลังงาน นิสัย สุขภาพ"
     },
     {
       "pageId": "dashboard",
-      "icon": "health",
-      "category": "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ",
+      "queryId": "money-system",
+      "icon": "money",
+      "category": "money system debt spending การเงิน หนี้ รายจ่าย",
       "tags": [
-        "habit",
-        "productivity",
-        "wellness",
-        "นิสัย",
-        "ผลิตภาพ",
-        "สุขภาพ"
+        "money",
+        "system",
+        "debt",
+        "spending",
+        "การเงิน",
+        "หนี้",
+        "รายจ่าย"
       ],
-      "title": "เมื่อ Productivity ท็อกซิกไป จะนิยามความสำเร็จใหม่ยังไงดี - Brand Inside",
-      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1iVU1Pblg5blFaYkpVdkZ6WVcwbFotS29jOF9VMkpfV0VZV09wTWdQODhpd0Q4VXhlN0pYMlJJQjJUWGE5V0hKZXNsSE1GemJPaUh4cnY1d09RTE5BdVBhQnpKVkpNQlBIU0ZFWUR1LXp2cjBGcW5pZV9YT3Jrdw?oc=5",
-      "source": "Brand Inside",
-      "sourceUrl": "https://brandinside.asia",
-      "publishedAt": "Wed, 20 Sep 2023 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ habit productivity wellness นิสัย ผลิตภาพ สุขภาพ"
+      "title": "ธปท. เปิดข้อมูลคนไทยก่อหนี้ไว-เป็นหนี้ยาว ห่วงบริการ \"ซื้อก่อนผ่อนทีหลัง\" สร้างหนี้โดยไม่จำเป็น - สำนักข่าวอินโฟเควสท์",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9DcDYtRnZIR3ZPZXp5NE5QOWp6ZmZ3M2g5YllrdjdlcjZ5V25JYWlEZW41SDhDRVkwc2J5aHVMbGFlMThxaEF5ZUZDMDE0WUdu?oc=5",
+      "source": "สำนักข่าวอินโฟเควสท์",
+      "sourceUrl": "https://www.infoquest.co.th",
+      "publishedAt": "Fri, 08 May 2026 09:01:36 GMT",
+      "reason": "อัปเดตสำหรับ money system debt spending การเงิน หนี้ รายจ่าย"
     },
     {
       "pageId": "dashboard",
-      "icon": "health",
-      "category": "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ",
+      "queryId": "money-system",
+      "icon": "money",
+      "category": "money system debt spending การเงิน หนี้ รายจ่าย",
       "tags": [
-        "habit",
-        "productivity",
-        "wellness",
-        "นิสัย",
-        "ผลิตภาพ",
-        "สุขภาพ"
+        "money",
+        "system",
+        "debt",
+        "spending",
+        "การเงิน",
+        "หนี้",
+        "รายจ่าย"
       ],
-      "title": "ถอดบทเรียน Work-from-Home ช่วงโควิด-19 สู่การทำงานที่ยืดหยุ่นในอนาคต - krungsri.com",
-      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOWkZtdE9KYmJDZEtBVWhOTUJ0VmtPS0NRVzVDLXI2VEladGdvS2RWOVotcE4zX002c0d1WDZPUnhDSURzLW0xX2RFeHZmZ3BweGpyaGtsYmJmalNnRFRYWVZIY2tSN1dZdWZIWF9QckFDLWxEdmc4emdMSld3S2k4Rll3?oc=5",
+      "title": "สงกรานต์จบ เงินในกระเป๋าก็หมด เปิด Financial First Aid กู้ซากการเงิน 15 วัน หลังเทศกาลต้องรอด! - Thairath",
+      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOZG1MLU1lTTY2Tkx6NEg1TjZMVzFSU1pMbk5jYTJTRkZ4WXJta18za2JYYUl1N3haSGsxTHhkenQ4ZU1ORmxBTmVGX3Jzc3VONU5WU3pmcURQVWpUMkJCejZiakZjMkhqV2JqOXEyNHZPdGlEbFpWY09rSmE5d0JmaEN3?oc=5",
+      "source": "Thairath",
+      "sourceUrl": "https://www.thairath.co.th",
+      "publishedAt": "Wed, 15 Apr 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ money system debt spending การเงิน หนี้ รายจ่าย"
+    },
+    {
+      "pageId": "dashboard",
+      "queryId": "money-system",
+      "icon": "money",
+      "category": "money system debt spending การเงิน หนี้ รายจ่าย",
+      "tags": [
+        "money",
+        "system",
+        "debt",
+        "spending",
+        "การเงิน",
+        "หนี้",
+        "รายจ่าย"
+      ],
+      "title": "ทางรอดแก้หนี้ธุรกิจ SMEs ฝ่ามรสุมเศรษฐกิจ พิชิตปัญหาหนี้ - krungsri.com",
+      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQbE5xT1hBMjg3dGl5YmpRQjFDOXZYN3RxdzB2blZjdXVQMUpwUjllbDh1RDdlRlVoQzNIU0lLbmxZTVBNOS1fbTliN0pKa19JbTQ4Y2JOZ2VNSXdlWDZoRHVMcWhjQmJYTTZheWtYNkhKTjZ1LVQ0NTZmbnRzTEtlWWpCTm9sXy1BRnh2U01YSGlzLWRVQUNoaHdXQQ?oc=5",
       "source": "krungsri.com",
       "sourceUrl": "https://www.krungsri.com",
-      "publishedAt": "Tue, 16 Aug 2022 00:46:53 GMT",
-      "reason": "อัปเดตสำหรับ habit productivity wellness นิสัย ผลิตภาพ สุขภาพ"
+      "publishedAt": "Thu, 25 Sep 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ money system debt spending การเงิน หนี้ รายจ่าย"
+    },
+    {
+      "pageId": "dashboard",
+      "queryId": "money-system",
+      "icon": "money",
+      "category": "money system debt spending การเงิน หนี้ รายจ่าย",
+      "tags": [
+        "money",
+        "system",
+        "debt",
+        "spending",
+        "การเงิน",
+        "หนี้",
+        "รายจ่าย"
+      ],
+      "title": "นโยบายแก้หนี้สะดุด เมื่อคนรายได้ไม่พอรายจ่าย - Policy Watch Thai PBS",
+      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE40TXM1U3FyWk5WNVdQZmx2dl9wTnFNSlhXSUdDbWphc0N3cUwwT25oT19ZUm9wUHVWbnBtYkM1aXFLU2V2QjZETmNCWXhwRUtndGx2ZVNQb0JoWFdSNFBaYTh3?oc=5",
+      "source": "Policy Watch Thai PBS",
+      "sourceUrl": "https://policywatch.thaipbs.or.th",
+      "publishedAt": "Wed, 24 Dec 2025 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ money system debt spending การเงิน หนี้ รายจ่าย"
+    },
+    {
+      "pageId": "dashboard",
+      "queryId": "money-system",
+      "icon": "money",
+      "category": "money system debt spending การเงิน หนี้ รายจ่าย",
+      "tags": [
+        "money",
+        "system",
+        "debt",
+        "spending",
+        "การเงิน",
+        "หนี้",
+        "รายจ่าย"
+      ],
+      "title": "จบปัญหาการเงิน ให้ใจโล่ง 5 วิธีจัดการ “หนี้ - รายจ่าย” ที่ทำให้หลับสบายขึ้นทันที | Thairath Money - LINE TODAY",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5VY3BWS0dQb3Jxa0hMRlJqeUh5ZFNTbWdWZ1RWRlk2TGNyMEtXSEZxbEp5V0htaXlXUlB0bE1JVzQ5eVhiN1dxd2RUU2lPQmlEWFRUTzln?oc=5",
+      "source": "LINE TODAY",
+      "sourceUrl": "https://today.line.me",
+      "publishedAt": "Tue, 19 Aug 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ money system debt spending การเงิน หนี้ รายจ่าย"
+    },
+    {
+      "pageId": "dashboard",
+      "queryId": "money-system",
+      "icon": "money",
+      "category": "money system debt spending การเงิน หนี้ รายจ่าย",
+      "tags": [
+        "money",
+        "system",
+        "debt",
+        "spending",
+        "การเงิน",
+        "หนี้",
+        "รายจ่าย"
+      ],
+      "title": "‘อนุทิน’อัด 6 หมื่นล้านฟื้นเศรษฐกิจ ชง ‘ครม.’ เคาะโอนงบ ทำคนละครึ่ง - พักหนี้ - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5KQ0pqV0RLd0tJTkJ2dGFYdW50TmhPVDVzZTdOd19rMHpZUWN6Q1dlTnFDU2RodHpabHAyeXRrUHkzekR0YVQ0anVxRnFscTgxVTJJa3haejNLaEN2d3RwRW9aU0xXcEU?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Mon, 29 Sep 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ money system debt spending การเงิน หนี้ รายจ่าย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "weekly-planning",
+      "icon": "calendar",
+      "category": "weekly planning goals วางแผน เป้าหมาย",
+      "tags": [
+        "weekly",
+        "planning",
+        "goals",
+        "วางแผน",
+        "เป้าหมาย"
+      ],
+      "title": "ปีใหม่ต้องปัง!…เริ่มต้นปีด้วยเป้าหมายการเงินที่ใคร ๆ ก็ทำได้ - มิติหุ้น | ชี้ชัดทุกการลงทุน - มิติหุ้น",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE1nUlZOY3JQcGdob2laTWxjZDNJSXhKSWJIcFZHSHVJOG5fbE16X2RkVVN6S1FWQUlBYTlLSjhFQjJqNXFYUTFvVkxITWZmcGM2MkltQmV3?oc=5",
+      "source": "มิติหุ้น",
+      "sourceUrl": "https://www.mitihoon.com",
+      "publishedAt": "Thu, 08 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ weekly planning goals วางแผน เป้าหมาย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "weekly-planning",
+      "icon": "calendar",
+      "category": "weekly planning goals วางแผน เป้าหมาย",
+      "tags": [
+        "weekly",
+        "planning",
+        "goals",
+        "วางแผน",
+        "เป้าหมาย"
+      ],
+      "title": "ทำงาน Full-time ก็เรียนต่อได้! แชร์เทคนิคเรียนปริญญาโทที่ SPU สู่ความสำเร็จแบบ Work-Life-Study Balance - spu.ac.th",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOR1pCZHJBN2w3Qkc3bTFsd2pVaG1Db1ZRZU95aGdtTkZUN2tEWmpBLVotay1Dc0dIUWNWMEEwRkFmSEkyNjhEa1puUGJ5UWFxY1p6Y3A4blhtOXd4cFlWRXQxak5tczlvdVlkQjgzb1JQYnJKc09LNW9zc2lqRTRtZkxHM05raW5QN2E1S2tSRW5sT2o3NHNSR1BmYk5KYzQ?oc=5",
+      "source": "spu.ac.th",
+      "sourceUrl": "https://www.spu.ac.th",
+      "publishedAt": "Mon, 26 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ weekly planning goals วางแผน เป้าหมาย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "weekly-planning",
+      "icon": "calendar",
+      "category": "weekly planning goals วางแผน เป้าหมาย",
+      "tags": [
+        "weekly",
+        "planning",
+        "goals",
+        "วางแผน",
+        "เป้าหมาย"
+      ],
+      "title": "ปฏิทินการเงินปี 2569 12 เดือน 12 ภารกิจ พิชิต “อิสรภาพทางการเงิน” | Thairath Money - LINE TODAY",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5WZEdxZzNMSnRMODdpTHA0TTdUV3ZIakVsX1cxS3lCbEx3dFFaN3JwQ0ZIM0ExUGRlUG9MRVhXMWNPeVVkVlZYeG5hUnVVT0hoLWVEbWpR?oc=5",
+      "source": "LINE TODAY",
+      "sourceUrl": "https://today.line.me",
+      "publishedAt": "Sat, 03 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ weekly planning goals วางแผน เป้าหมาย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "weekly-planning",
+      "icon": "calendar",
+      "category": "weekly planning goals วางแผน เป้าหมาย",
+      "tags": [
+        "weekly",
+        "planning",
+        "goals",
+        "วางแผน",
+        "เป้าหมาย"
+      ],
+      "title": "ปีใหม่อยากมีเงินเก็บ เริ่มให้ถูกทาง 5 เคล็ดลับวางแผนการเงินที่ควรรู้ - springnews",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5MMnRVUEVRWVQyb2J2VURNaTlLWGJZVVd5OUVJLW9YX3NHaXpmNDlnRUhVX1NrUzVIY25UN3dzNlhTTUJBNkwxU2tQRkx6dkIxME41d1NtODEtUW9qZmU5eUczb2VJendT?oc=5",
+      "source": "springnews",
+      "sourceUrl": "https://www.springnews.co.th",
+      "publishedAt": "Thu, 15 Jan 2026 05:22:01 GMT",
+      "reason": "อัปเดตสำหรับ weekly planning goals วางแผน เป้าหมาย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "weekly-planning",
+      "icon": "calendar",
+      "category": "weekly planning goals วางแผน เป้าหมาย",
+      "tags": [
+        "weekly",
+        "planning",
+        "goals",
+        "วางแผน",
+        "เป้าหมาย"
+      ],
+      "title": "บอกลาเวอร์ชั่นเก่า เปิดสเต็ปลงทุนสุขภาพกาย-ใจให้ปังรับปี 2569 - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFB0UV9CcU05WUZYaThEY2pQZkJZWVlhZVpES1lac2VZZTJqbmVEdi0yTEhJS01NZ3BObS01eVlCRkZPSVdBNXMwdDdxQmszUEFuRktXUGcteGNWbUdXYkhqVHRUWXdkb1k?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Sun, 28 Dec 2025 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ weekly planning goals วางแผน เป้าหมาย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "weekly-planning",
+      "icon": "calendar",
+      "category": "weekly planning goals วางแผน เป้าหมาย",
+      "tags": [
+        "weekly",
+        "planning",
+        "goals",
+        "วางแผน",
+        "เป้าหมาย"
+      ],
+      "title": "แนะวิธี SMART Goal ทำอย่างไรตั้งเป้าหมายการเงินให้สำเร็จ - thansettakij",
+      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE5hNVUzQUE1ZVViYzN1Q0pDZV8yM0ZqUVk1TENPZXRvckQxNWk5bG9xemJha1hvak9lUkRqeXloQ1hnRUprM2RGVWU0YU5HczNKSkpIX0hlc0VaMTJpVlVPT1RNZ1JwZw?oc=5",
+      "source": "thansettakij",
+      "sourceUrl": "https://www.thansettakij.com",
+      "publishedAt": "Sat, 04 Oct 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ weekly planning goals วางแผน เป้าหมาย"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "short-workout",
+      "icon": "exercise",
+      "category": "short workout fitness exercise ออกกำลังกายสั้น",
+      "tags": [
+        "short",
+        "workout",
+        "fitness",
+        "exercise",
+        "ออกกำลังกายสั้น"
+      ],
+      "title": "ลดน้ำหนักต้นปีแบบคนไม่มีเวลา ทำความรู้จักเทรนด์ใหม่ \"Micro Workout\" - krungsri.com",
+      "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE4tZktHUFRId3BoalM3MlQ1aHIxNnZudm9fS2lJdFFMejRBeFltdGtBMGRUcEFLRlFXMVFjMkxRbVVJeUphYlg4RDNDQThuQVFvdWdjQ2FTUzNnSEE5VHlVczBhXzVqc19fZVVxblJ2N3hTTFUtQ1FLZGdYcFA?oc=5",
+      "source": "krungsri.com",
+      "sourceUrl": "https://www.krungsri.com",
+      "publishedAt": "Sun, 07 Dec 2025 21:31:08 GMT",
+      "reason": "อัปเดตสำหรับ short workout fitness exercise ออกกำลังกายสั้น"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "short-workout",
+      "icon": "exercise",
+      "category": "short workout fitness exercise ออกกำลังกายสั้น",
+      "tags": [
+        "short",
+        "workout",
+        "fitness",
+        "exercise",
+        "ออกกำลังกายสั้น"
+      ],
+      "title": "วิจัยเผย การออกกำลังกายที่ \"สโตรก\" กลัวที่สุด! แค่วันละ 10 นาที ลดเสียงอัมพาตได้เยอะ! - Sanook",
+      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE9CaVV6Z1VPZ0lhOS1xNjZ2MmJBMktEZWdyTUpuZFpzV1NLVFFtR3RmZWh1LXJZeF94X1ZDQVhBdFNGWXBXRHk3a0tfUzE?oc=5",
+      "source": "Sanook",
+      "sourceUrl": "https://www.sanook.com",
+      "publishedAt": "Thu, 23 Apr 2026 03:20:55 GMT",
+      "reason": "อัปเดตสำหรับ short workout fitness exercise ออกกำลังกายสั้น"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "short-workout",
+      "icon": "exercise",
+      "category": "short workout fitness exercise ออกกำลังกายสั้น",
+      "tags": [
+        "short",
+        "workout",
+        "fitness",
+        "exercise",
+        "ออกกำลังกายสั้น"
+      ],
+      "title": "เตือนสายเฮลตี้ แอโรบิค ต่อครั้งนานเกินไป ไม่ใช่เรื่องดี - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTE91TExWMjdnVW9BZ0tZTjViRWI2MkMtTE0ta1M3cFkxS2MwS2xESDEwSDRiaVBUdUxudFQ0N2tiRnU5RXFpZ3NrQjFnbWt0SC1nd0U3NG9vYTd1RGlmaEs2ai1OaGdpOVhoMDRN?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Sat, 11 Apr 2026 05:43:49 GMT",
+      "reason": "อัปเดตสำหรับ short workout fitness exercise ออกกำลังกายสั้น"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "short-workout",
+      "icon": "exercise",
+      "category": "short workout fitness exercise ออกกำลังกายสั้น",
+      "tags": [
+        "short",
+        "workout",
+        "fitness",
+        "exercise",
+        "ออกกำลังกายสั้น"
+      ],
+      "title": "เดินเร็วเป็นเวลา 10 นาที: วิทยาศาสตร์ค้นพบผลลัพธ์ที่น่าทึ่ง - Vietnam.vn",
+      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPS2NVRXR6dFA3TlRUR1h5UGJ5NFBSUFNCR3dQTmdzSTlxVzROMUgxSFRZSkZzR1RuSGRpVlhtU24yUTAyZEszMHhCMEpDSV83a1ZsMURhcTNQWGlmYlNMOTVKR1AteTEzeFFiSl9KcGlFUTFhRW5hZ0ZrSnlLSjh4cXI0QQ?oc=5",
+      "source": "Vietnam.vn",
+      "sourceUrl": "https://www.vietnam.vn",
+      "publishedAt": "Sat, 21 Mar 2026 00:09:17 GMT",
+      "reason": "อัปเดตสำหรับ short workout fitness exercise ออกกำลังกายสั้น"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "short-workout",
+      "icon": "exercise",
+      "category": "short workout fitness exercise ออกกำลังกายสั้น",
+      "tags": [
+        "short",
+        "workout",
+        "fitness",
+        "exercise",
+        "ออกกำลังกายสั้น"
+      ],
+      "title": "สวนลุมฯ ฟีเวอร์! แอโรบิกเวอร์ชัน 2026 จากลานออกกำลังกายสู่เฟสติวัลกลางกรุงที่สายคอนเทนต์ห้ามพลาด - LINE TODAY",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBkdWJ2aG51UG51b2RuT2tBaERjZlBtRGsyak9BcHB4c1JvS2swUnMxRHhOTWNFZWtUcG15QnVMQnVCM1lCRVdtRDdOdVRuOFBjb1lXOVBn?oc=5",
+      "source": "LINE TODAY",
+      "sourceUrl": "https://today.line.me",
+      "publishedAt": "Fri, 10 Apr 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ short workout fitness exercise ออกกำลังกายสั้น"
+    },
+    {
+      "pageId": "goals",
+      "queryId": "short-workout",
+      "icon": "exercise",
+      "category": "short workout fitness exercise ออกกำลังกายสั้น",
+      "tags": [
+        "short",
+        "workout",
+        "fitness",
+        "exercise",
+        "ออกกำลังกายสั้น"
+      ],
+      "title": "Go Hotel กรุงเทพ โรงแรมเปิดใหม่ ใกล้สนามบินสุวรรณภูมิ แค่ 10 นาที - TrueID",
+      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBpYUhBT2cxZFpYUTVkZUhyZ2JTM3I1SGtkekZpZUtoQjlXRTcwaFg5b0YtQWVJS2d1YnU4MHBYZ01sWnlfelpCQnliRW5GM1Zsdk1ydE5vcVA?oc=5",
+      "source": "TrueID",
+      "sourceUrl": "https://travel.trueid.net",
+      "publishedAt": "Tue, 03 Feb 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ short workout fitness exercise ออกกำลังกายสั้น"
+    },
+    {
+      "pageId": "checkin",
+      "queryId": "small-wins",
+      "icon": "win",
+      "category": "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ",
+      "tags": [
+        "small",
+        "wins",
+        "motivation",
+        "ชัยชนะเล็กๆ",
+        "แรงจูงใจ"
+      ],
+      "title": "เมืองแบบไหนคือเมืองในฝันของคนชอบวิ่งคุยกับ Cruise Control Run Club ถึงรูปแบบเมืองและกิจกรรมที่ชักชวนคนออกมาพบปะกัน - Urban Creature",
+      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1FVXJiNFlIdTNtSUlHbUphRE9lSjU0MmtmYTB2MUVUdVRiSlYzS3BBV29GM3laQTdhU1pnTEdjclMwSWFVZ3EwMTJ0RjBxc0lRQXZpQko5UnFDOEZnRXc?oc=5",
+      "source": "Urban Creature",
+      "sourceUrl": "https://urbancreature.co",
+      "publishedAt": "Tue, 26 Aug 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ small wins motivation ชัยชนะเล็กๆ แรงจูงใจ"
+    },
+    {
+      "pageId": "checkin",
+      "queryId": "small-wins",
+      "icon": "win",
+      "category": "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ",
+      "tags": [
+        "small",
+        "wins",
+        "motivation",
+        "ชัยชนะเล็กๆ",
+        "แรงจูงใจ"
+      ],
+      "title": "ONE Championship : \"นาดากะ\" ขอโชว์มวยไทยเร้าใจแบบ \"รถถัง\" หวังขึ้นนั่งบัลลังก์ในบ้านเกิด - Ch7.com",
+      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE5lUFBXemxTS1hzeVFRR3NHQWoyeG9OR2dLUElrTk1UY1NWQ0lHaGxUWVVHOFVqNkhxVnN5dEVMakJNLS01Qm1xRElfNmNyWDk0dzFLTGRERlZRbEdNYWc?oc=5",
+      "source": "Ch7.com",
+      "sourceUrl": "https://www.ch7.com",
+      "publishedAt": "Wed, 01 Oct 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ small wins motivation ชัยชนะเล็กๆ แรงจูงใจ"
+    },
+    {
+      "pageId": "checkin",
+      "queryId": "small-wins",
+      "icon": "win",
+      "category": "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ",
+      "tags": [
+        "small",
+        "wins",
+        "motivation",
+        "ชัยชนะเล็กๆ",
+        "แรงจูงใจ"
+      ],
+      "title": "ทีมหมดไฟ? วิจัยชี้ 5 วิธีหัวหน้าที่ดีต้องทำ ฟื้นทีมรอด ชนะอุปสรรค - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE1ma1R4TE5aQzdzU3g1R2w4OTFPdUhpVFhic2VkRWRJZDlfMEFoajJCVk4xcG9WUjlZNU5jejd3NDZZZWY3QkF2SnN3Mmg1dUVzdnhNSEowOUk5SGdL?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Thu, 14 Aug 2025 08:51:03 GMT",
+      "reason": "อัปเดตสำหรับ small wins motivation ชัยชนะเล็กๆ แรงจูงใจ"
+    },
+    {
+      "pageId": "checkin",
+      "queryId": "small-wins",
+      "icon": "win",
+      "category": "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ",
+      "tags": [
+        "small",
+        "wins",
+        "motivation",
+        "ชัยชนะเล็กๆ",
+        "แรงจูงใจ"
+      ],
+      "title": "10 ไอเดียสร้าง Small Wins ที่เราอยากให้คุณเอาชนะตัวเองให้ได้ทุกวัน - thestandard.co",
+      "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE96bzlITGNqbXhfRFd2bGJLZGgxdkJvS2w1TS1QWmZna2NyTkZxaTE5ZzZGYXpvV2xvVWNoSkQtX0JRMDZnelZEdTJDelY5Zw?oc=5",
+      "source": "thestandard.co",
+      "sourceUrl": "https://thestandard.co",
+      "publishedAt": "Fri, 21 Jan 2022 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ small wins motivation ชัยชนะเล็กๆ แรงจูงใจ"
+    },
+    {
+      "pageId": "checkin",
+      "queryId": "small-wins",
+      "icon": "win",
+      "category": "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ",
+      "tags": [
+        "small",
+        "wins",
+        "motivation",
+        "ชัยชนะเล็กๆ",
+        "แรงจูงใจ"
+      ],
+      "title": "เล็กพริกขี้หนู “จูเนียร์” เล็งยึดไร้พ่ายไฟต์ที่ 5 สกัดความไวคู่ชกซามูไร “มาซามิ” - ONE Championship",
+      "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQUUlsY2xmZk1WTzB1SlNrRENqZFhHWk1mbGdQM2p1bm5sZV96bjlBRlVuektBSlc2M3NSUVJYdC05bHdPUkIwRUh3ckRtYU5Sa0JBUmZ5T2RMLU9CY1pKQTVhUEpmREVuVDBJVWRBUnYyQzJiV1lHYTl3WnhxZndHbmF6bXV4NFhTWEpsYldscmlQT0UzRWJyTGhzVlZQdDhmeU13SHh1ZlpKQTQ?oc=5",
+      "source": "ONE Championship",
+      "sourceUrl": "https://www.onefc.com",
+      "publishedAt": "Mon, 22 Apr 2024 08:00:33 GMT",
+      "reason": "อัปเดตสำหรับ small wins motivation ชัยชนะเล็กๆ แรงจูงใจ"
+    },
+    {
+      "pageId": "checkin",
+      "queryId": "small-wins",
+      "icon": "win",
+      "category": "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ",
+      "tags": [
+        "small",
+        "wins",
+        "motivation",
+        "ชัยชนะเล็กๆ",
+        "แรงจูงใจ"
+      ],
+      "title": "15 เป้าหมายปีใหม่ 2568 New Year's Resolution 2025 เรื่องความสัมพันธ์ - Sanook",
+      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE45Q01ZRTZ6MGp2WUc1STFrci10MlVMVC1HZENlVFlfUVc1TDFkc251dFhhSGR2bEdyTi1mOFA5RHVqMTBwRGF1Vi04SFo?oc=5",
+      "source": "Sanook",
+      "sourceUrl": "https://www.sanook.com",
+      "publishedAt": "Thu, 19 Dec 2024 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ small wins motivation ชัยชนะเล็กๆ แรงจูงใจ"
     },
     {
       "pageId": "money",
-      "icon": "money",
-      "category": "debt budget saving spending หนี้ ออมเงิน การเงิน",
+      "queryId": "impulse-spending",
+      "icon": "sweet",
+      "category": "impulse spending sugar budget น้ำหวาน รายจ่ายไม่จำเป็น",
+      "tags": [
+        "impulse",
+        "spending",
+        "sugar",
+        "budget",
+        "น้ำหวาน",
+        "รายจ่ายไม่จำเป็น"
+      ],
+      "title": "สงกรานต์ปีนี้ เคทีซีแนะวางแผนการใช้จ่ายดี ความสุขไม่สะดุด - ข่าวสด",
+      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBaa09xMkZnVU92UUk3VmgwdjJoU2RlRHItZVZsS3hGUWc3S0dzZGsxa0NMTEUtNTBSOXBJeGZNamltU1VwSHJnVUNYV1lJQ0poOHNnazNaZFlLbHdFSE94VldEZnl3R2daMzhfcG9Za3k?oc=5",
+      "source": "ข่าวสด",
+      "sourceUrl": "https://www.khaosod.co.th",
+      "publishedAt": "Wed, 08 Apr 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ impulse spending sugar budget น้ำหวาน รายจ่ายไม่จำเป็น"
+    },
+    {
+      "pageId": "money",
+      "queryId": "debt-payoff",
+      "icon": "debt",
+      "category": "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน",
       "tags": [
         "debt",
-        "budget",
-        "saving",
-        "spending",
+        "payoff",
         "หนี้",
-        "ออมเงิน",
-        "การเงิน"
+        "ปิดหนี้",
+        "วางแผนการเงิน"
       ],
       "title": "วิธีเช็กสุขภาพการเงินรับปี 2569 การเงินมั่นคง มีเงินใช้ยาว ๆ - krungsri.com",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNd0pucGI4OVBEWFVZSVR2bWpHX2xOcnZ3QlVkSGp4b3ZTdEt5SEdqZWRELURLUG5pRzBXa05URUpMQzgxNV9pWGdqaDVKX2Q2cmNnM1RnVHZzOEtQQVM5U0hGQk9fYUprZC1QeHBwUnp5UFdsS2wzcUsteHZadjdGcEhWejhMbk9VTGoxYUJDcEcxZEdSblpSYTA4VWw?oc=5",
       "source": "krungsri.com",
       "sourceUrl": "https://www.krungsri.com",
       "publishedAt": "Mon, 12 Jan 2026 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ debt budget saving spending หนี้ ออมเงิน การเงิน"
+      "reason": "อัปเดตสำหรับ debt payoff หนี้ ปิดหนี้ วางแผนการเงิน"
     },
     {
       "pageId": "money",
-      "icon": "money",
-      "category": "debt budget saving spending หนี้ ออมเงิน การเงิน",
+      "queryId": "debt-payoff",
+      "icon": "debt",
+      "category": "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน",
       "tags": [
         "debt",
-        "budget",
-        "saving",
-        "spending",
+        "payoff",
         "หนี้",
-        "ออมเงิน",
-        "การเงิน"
+        "ปิดหนี้",
+        "วางแผนการเงิน"
       ],
-      "title": "การเงินของคนไทยก้าวไปถึงไหน? เปิดผลสำรวจทักษะทางการเงิน ระดับการออม และการใช้บริการทางการเงินของคนไทย ปี 2567 - bot.or.th",
-      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNTTF3UjFfU2oyYVhzN2U4RjYwVUFuRnllQ0xjeTNUVml5ZmRpeFppUkxWVnhwWEl6Q0xZd2RYd2lsUk04eGpmRXU4TEFDOENrd0xibDAxencteVY4QTJlM2x6eWYwaGR4MG5VdkVUMGRWUzFPYThLRUdCaXNVeVhfNjRrZGRGZDI1U2JiM0JEZEI1ZF85cE1jdlNEUVJoQ1FyeW9nR0tNdWo3YllHMHRULW0xbjdHSTNtQWEzQ0dqSDhCN281OHJOYVZ4U1QwdWF0TkpZ?oc=5",
-      "source": "bot.or.th",
-      "sourceUrl": "https://www.bot.or.th",
-      "publishedAt": "Fri, 06 Mar 2026 05:30:10 GMT",
-      "reason": "อัปเดตสำหรับ debt budget saving spending หนี้ ออมเงิน การเงิน"
+      "title": "คนไทยหนี้ล้น! ทีทีบี เผย มนุษย์เงินเดือนรายได้เกินแสนยังเหนื่อย เพราะ 32% ยังใช้เงินเดือนชนเดือน | Thairath Money - LINE TODAY",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE82YVZYTHNNdmsxVFlnZWg2UmdFSW5oeDN0a2FqdHlLajI5NG9HTTJPX1RyQm55Rk5xOGdvLVgtSnI5bVlxSl9uLXZBVTlNSWpkRlV1bVRn?oc=5",
+      "source": "LINE TODAY",
+      "sourceUrl": "https://today.line.me",
+      "publishedAt": "Tue, 21 Oct 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ debt payoff หนี้ ปิดหนี้ วางแผนการเงิน"
     },
     {
       "pageId": "money",
-      "icon": "money",
-      "category": "debt budget saving spending หนี้ ออมเงิน การเงิน",
+      "queryId": "debt-payoff",
+      "icon": "debt",
+      "category": "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน",
       "tags": [
         "debt",
-        "budget",
-        "saving",
-        "spending",
+        "payoff",
         "หนี้",
-        "ออมเงิน",
-        "การเงิน"
+        "ปิดหนี้",
+        "วางแผนการเงิน"
       ],
-      "title": "คนไทยหนี้ล้น! ทีทีบี เผย มนุษย์เงินเดือนรายได้เกินแสนยังเหนื่อย เพราะ 32% ยังใช้เงินเดือนชนเดือน - Thairath",
-      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQTG0wNEZtWnpRUDk1YlFfZ1c0dTNLb2NDbWxPRk92WDczeG1PdUZfV3hGSXVQZS1WLTV0QldzYXhwWEI5REVIVVlCNk1oLTRsdHBrWXhNdDNBZE9tTlJqMjBJeVg3MEhwOGhVTUJES29kbmRScmFlVFJrSGY2WkNyalB3?oc=5",
+      "title": "จัดการเงินให้อยู่มือ! จุฬาฯ - ธปท. เปิดวิชาใหม่สอนแก้หนี้ “วางแผนการเงิน” นิสิต คนทั่วไปลงเรียนฟรี - Thairath",
+      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxNNmtpOWZuU1pmWUhkamZJZEVTN1lQSGRwRTFLY3ZiUEx0WkV2RjlkcHF1Tmd1bTBuTFlCcngxV3RaMDl6VnpNc2l1eVdKX0FtY2Z1bEI0ckpUd0ZQaHRwakpwTThUeUR2cWR6dVQ3VFRZdTNKSi1NNzYyLUIyQnZlX0l3?oc=5",
       "source": "Thairath",
       "sourceUrl": "https://www.thairath.co.th",
-      "publishedAt": "Tue, 21 Oct 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ debt budget saving spending หนี้ ออมเงิน การเงิน"
+      "publishedAt": "Fri, 30 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ debt payoff หนี้ ปิดหนี้ วางแผนการเงิน"
     },
     {
       "pageId": "money",
-      "icon": "money",
-      "category": "debt budget saving spending หนี้ ออมเงิน การเงิน",
+      "queryId": "debt-payoff",
+      "icon": "debt",
+      "category": "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน",
       "tags": [
         "debt",
-        "budget",
-        "saving",
-        "spending",
+        "payoff",
         "หนี้",
-        "ออมเงิน",
-        "การเงิน"
+        "ปิดหนี้",
+        "วางแผนการเงิน"
       ],
-      "title": "มนุษย์เงินเดือนไทยแบกหนี้ ttb ชี้ 51% มีใช้เดือนชนเดือน รายได้-เงินเก็บต่ำ แถมติดแกลม - อมรินทร์ทีวี ช่อง 34",
-      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFB3QTBpaGZrUVd4NDBjV04zSjRSVmhjOGdLUWlMeERDcDRDZURQelpmOUFoVndCYWRWSkJtQk83NVJkVHVxQ2YyTS1zUFhtQTdHX1NoOEpuRndxVzFlLVE?oc=5",
-      "source": "อมรินทร์ทีวี ช่อง 34",
-      "sourceUrl": "https://www.amarintv.com",
-      "publishedAt": "Tue, 21 Oct 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ debt budget saving spending หนี้ ออมเงิน การเงิน"
+      "title": "SCB EIC ชี้ความเสี่ยงการเงินที่มาพร้อมความสะดวกในการเข้าถึงสินเชื่อที่ง่ายขึ้น - มิติหุ้น | ชี้ชัดทุกการลงทุน - มิติหุ้น",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBNQTFWVEg1Tld0TE9CS1l4R1ljWXpoVWpKaDVYcktJNUdHbmV6RGZFcnBvckVkclkwV0c1RWl4eEl4amU5NGNjVnl6VW1pTU0tb0ViMnBn?oc=5",
+      "source": "มิติหุ้น",
+      "sourceUrl": "https://www.mitihoon.com",
+      "publishedAt": "Mon, 05 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ debt payoff หนี้ ปิดหนี้ วางแผนการเงิน"
     },
     {
       "pageId": "money",
-      "icon": "money",
-      "category": "debt budget saving spending หนี้ ออมเงิน การเงิน",
+      "queryId": "debt-payoff",
+      "icon": "debt",
+      "category": "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน",
       "tags": [
         "debt",
-        "budget",
-        "saving",
-        "spending",
+        "payoff",
         "หนี้",
-        "ออมเงิน",
-        "การเงิน"
+        "ปิดหนี้",
+        "วางแผนการเงิน"
       ],
-      "title": "‘หนี้ความรัก’ กับดักวัยเดอะแบกของบ้าน กอดหนี้จนเกษียณ - The Active",
-      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5xalNRTEstTTRCR2lJR2w1dUFPZTNZLXNRY2FveDk5TDE0S29kTkdkSHpCU0JBQjY4RnJvN3ZnLTA4Y294dERXZ3hhVWhpeDlfLWJFYm9ydVBFa3c1YTgzWk1Ybw?oc=5",
-      "source": "The Active",
-      "sourceUrl": "https://theactive.thaipbs.or.th",
-      "publishedAt": "Tue, 17 Jun 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ debt budget saving spending หนี้ ออมเงิน การเงิน"
+      "title": "สงกรานต์ปีนี้ \"เคทีซี\" แนะวางแผนการใช้จ่ายดี ความสุขไม่สะดุด - posttoday",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBuaWdkVVlKSGxGY2thaWtTOFZ2TFBVS2g3d01TUjctWnlQaVlQZ3hOdlRFOHpLcS1Hc0FCN0Jld0QzY19zd1VoUGRfTFZYZmo1SjY2R0tB?oc=5",
+      "source": "posttoday",
+      "sourceUrl": "https://www.posttoday.com",
+      "publishedAt": "Mon, 13 Apr 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ debt payoff หนี้ ปิดหนี้ วางแผนการเงิน"
     },
     {
       "pageId": "money",
-      "icon": "money",
-      "category": "debt budget saving spending หนี้ ออมเงิน การเงิน",
+      "queryId": "debt-payoff",
+      "icon": "debt",
+      "category": "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน",
       "tags": [
         "debt",
-        "budget",
-        "saving",
-        "spending",
+        "payoff",
         "หนี้",
-        "ออมเงิน",
-        "การเงิน"
+        "ปิดหนี้",
+        "วางแผนการเงิน"
       ],
-      "title": "ช็อก! ผลสำรวจ คนกทม. \"จมหนี้เพื่อความอยู่รอด\" หันพึ่งนอกระบบดอกเบี้ยโหด - thansettakij",
-      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE82N0RTelpBV0Vac0tkbjZLRW8wU2xRQmVqcDhJczl0Nkt1ZGZudFJRY1ZITnhyQ25CUjFkdU92N0NxN0E0MXNlY3lNeEhHVjk2emtuVVBn?oc=5",
-      "source": "thansettakij",
-      "sourceUrl": "https://www.thansettakij.com",
-      "publishedAt": "Wed, 25 Feb 2026 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ debt budget saving spending หนี้ ออมเงิน การเงิน"
+      "title": "มนุษย์เงินเดือนไทย ถึงจะรายได้เป็นแสน แต่ใช้จ่ายเดือนชนเดือน เพราะเป็น ‘เดอะแบก’ ของครอบครัว - Brand Inside",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1kcFpNWFlZT0lOeEx3WWdQLXhKdjZtdUpHMmxPOGdUVmxhYkhuRXVidDhEbURrQW9NaUNNbENJYVhDNGo0YWItQmlFLXdMWFNqWmcyRElfTnhqM0kzdWNNQkxwdmpnRUhvUWRYSGJhcDF3czlVaXM0?oc=5",
+      "source": "Brand Inside",
+      "sourceUrl": "https://brandinside.asia",
+      "publishedAt": "Wed, 29 Oct 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ debt payoff หนี้ ปิดหนี้ วางแผนการเงิน"
     },
     {
       "pageId": "side",
+      "queryId": "side-experiment",
       "icon": "side",
-      "category": "creator affiliate youtube tiktok resale รายได้เสริม",
+      "category": "side income experiment รายได้เสริม ทดลองขาย",
+      "tags": [
+        "side",
+        "income",
+        "experiment",
+        "รายได้เสริม",
+        "ทดลองขาย"
+      ],
+      "title": "เผยเคล็ดลับ พลิกชีวิตจากสิ้นเนื้อประดาตัวสู่ “เศรษฐีร้อยล้าน” - บริษัท ซีพี ออลล์ จํากัด",
+      "url": "https://news.google.com/rss/articles/CBMi3wJBVV95cUxPQ2otWWdOazR0MFFhUFN1ekthZGgxRzdYSkxvMVFWSGdRbE9GV1l6dnRwVDdNQUpkVUVKSG1yeHp2OHdVMVZrbTI0eTU4c1V1X2JnREw2SnZjSjZHQXRTZXROcWsycnF2RFl5c0JqNW53cUtpLUxmNXM0TXBkU1R5RVVIeWZFcGkydVBpU1JCQnhRVUk0Zy05dEV4S2dmcElmWXV5QkN2M0E2MXRDRHVWRTRFanBUeE5zWUJlRWpuc2Jwa3VrVzdmelNnOWZkNkkwRFpLXzhVWWgxekRGclVfamtfeG9ianNiNDdQX2JpWWM0aUkzTHBxWmVaSkpPal83SFVDc3FQLXA5NFJYVURoNjBRR0Jtdm5YaC04cmtXMlBQR09VNXd1NnVVUVFRRjd0WFhjSUx1Ynk4NUJNYTJnNDUyOHFRSWtVT0x2Yy00TTZpQUNqWDFlekUwdE91ZE0?oc=5",
+      "source": "บริษัท ซีพี ออลล์ จํากัด",
+      "sourceUrl": "https://www.cpall.co.th",
+      "publishedAt": "Wed, 19 Nov 2025 04:23:42 GMT",
+      "reason": "อัปเดตสำหรับ side income experiment รายได้เสริม ทดลองขาย"
+    },
+    {
+      "pageId": "side",
+      "queryId": "side-experiment",
+      "icon": "side",
+      "category": "side income experiment รายได้เสริม ทดลองขาย",
+      "tags": [
+        "side",
+        "income",
+        "experiment",
+        "รายได้เสริม",
+        "ทดลองขาย"
+      ],
+      "title": "จบปริญญา มาเป็นแม่ค้า \"ขายอาหารบนคอนโด\" พื้นที่ 30 ตร.ม. - ข่าวสด",
+      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9JenI0NHpsOUF5a2pkeU8td1ZNaExwcDdiU1EzcGhfQ09kc1c1NXZKOVZwVW5MYmxOMTlBSGFKbF82UzN0OFZBT0E5S3dkSGpLZTJGblpmQkpWdEVoZzhpcTVnaC13MDJKelFxaVN5NS0?oc=5",
+      "source": "ข่าวสด",
+      "sourceUrl": "https://www.khaosod.co.th",
+      "publishedAt": "Wed, 14 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ side income experiment รายได้เสริม ทดลองขาย"
+    },
+    {
+      "pageId": "side",
+      "queryId": "side-experiment",
+      "icon": "side",
+      "category": "side income experiment รายได้เสริม ทดลองขาย",
+      "tags": [
+        "side",
+        "income",
+        "experiment",
+        "รายได้เสริม",
+        "ทดลองขาย"
+      ],
+      "title": "เริ่มต้นธุรกิจขายส่ง 2025 คู่มือทำกำไรแบบ B2B ครบจบในที่เดียว - Shopify",
+      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE4xM1NsTEZjd2kzaHdfeGs0T3hEdTFLOXVqMHhDUTRxcmZKYXdNdlFBaXJBMHp2SkJiQmZvVW9TTUxwOW5hQTl0Rnc3ZGhJT0VOMS1YVzJLVERNemFHTGc?oc=5",
+      "source": "Shopify",
+      "sourceUrl": "https://www.shopify.com",
+      "publishedAt": "Wed, 20 Aug 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ side income experiment รายได้เสริม ทดลองขาย"
+    },
+    {
+      "pageId": "side",
+      "queryId": "side-experiment",
+      "icon": "side",
+      "category": "side income experiment รายได้เสริม ทดลองขาย",
+      "tags": [
+        "side",
+        "income",
+        "experiment",
+        "รายได้เสริม",
+        "ทดลองขาย"
+      ],
+      "title": "ถอดรหัส JOURNAL ทำไม \"บอดี้ออยล์\" ถึงขายดีดันรายได้ถึง 575 ล้าน - posttoday",
+      "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBYbVY1dHpuV3lKNE1MT2pRS3VaSXhWa2x5eWpEcExVV3BMMjlyaE9SZ2g0ZkU1YmhzUE5GbkZlWjBpdGU5d19mZG9jaFZKdGdYX09mdA?oc=5",
+      "source": "posttoday",
+      "sourceUrl": "https://www.posttoday.com",
+      "publishedAt": "Wed, 28 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ side income experiment รายได้เสริม ทดลองขาย"
+    },
+    {
+      "pageId": "side",
+      "queryId": "side-experiment",
+      "icon": "side",
+      "category": "side income experiment รายได้เสริม ทดลองขาย",
+      "tags": [
+        "side",
+        "income",
+        "experiment",
+        "รายได้เสริม",
+        "ทดลองขาย"
+      ],
+      "title": "ใครได้บ้าง แจกเงิน 2,000 บาท ร้านคนละครึ่ง รัฐเติมเงิน เข้าถุงเงิน - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE5VSy11UUFkRWNYanN2WlVqZk4zc1o3N25JZ3lnWW0wRGFDdnZnUEF5anNEcGtvVmpuSEpBN2FEaU53TDVlejZ6eVB3bmNzZTdnUFB6VzctRnczRnlnS0tzUEpuQzU5QQ?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Mon, 10 Nov 2025 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ side income experiment รายได้เสริม ทดลองขาย"
+    },
+    {
+      "pageId": "side",
+      "queryId": "side-experiment",
+      "icon": "side",
+      "category": "side income experiment รายได้เสริม ทดลองขาย",
+      "tags": [
+        "side",
+        "income",
+        "experiment",
+        "รายได้เสริม",
+        "ทดลองขาย"
+      ],
+      "title": "แนะนำ 5 โปรแกรมบัญชีน่าใช้ ปี 2026 สำหรับธุรกิจ SME - kapook.com",
+      "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBFM2h5NTl5R1B3TnVQVmViRndnQTZhcGZVZGRDVG9xclZnazBHQ3M1TURacGFkN0FtQTNKZGJRdU9BM19FUjJ2R2tqVmExbTV6Y1E?oc=5",
+      "source": "kapook.com",
+      "sourceUrl": "https://money.kapook.com",
+      "publishedAt": "Sat, 27 Dec 2025 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ side income experiment รายได้เสริม ทดลองขาย"
+    },
+    {
+      "pageId": "side",
+      "queryId": "content-monetization",
+      "icon": "income",
+      "category": "creator affiliate youtube tiktok monetization",
       "tags": [
         "creator",
         "affiliate",
         "youtube",
         "tiktok",
-        "resale",
-        "รายได้เสริม"
+        "monetization"
       ],
       "title": "Creator สร้างรายได้ทางไหนบ้าง? เปิดคัมภีร์ 10 โมเดลทำเงินออนไลน์ - Content Shifu",
       "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFB4TUpzM3hOTTE1eWhkQ293c2xQSzBCUGEyclBULWRSZ3RId0dWTDNCSXBSdm1ac0VrWUZtQkExY3ZyTXVBY21haHpRZDVxVTg4THFocXA1Z3ZfeXRxdHllcXc0U3Q?oc=5",
       "source": "Content Shifu",
       "sourceUrl": "https://contentshifu.com",
       "publishedAt": "Wed, 01 Oct 2025 08:21:28 GMT",
-      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok resale รายได้เสริม"
+      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok monetization"
     },
     {
       "pageId": "side",
-      "icon": "side",
-      "category": "creator affiliate youtube tiktok resale รายได้เสริม",
+      "queryId": "content-monetization",
+      "icon": "income",
+      "category": "creator affiliate youtube tiktok monetization",
       "tags": [
         "creator",
         "affiliate",
         "youtube",
         "tiktok",
-        "resale",
-        "รายได้เสริม"
+        "monetization"
       ],
-      "title": "“จาก Content สู่ Commerce” Creator economy สร้างรายได้ สร้างยอดขาย สร้างระบบ - ThaiPR.NET",
-      "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE8tYndEQVAycDVKNWVZN01MSUQwN09JTVNvVlg0SWhJR0dUSmtwNTVxWkpDaWtMM3Jka2NRYjlCcGdmRV83M2l6MkNhb1Vld00?oc=5",
-      "source": "ThaiPR.NET",
-      "sourceUrl": "https://www.thaipr.net",
-      "publishedAt": "Wed, 18 Feb 2026 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok resale รายได้เสริม"
+      "title": "ครีเอเตอร์ไทย 2025 โตแรง! พบใช้ Facebook มากที่สุด รองลงมา Tiktok - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE01dG5kU3pyOUo1OG5qRUlpbnFjVnZOQmQxa3hNdkc2RUVEclVBOTByWFd1MmNmSTM0NEl2aWp0OXlBSDVhQ1RuX1hnYzhFTVA0MWtxZW5jYXRmeEhQ?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Thu, 25 Sep 2025 09:41:52 GMT",
+      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok monetization"
     },
     {
       "pageId": "side",
-      "icon": "side",
-      "category": "creator affiliate youtube tiktok resale รายได้เสริม",
+      "queryId": "content-monetization",
+      "icon": "income",
+      "category": "creator affiliate youtube tiktok monetization",
       "tags": [
         "creator",
         "affiliate",
         "youtube",
         "tiktok",
-        "resale",
-        "รายได้เสริม"
+        "monetization"
       ],
       "title": "ติดตะกร้า-แบรนด์ดังจ่ายเงินจ้าง จูงใจคนไทยผันตัวเป็น “อินฟลูเอนเซอร์” 3 ล้านราย - LINE TODAY",
       "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5QOE5mUTlxdGlCbWU0OEpqMG9IS05hTmQzb1JzdUtvZkpacjZzeTc0eThhR2tmMUdOck9YUnhrQUREWWtLSWw0MDJGdmxReUdaM3c5QVVR?oc=5",
       "source": "LINE TODAY",
       "sourceUrl": "https://today.line.me",
       "publishedAt": "Tue, 04 Feb 2025 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok resale รายได้เสริม"
+      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok monetization"
     },
     {
       "pageId": "side",
-      "icon": "side",
-      "category": "creator affiliate youtube tiktok resale รายได้เสริม",
+      "queryId": "content-monetization",
+      "icon": "income",
+      "category": "creator affiliate youtube tiktok monetization",
       "tags": [
         "creator",
         "affiliate",
         "youtube",
         "tiktok",
-        "resale",
-        "รายได้เสริม"
+        "monetization"
       ],
-      "title": "4 กลยุทธ์ Influencer Trends 2026 จับตา Live Commerce มาแรง เม็ดเงินสะพัดกว่า 30,000 ล้าน - Brand Buffet",
-      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPeEEtbGEyMURuS1kwWGxGLUZ2TjEtdVpLZHhQWWFjQkJvSHcwZDhpNUxBQ084TFdaUFNVLWNFYkZNeW81Wm94WDhZN2FGT1ExalhBRE1KbWNrUGVaYjNvZWc5b0l4U1B5UEVUWlR6ejBBRy1hUmtZZnBCakZOVVhaLWVINWU?oc=5",
-      "source": "Brand Buffet",
-      "sourceUrl": "https://www.brandbuffet.in.th",
-      "publishedAt": "Sun, 07 Dec 2025 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok resale รายได้เสริม"
+      "title": "“จาก Content สู่ Commerce” Creator economy สร้างรายได้ สร้างยอดขาย สร้างระบบ - ThaiPR.NET",
+      "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE8tYndEQVAycDVKNWVZN01MSUQwN09JTVNvVlg0SWhJR0dUSmtwNTVxWkpDaWtMM3Jka2NRYjlCcGdmRV83M2l6MkNhb1Vld00?oc=5",
+      "source": "ThaiPR.NET",
+      "sourceUrl": "https://www.thaipr.net",
+      "publishedAt": "Wed, 18 Feb 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok monetization"
     },
     {
       "pageId": "side",
-      "icon": "side",
-      "category": "creator affiliate youtube tiktok resale รายได้เสริม",
+      "queryId": "content-monetization",
+      "icon": "income",
+      "category": "creator affiliate youtube tiktok monetization",
       "tags": [
         "creator",
         "affiliate",
         "youtube",
         "tiktok",
-        "resale",
-        "รายได้เสริม"
-      ],
-      "title": "เจาะลึกกลยุทธ์ป้ายยาฉบับ “เดียร์ – Holidear” สร้างรายได้แตะหลักแสน ลุยแพลตฟอร์ม Shopee x YouTube Shopping ในยุค Creator Economy มาแรง! - Marketing Oops!",
-      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNRDVLTE53VDhGQjJnUWZZZHVrZUdHQmpTNXktMXpyMlFqNzFBQ2JVUDZiWE1GdVFBY3lCMGVjemd1dFhVQnZkRHdlN19jLWZGVHZoc0l1dnhmTGNnY1p6U2ZPUElacUFvMDJwclhLNGNpdXpLd1JyVUQyRnpXV3BJS0FHRmFzb3pYTkZpVnRmRUJZVFRKX3UtRDlLdw?oc=5",
-      "source": "Marketing Oops!",
-      "sourceUrl": "https://www.marketingoops.com",
-      "publishedAt": "Thu, 03 Jul 2025 06:12:20 GMT",
-      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok resale รายได้เสริม"
-    },
-    {
-      "pageId": "side",
-      "icon": "side",
-      "category": "creator affiliate youtube tiktok resale รายได้เสริม",
-      "tags": [
-        "creator",
-        "affiliate",
-        "youtube",
-        "tiktok",
-        "resale",
-        "รายได้เสริม"
+        "monetization"
       ],
       "title": "\"Creator economy\" ขับเคลื่อนเศรษฐกิจดิจิทัล - TNN Thailand",
       "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBSbFZBeTF2QkJUdTBlQUhtOFY0cF9DdHBBMEFGUEdGX01zVm52UjNFTFZGaUI2dmJuWi1xSjhzWmRYaGdqdy1PN196YlI0OHc0bE5yYUVka1NYMnBIOGlv?oc=5",
       "source": "TNN Thailand",
       "sourceUrl": "https://www.tnnthailand.com",
       "publishedAt": "Fri, 06 Mar 2026 03:15:32 GMT",
-      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok resale รายได้เสริม"
+      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok monetization"
     },
     {
-      "pageId": "health",
-      "icon": "sleep",
-      "category": "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม",
+      "pageId": "side",
+      "queryId": "content-monetization",
+      "icon": "income",
+      "category": "creator affiliate youtube tiktok monetization",
       "tags": [
-        "sleep",
-        "hydration",
-        "fitness",
-        "skincare",
-        "นอน",
-        "ออกกำลังกาย",
-        "ความงาม"
+        "creator",
+        "affiliate",
+        "youtube",
+        "tiktok",
+        "monetization"
       ],
-      "title": "SOLVEGROUP ชูแนวคิด Preventive Health เมื่อการดูแลสุขภาพไม่ใช่แค่การรักษา - TrueID",
-      "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE1EM0dXT21qMXZKYkR1aVRLNGZVNkdQQTZUbHpqekhyY1V4MzFabGdIWlNCTWxvVGFncnFLc3BYWnV2dm1LcVBJUzVPOHg0eHRlaUZyTkQ1WQ?oc=5",
-      "source": "TrueID",
-      "sourceUrl": "https://women.trueid.net",
-      "publishedAt": "Tue, 28 Apr 2026 10:00:00 GMT",
-      "reason": "อัปเดตสำหรับ sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม"
+      "title": "เจาะลึกกลยุทธ์ป้ายยาฉบับ “เดียร์ – Holidear” สร้างรายได้แตะหลักแสน ลุยแพลตฟอร์ม Shopee x YouTube Shopping ในยุค Creator Economy มาแรง! - Marketing Oops!",
+      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNRDVLTE53VDhGQjJnUWZZZHVrZUdHQmpTNXktMXpyMlFqNzFBQ2JVUDZiWE1GdVFBY3lCMGVjemd1dFhVQnZkRHdlN19jLWZGVHZoc0l1dnhmTGNnY1p6U2ZPUElacUFvMDJwclhLNGNpdXpLd1JyVUQyRnpXV3BJS0FHRmFzb3pYTkZpVnRmRUJZVFRKX3UtRDlLdw?oc=5",
+      "source": "Marketing Oops!",
+      "sourceUrl": "https://www.marketingoops.com",
+      "publishedAt": "Thu, 03 Jul 2025 06:12:20 GMT",
+      "reason": "อัปเดตสำหรับ creator affiliate youtube tiktok monetization"
     },
     {
       "pageId": "health",
+      "queryId": "sleep-hygiene",
       "icon": "sleep",
-      "category": "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม",
+      "category": "sleep hygiene recovery นอน สุขภาพ",
       "tags": [
         "sleep",
-        "hydration",
-        "fitness",
-        "skincare",
+        "hygiene",
+        "recovery",
         "นอน",
-        "ออกกำลังกาย",
-        "ความงาม"
+        "สุขภาพ"
+      ],
+      "title": "เตือน! 'อดนอน' เสี่ยงทำลายสมอง ย้ำ 'การนอนคุณภาพ' กุญแจสุขภาพดี - bangkokbiznews",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1rVElXZXExUEpOM2xEZ0ZCUWhCQXJaeThOYVRCT2s4Sm1GaWVTcDAxVUFscDZKUHZpLXVibGduQ3NxbXg0LV9ZR2NVTlY0blRqalZSTHZpUzdYMm5BUVhrcGgwZG8wWXc?oc=5",
+      "source": "bangkokbiznews",
+      "sourceUrl": "https://www.bangkokbiznews.com",
+      "publishedAt": "Tue, 17 Mar 2026 07:50:38 GMT",
+      "reason": "อัปเดตสำหรับ sleep hygiene recovery นอน สุขภาพ"
+    },
+    {
+      "pageId": "health",
+      "queryId": "sleep-hygiene",
+      "icon": "sleep",
+      "category": "sleep hygiene recovery นอน สุขภาพ",
+      "tags": [
+        "sleep",
+        "hygiene",
+        "recovery",
+        "นอน",
+        "สุขภาพ"
+      ],
+      "title": "สสส. ผนึกภาคีเครือข่ายเดินหน้าโครงการ Sleeping Hygiene for All Ages ยกระดับสุขภาวะการนอนที่เหมาะสมสำหรับคนทุกช่วงวัย - อมรินทร์ทีวี ช่อง 34",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBaOTFONWpxWE1YcjFFVS1Ic1U2Wi1zdm16Y1N2TmN4T3NzTTVBaHJHM3RaZXByMUgzUVBtU0oyNnNueXhCc0U3UWxUVkFjMGFFRWdraHdB?oc=5",
+      "source": "อมรินทร์ทีวี ช่อง 34",
+      "sourceUrl": "https://www.amarintv.com",
+      "publishedAt": "Tue, 17 Mar 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ sleep hygiene recovery นอน สุขภาพ"
+    },
+    {
+      "pageId": "health",
+      "queryId": "sleep-hygiene",
+      "icon": "sleep",
+      "category": "sleep hygiene recovery นอน สุขภาพ",
+      "tags": [
+        "sleep",
+        "hygiene",
+        "recovery",
+        "นอน",
+        "สุขภาพ"
+      ],
+      "title": "รู้หรือไม่? การนอนไม่พอของพนักงาน อาจทำให้องค์กรสูญเสียรายได้อย่างมหาศาล - Techsauce",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNbFB4NmVXN3pDUEFfX1BCWVlXS28zNGRqSDNTXzh4WmJ6OUtNVnNGeEFLdzltcVpkbTdldElnRENsSm1oUUd1STFrN2ZOYWtiWE4xazl4NGMxN3d4LURTSFRJcTRrTDhtdlVxVVg2cU9ia3cwYWMwTEtXRDV4azRITkxDc0xTdUxmLU5Vb3FLWlE1YXd6UzVKeU1vMDFydTZydjNfOF94RndPQmdZ?oc=5",
+      "source": "Techsauce",
+      "sourceUrl": "https://techsauce.co",
+      "publishedAt": "Wed, 18 Sep 2024 00:50:08 GMT",
+      "reason": "อัปเดตสำหรับ sleep hygiene recovery นอน สุขภาพ"
+    },
+    {
+      "pageId": "health",
+      "queryId": "sleep-hygiene",
+      "icon": "sleep",
+      "category": "sleep hygiene recovery นอน สุขภาพ",
+      "tags": [
+        "sleep",
+        "hygiene",
+        "recovery",
+        "นอน",
+        "สุขภาพ"
+      ],
+      "title": "ผุดคู่มือ ‘How-to นอนคุณภาพ’ สธ.แนะ 10 ประการหลับอย่างถูกวิธี วัยทำงานควรนอน 7-9 ชั่วโมง - TheCoverage.info",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBzNm11TllqSUxTZkFKdVNGeUZjN0xsTTlvMllfa05tZWFlX09sb3NKVG56by04dDFCd2hmb0VJczlhalRtLUx2NVVMUEdtLW9vMllzcVZLaDExQQ?oc=5",
+      "source": "TheCoverage.info",
+      "sourceUrl": "https://www.thecoverage.info",
+      "publishedAt": "Sun, 04 Apr 2021 14:21:52 GMT",
+      "reason": "อัปเดตสำหรับ sleep hygiene recovery นอน สุขภาพ"
+    },
+    {
+      "pageId": "health",
+      "queryId": "sleep-hygiene",
+      "icon": "sleep",
+      "category": "sleep hygiene recovery นอน สุขภาพ",
+      "tags": [
+        "sleep",
+        "hygiene",
+        "recovery",
+        "นอน",
+        "สุขภาพ"
+      ],
+      "title": "สสส.ชวนไขคำตอบ นอนเปลี่ยนชีวิต - สำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ",
+      "url": "https://news.google.com/rss/articles/CBMizwJBVV95cUxPeFRvSk01MTlXTFMzNXladUQ0VllFWXJpbnBtZ3ZIdWllU0dLN01IOEl2YUIySHhtaGNkN3BiV0xsNTF2QnZ5amxrNUxmUVg1OFVJVV9FQzNhMXp6c1ZyUmdRbFdGY3p0SEJzcUNNWWNUakFKQXE0T1FRT2F6d1JITWR5MnFubVNrVWowem1EQWg3T3FGVmFSOTh0X09NZHB0V296dHMxOHJMdTZZemZSdXBmOVdqakp0eUNuaEstNTh2Ri1LcDRQbEctUmQ5bXE2Rnc5SnVITVo5RkNrZ3podmMycUJWNVR1c1lqVDdWV0pUREtvbE1YZ3g4MFVDblloUENJUGU5WldxNXZHVkNuT3d0VXNob3Rpal8tNnh2ZHVrOHlhOHp3ZU90UDl2OVVyQXNfbGlWemFMakxCUV93ZGNnWXJqVWFid1FxTVRrdw?oc=5",
+      "source": "สำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ",
+      "sourceUrl": "https://www.thaihealth.or.th",
+      "publishedAt": "Mon, 13 Jan 2020 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ sleep hygiene recovery นอน สุขภาพ"
+    },
+    {
+      "pageId": "health",
+      "queryId": "sleep-hygiene",
+      "icon": "sleep",
+      "category": "sleep hygiene recovery นอน สุขภาพ",
+      "tags": [
+        "sleep",
+        "hygiene",
+        "recovery",
+        "นอน",
+        "สุขภาพ"
+      ],
+      "title": "15 วิธีที่ทำให้การนอนหลับของคุณดีขึ้น - ประชาชาติธุรกิจ",
+      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFAzenpxajRqODVnMmlXVkFGdzNKNjFfNlRmRjBrVHNvQ2U1NDRNd0l2ZXlyRjFrTVdTbzJlS1NrQ2RlVW1mNC0zN1pFWnppelBpODNjNzJrcDVaZUlTUktv?oc=5",
+      "source": "ประชาชาติธุรกิจ",
+      "sourceUrl": "https://www.prachachat.net",
+      "publishedAt": "Tue, 12 May 2020 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ sleep hygiene recovery นอน สุขภาพ"
+    },
+    {
+      "pageId": "health",
+      "queryId": "confidence-care",
+      "icon": "confidence",
+      "category": "confidence skincare self care ความมั่นใจ ดูแลตัวเอง",
+      "tags": [
+        "confidence",
+        "skincare",
+        "self",
+        "care",
+        "ความมั่นใจ",
+        "ดูแลตัวเอง"
       ],
       "title": "“แฮนน่า” 4EVE แชร์ทิปส์ 6 ข้อที่ทำแล้วดูดีขึ้นแน่นอน! - Vogue Thailand",
       "url": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBadU5Ud1RsTTJXa0F1Q1BfNXN3QXNwTU1XbWIxeFZMckhyc0ZTa2VtVi04Z1FhV3pJWmVVSGRael9RYzUzdHpxTzVyMHdXbjZ0dTBpdGpyZnptV1E4SVE0Wk92VGZTTTF2WHc?oc=5",
       "source": "Vogue Thailand",
       "sourceUrl": "https://vogue.co.th",
       "publishedAt": "Fri, 13 Feb 2026 15:56:34 GMT",
-      "reason": "อัปเดตสำหรับ sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม"
+      "reason": "อัปเดตสำหรับ confidence skincare self care ความมั่นใจ ดูแลตัวเอง"
     },
     {
       "pageId": "health",
-      "icon": "sleep",
-      "category": "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม",
+      "queryId": "confidence-care",
+      "icon": "confidence",
+      "category": "confidence skincare self care ความมั่นใจ ดูแลตัวเอง",
       "tags": [
-        "sleep",
-        "hydration",
-        "fitness",
+        "confidence",
         "skincare",
-        "นอน",
-        "ออกกำลังกาย",
-        "ความงาม"
+        "self",
+        "care",
+        "ความมั่นใจ",
+        "ดูแลตัวเอง"
       ],
-      "title": "7 เทรนด์ความงามปี 2025 ที่จะช่วยเปลี่ยนวิธีดูแลผิวสาวให้ล้ำกว่าที่เคย - Sanook",
-      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE1qVnJ5bDJXbEtuSl92ckNFS0RVa2F0Y0pmV3hERkJhajdIRmMwY0FVdGRINGk2cVE1N3RMUTRXWXBpa25wdVhzWE9aSG0?oc=5",
-      "source": "Sanook",
-      "sourceUrl": "https://www.sanook.com",
-      "publishedAt": "Wed, 04 Jun 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม"
+      "title": "เปิดตัว PrimaNest x FAHFAHS คอลแลบสุดคิวต์ ถ่ายทอดเสน่ห์การเติบโตของผู้หญิงยุคใหม่ - sudsapda",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1kSzFFZ2hOSDlTSkpCWGQwZ0pVTFZSMzdWNG5iZ0xVbG9rbEhxUTZrdWtENjRMMzd4bGVWQzBuaFhCU1dQUWpFdVB4SXY4eHZS?oc=5",
+      "source": "sudsapda",
+      "sourceUrl": "https://sudsapda.com",
+      "publishedAt": "Mon, 23 Feb 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ confidence skincare self care ความมั่นใจ ดูแลตัวเอง"
     },
     {
       "pageId": "health",
-      "icon": "sleep",
-      "category": "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม",
+      "queryId": "confidence-care",
+      "icon": "confidence",
+      "category": "confidence skincare self care ความมั่นใจ ดูแลตัวเอง",
       "tags": [
-        "sleep",
-        "hydration",
-        "fitness",
+        "confidence",
         "skincare",
-        "นอน",
-        "ออกกำลังกาย",
-        "ความงาม"
-      ],
-      "title": "20 ไอเดียของขวัญรับปริญญา 2568/2025 แสดงความยินดี ถูกใจบัณฑิตแน่นอน - Thairath",
-      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE0yUi0ydFJ0M1BCbi00NlJiN1NHTFRtSTh2UnJpRXBNM3g1R3VJd1ZUN1VKZ1lTWmhsUzJWcXBaUzd4NDZHZjgta0t2THB6WGppSDg3dTN5Mk9rRkV5dHY0?oc=5",
-      "source": "Thairath",
-      "sourceUrl": "https://www.thairath.co.th",
-      "publishedAt": "Wed, 17 Sep 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม"
-    },
-    {
-      "pageId": "health",
-      "icon": "sleep",
-      "category": "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม",
-      "tags": [
-        "sleep",
-        "hydration",
-        "fitness",
-        "skincare",
-        "นอน",
-        "ออกกำลังกาย",
-        "ความงาม"
+        "self",
+        "care",
+        "ความมั่นใจ",
+        "ดูแลตัวเอง"
       ],
       "title": "‘หลุยส์ เตชะอุบล’ กับพลังผู้หญิงวัย 40+ผ่านสุขภาพ ความงาม และความตั้งใจ - แนวหน้า",
       "url": "https://news.google.com/rss/articles/CBMiSkFVX3lxTE8xS3lmOEFmNUowSlNnYlUzX2xwQ1pldWdaYUZmYm1vT1JTbWFGTHhFak1xMHhlbGZRdFE3SnY5cWV6SlREajkxYURR?oc=5",
       "source": "แนวหน้า",
       "sourceUrl": "https://www.naewna.com",
       "publishedAt": "Mon, 02 Mar 2026 08:00:00 GMT",
-      "reason": "อัปเดตสำหรับ sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม"
+      "reason": "อัปเดตสำหรับ confidence skincare self care ความมั่นใจ ดูแลตัวเอง"
     },
     {
       "pageId": "health",
-      "icon": "sleep",
-      "category": "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม",
+      "queryId": "confidence-care",
+      "icon": "confidence",
+      "category": "confidence skincare self care ความมั่นใจ ดูแลตัวเอง",
       "tags": [
-        "sleep",
-        "hydration",
-        "fitness",
+        "confidence",
         "skincare",
-        "นอน",
-        "ออกกำลังกาย",
-        "ความงาม"
+        "self",
+        "care",
+        "ความมั่นใจ",
+        "ดูแลตัวเอง"
       ],
-      "title": "AS CRYSTAL - The Art of Timeless Beauty สกินแคร์ลักชัวรีจากลาว ถ่ายทอดความงามแห่งวัฒนธรรม ผ่านดีไซน์ร่วมสมัยโดย \"นาทินี คริสอิสระ\" - newswit",
-      "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTFA0b1R0RzFLNmtWdFFmUGVYSkZpYVZCSkd3MzUwX0k2czA4a1l6VFpBRlBoRzd5dXlWX2xuS0xPVUJQUThtdlVNZEFBUDY4dW1GcUUtVENsdjBKZy1WQWt3WHhCelNRWTA4em9J?oc=5",
-      "source": "newswit",
-      "sourceUrl": "https://www.newswit.com",
-      "publishedAt": "Tue, 14 Oct 2025 07:00:00 GMT",
-      "reason": "อัปเดตสำหรับ sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม"
+      "title": "\"อั้ม พัชราภา\" เผยเคล็ดลับผิวเด็กฉ่ำฟู นั่งแท่นพรีเซนเตอร์ Q Russ สกินแคร์ไทยระดับพรีเมียม - Sanook",
+      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE96a1BKTlc2ejRkNE5jeFZxendIWjR6MXVIdFhyTnZleXpOOFRzeU8zbXNTX2Y4bDNFcU5OenJCVW5TSV9oR3VuRG5weFE?oc=5",
+      "source": "Sanook",
+      "sourceUrl": "https://www.sanook.com",
+      "publishedAt": "Sat, 04 Apr 2026 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ confidence skincare self care ความมั่นใจ ดูแลตัวเอง"
+    },
+    {
+      "pageId": "health",
+      "queryId": "confidence-care",
+      "icon": "confidence",
+      "category": "confidence skincare self care ความมั่นใจ ดูแลตัวเอง",
+      "tags": [
+        "confidence",
+        "skincare",
+        "self",
+        "care",
+        "ความมั่นใจ",
+        "ดูแลตัวเอง"
+      ],
+      "title": "แอนโทเนีย พรีเซนเตอร์ Parin IPL เปิด Parin Pop-Up Store - ข่าวสด",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1kMzA5cmZJSDgtaG1rd3ItSHlDYXRmZkdjSFBIYkZibERpOG13R2tDTVlWalNKUjRTUTVBNDIwR3d6bUtEaFZYU29Jb21yTVV6WWs2a2xsSXhLZw?oc=5",
+      "source": "ข่าวสด",
+      "sourceUrl": "https://www.khaosod.co.th",
+      "publishedAt": "Sun, 06 Oct 2024 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ confidence skincare self care ความมั่นใจ ดูแลตัวเอง"
+    },
+    {
+      "pageId": "health",
+      "queryId": "confidence-care",
+      "icon": "confidence",
+      "category": "confidence skincare self care ความมั่นใจ ดูแลตัวเอง",
+      "tags": [
+        "confidence",
+        "skincare",
+        "self",
+        "care",
+        "ความมั่นใจ",
+        "ดูแลตัวเอง"
+      ],
+      "title": "ตอกย้ำเทรนด์ ‘การลงทุนเพื่อตัวเอง’ เป็นพอร์ตการลงทุนที่ดีที่สุด Clé de Peau Beauté คือ Luxury Skincare ที่ควรค่าสำหรับ Girl Boss แห่งยุค [ADVERTORIAL] - thestandard.co",
+      "url": "https://news.google.com/rss/articles/CBMiakFVX3lxTE1mc1NXc1lQQ1loczBiNTZoaURxSnJFRVJwM0F6SXlzOGJmb05DWW5IS05FV3pPOC02NGdLZzZtbkJJem9BTDBUWmx2bDJ6OGpsYjBKZ3NseGZqZGNPRXlDYzNTMHJoRHFaN1E?oc=5",
+      "source": "thestandard.co",
+      "sourceUrl": "https://thestandard.co",
+      "publishedAt": "Thu, 06 Feb 2025 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ confidence skincare self care ความมั่นใจ ดูแลตัวเอง"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "ux-case-study",
+      "icon": "career",
+      "category": "ux ui case study portfolio design system",
+      "tags": [
+        "ux",
+        "ui",
+        "case",
+        "study",
+        "portfolio",
+        "design",
+        "system"
+      ],
+      "title": "ทำความรู้จัก Unified Branding Strategy กลยุทธ์การรวมศูนย์แบรนด์ ให้เป็นอันหนึ่งอันเดียวกัน - การตลาดวันละตอน",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQd3BtNmpRTHJwT2tfR3dPQ1NGb1lXeW5UemlyR0hfM2RIaUtPd09NWWJWdDhfblpSX1FXTlkxbEJEbFhSVUM4VEtSSHBVODhnQUFYOUdwelpMU1NLc1IwNllwWEpLTEdmb01McjBGdDYtV0Y3aEZHbUxCdGxWYTlFMEZFbThfVzh5c0dJVXhhdHRjeWVNMWhoT3BrckZWXzRkNGUwZHdVMzd6UTBybm1OakpzX0Y4ZVpBbnFR?oc=5",
+      "source": "การตลาดวันละตอน",
+      "sourceUrl": "https://everydaymarketing.co",
+      "publishedAt": "Sat, 24 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ ux ui case study portfolio design system"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "language-practice",
+      "icon": "language",
+      "category": "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ",
+      "tags": [
+        "english",
+        "arabic",
+        "language",
+        "learning",
+        "ภาษาอังกฤษ",
+        "ภาษาอาหรับ"
+      ],
+      "title": "กาซา: ชั้นเรียนของเด็ก ๆ ในกาซากลับมาเปิดสอนอีกครั้งในเต็นท์ชั่วคราว ท่ามกลางซากปรักหักพัง - BBC",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE0tYTNHcjlGcHoyS09rUXI0WHRMb0hkeEt3amFYNFctMm45T0tRSW9fMFpjN3VjbTh2aGNqelJuZzBJSW1XYTQ1ZUJ1Um5QYlBqSXhmajZHU0p2QdIBX0FVX3lxTFAxek14cHlXVzlXWjF0MEN0MGQwb2kyNmVBeGVNa2JKT0VhT1hLOG5wanc4bGJpdnVDVjNoajlhNUFZNTM5aWYwQ21OdWwxU1Y3OXpsQjRWOWx6bkEwOEdV?oc=5",
+      "source": "BBC",
+      "sourceUrl": "https://www.bbc.com",
+      "publishedAt": "Sat, 10 Jan 2026 08:00:00 GMT",
+      "reason": "อัปเดตสำหรับ english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "language-practice",
+      "icon": "language",
+      "category": "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ",
+      "tags": [
+        "english",
+        "arabic",
+        "language",
+        "learning",
+        "ภาษาอังกฤษ",
+        "ภาษาอาหรับ"
+      ],
+      "title": "ชายแดนใต้ศึกษา : เรียนสามัญไม่ทิ้งศาสนา รู้ภาษาไทย ไม่ลืม ‘ภาษาแม่’ - The Active",
+      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBSUnpyMGxyM2w1Z3d2T0V4aldaQm5qVmprTVFUMTF5ajFWVjJpbUhwSExWc25aUXRzODVWNzFvLUZqeWtWXy0yQnZjNVNsSy1oeWw1bXJUWjRfM3hybTg0?oc=5",
+      "source": "The Active",
+      "sourceUrl": "https://theactive.thaipbs.or.th",
+      "publishedAt": "Tue, 21 Oct 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "language-practice",
+      "icon": "language",
+      "category": "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ",
+      "tags": [
+        "english",
+        "arabic",
+        "language",
+        "learning",
+        "ภาษาอังกฤษ",
+        "ภาษาอาหรับ"
+      ],
+      "title": "AI ทำพิษคนทำงานสายภาษาในจีน มหา’ลัยหั่นหลักสูตรภาษาอังกฤษ บัณฑิตตกงานเพิ่มขึ้น - สำนักข่าวอินโฟเควสท์",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFA5UkVpU1padGYyYlFvcFh5RWFndGl2LUJicFBOZUE0SWpFQ1NzZzVXeXlBa09IU29RcDZpVjhZZF8xaDlJV296TElJVWZtV1d4?oc=5",
+      "source": "สำนักข่าวอินโฟเควสท์",
+      "sourceUrl": "https://www.infoquest.co.th",
+      "publishedAt": "Wed, 16 Jul 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "language-practice",
+      "icon": "language",
+      "category": "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ",
+      "tags": [
+        "english",
+        "arabic",
+        "language",
+        "learning",
+        "ภาษาอังกฤษ",
+        "ภาษาอาหรับ"
+      ],
+      "title": "Google Translate เปิดตัว 2 ฟีเจอร์ใหม่ ใช้ AI แปลสดกว่า 70 ภาษา และโหมดฝึกภาษาแบบส่วนตัว ฟังและพูดได้ด้วยตัวเอง - DroidSans",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBOUGJ5cmc5TjdjTFRHVko1WE1aM3d3VXBQUk9IMlk0d0lnU0NEdG1lbnhIMGlielpUNUF0azJTN3BidkQ5RVdVWWNHblpiYWFnbV9XaFEtZ2syYmlFeFlMcEtwcVkwNlk?oc=5",
+      "source": "DroidSans",
+      "sourceUrl": "https://droidsans.com",
+      "publishedAt": "Wed, 27 Aug 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "language-practice",
+      "icon": "language",
+      "category": "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ",
+      "tags": [
+        "english",
+        "arabic",
+        "language",
+        "learning",
+        "ภาษาอังกฤษ",
+        "ภาษาอาหรับ"
+      ],
+      "title": "เปิดวาร์ป! ‘Testizer.com’ เว็บทดสอบระดับภาษาฟรี จัดเต็ม 11 ภาษาสุดฮิต & มี cert. เพิ่มความปัง - Dek-D.com",
+      "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE53c01TU084Tkppb1RIR2VuMU1rLWZxaDBZNWN6UG5DZ0xVeno3MjB5MkVHV3AzSVd1cFVLMGZ0c0lpVVI0YnBSTWRnTW5rS2tHV1E?oc=5",
+      "source": "Dek-D.com",
+      "sourceUrl": "https://www.dek-d.com",
+      "publishedAt": "Tue, 19 Aug 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ"
+    },
+    {
+      "pageId": "skills",
+      "queryId": "language-practice",
+      "icon": "language",
+      "category": "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ",
+      "tags": [
+        "english",
+        "arabic",
+        "language",
+        "learning",
+        "ภาษาอังกฤษ",
+        "ภาษาอาหรับ"
+      ],
+      "title": "เปิด 10 ภาษาที่มี “พลัง” ที่สุดในโลก พูดคล่องไม่ต้องกลัวตกงาน แค่อันดับ 2 ก็รายได้สูงมาก! - Sanook",
+      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE1nUUstaUxkWldLYkc3OEZpSER6aXZHM2NNNDV3SThrYVpLak5CMW9CLW5LcDNNSmxoYnRBUDRmRXFlVHZlb0NQX1J6YlE?oc=5",
+      "source": "Sanook",
+      "sourceUrl": "https://www.sanook.com",
+      "publishedAt": "Mon, 09 Jun 2025 07:00:00 GMT",
+      "reason": "อัปเดตสำหรับ english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ"
     }
   ]
 }

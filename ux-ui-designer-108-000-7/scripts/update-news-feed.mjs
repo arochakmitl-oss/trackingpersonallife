@@ -1,13 +1,20 @@
 import { writeFile } from "node:fs/promises";
 
 const sources = [
-  { pageId: "dashboard", icon: "health", category: "habit productivity wellness นิสัย ผลิตภาพ สุขภาพ", query: "พัฒนาตัวเอง สุขภาพ ผลิตภาพ นิสัย คนทำงาน" },
-  { pageId: "goals", icon: "calendar", category: "goal planning weekly review เป้าหมาย วางแผน", query: "ตั้งเป้าหมาย วางแผนรายสัปดาห์ habit tracking" },
-  { pageId: "checkin", icon: "mood", category: "journaling mood reflection mindfulness บันทึก อารมณ์", query: "journaling บันทึกอารมณ์ mindfulness สุขภาพใจ" },
-  { pageId: "money", icon: "money", category: "debt budget saving spending หนี้ ออมเงิน การเงิน", query: "การเงินส่วนบุคคล ปิดหนี้ ออมเงิน วางแผนการเงิน" },
-  { pageId: "side", icon: "side", category: "creator affiliate youtube tiktok resale รายได้เสริม", query: "รายได้เสริม creator economy affiliate TikTok YouTube ขายของออนไลน์" },
-  { pageId: "health", icon: "sleep", category: "sleep hydration fitness skincare นอน ออกกำลังกาย ความงาม", query: "สุขภาพ การนอน ออกกำลังกาย skincare ผู้หญิง" },
-  { pageId: "skills", icon: "career", category: "ux ui design system ai tools portfolio english ทักษะ อาชีพ", query: "UX UI design system AI tools portfolio ภาษาอังกฤษ อาชีพดีไซเนอร์" }
+  { pageId: "dashboard", queryId: "energy-habit", icon: "health", category: "habit hydration routine พลังงาน นิสัย สุขภาพ", query: "นิสัยสุขภาพ ดื่มน้ำ พลังงาน คนทำงาน" },
+  { pageId: "dashboard", queryId: "money-system", icon: "money", category: "money system debt spending การเงิน หนี้ รายจ่าย", query: "จัดการเงินส่วนบุคคล ลดรายจ่าย ปิดหนี้" },
+  { pageId: "goals", queryId: "weekly-planning", icon: "calendar", category: "weekly planning goals วางแผน เป้าหมาย", query: "วางแผนรายสัปดาห์ ตั้งเป้าหมาย เทคนิคทำตามเป้า" },
+  { pageId: "goals", queryId: "short-workout", icon: "exercise", category: "short workout fitness exercise ออกกำลังกายสั้น", query: "ออกกำลังกายสั้น 10 นาที คนทำงาน" },
+  { pageId: "checkin", queryId: "mood-journaling", icon: "mood", category: "journaling mood reflection บันทึกอารมณ์ สุขภาพใจ", query: "บันทึกอารมณ์ journaling สุขภาพใจ reflection" },
+  { pageId: "checkin", queryId: "small-wins", icon: "win", category: "small wins motivation ชัยชนะเล็กๆ แรงจูงใจ", query: "แรงจูงใจ ชัยชนะเล็กๆ พัฒนาตัวเอง" },
+  { pageId: "money", queryId: "impulse-spending", icon: "sweet", category: "impulse spending sugar budget น้ำหวาน รายจ่ายไม่จำเป็น", query: "ลดรายจ่ายไม่จำเป็น น้ำหวาน งบประมาณ การเงินส่วนบุคคล" },
+  { pageId: "money", queryId: "debt-payoff", icon: "debt", category: "debt payoff หนี้ ปิดหนี้ วางแผนการเงิน", query: "ปิดหนี้ วางแผนชำระหนี้ การเงินส่วนบุคคล" },
+  { pageId: "side", queryId: "side-experiment", icon: "side", category: "side income experiment รายได้เสริม ทดลองขาย", query: "รายได้เสริม ขายของออนไลน์ ทดลองธุรกิจเล็ก" },
+  { pageId: "side", queryId: "content-monetization", icon: "income", category: "creator affiliate youtube tiktok monetization", query: "creator economy affiliate TikTok YouTube รายได้เสริม" },
+  { pageId: "health", queryId: "sleep-hygiene", icon: "sleep", category: "sleep hygiene recovery นอน สุขภาพ", query: "การนอน sleep hygiene สุขภาพ คนทำงาน" },
+  { pageId: "health", queryId: "confidence-care", icon: "confidence", category: "confidence skincare self care ความมั่นใจ ดูแลตัวเอง", query: "ดูแลตัวเอง skincare ความมั่นใจ ผู้หญิง" },
+  { pageId: "skills", queryId: "ux-case-study", icon: "career", category: "ux ui case study portfolio design system", query: "UX UI case study portfolio design system ไทย" },
+  { pageId: "skills", queryId: "language-practice", icon: "language", category: "english arabic language learning ภาษาอังกฤษ ภาษาอาหรับ", query: "ฝึกภาษาอังกฤษ ภาษาอาหรับ เรียนภาษา คนทำงาน" }
 ];
 
 function decodeEntities(value = "") {
@@ -55,6 +62,7 @@ async function fetchSource(source) {
     const sourceUrl = readSourceUrl(item);
     return {
       pageId: source.pageId,
+      queryId: source.queryId,
       icon: source.icon,
       category: source.category,
       tags: source.category.split(" "),

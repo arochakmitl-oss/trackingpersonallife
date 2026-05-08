@@ -25,7 +25,7 @@ const DEFAULT_SETTINGS = {
 
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "⌂", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
-  { id: "goals", label: "เป้าหมาย", icon: "◎", title: "เป้าหมาย", cover: "assets/goals.svg", kicker: "ออกแบบชีวิตแบบมี milestone", quote: "เป้าหมายที่ดีไม่กดดันเรา แต่มันชวนเราเดินต่ออย่างชัดเจน" },
+  { id: "goals", label: "ตั้งค่าเป้าหมาย", icon: "◎", title: "ตั้งค่าเป้าหมาย", cover: "assets/goals.svg", kicker: "ออกแบบชีวิตแบบมี milestone", quote: "เป้าหมายที่ดีไม่กดดันเรา แต่มันชวนเราเดินต่ออย่างชัดเจน" },
   { id: "checkin", label: "เช็คอินวันนี้", icon: "✓", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
   { id: "money", label: "เงิน & หนี้", icon: "฿", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "ปิดหนี้ 108,000 บาท", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
   { id: "side", label: "รายได้เสริม", icon: "↗", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
@@ -263,7 +263,7 @@ function updateAuthUI() {
     authButton.textContent = "กำลัง sync...";
     return;
   }
-  authButton.textContent = currentUser ? `DB: ${currentUser.email}` : "เชื่อม DB";
+  authButton.textContent = currentUser ? `DB: ${currentUser.email}` : "เข้าสู่ระบบ";
 }
 
 async function initSupabase() {
@@ -587,7 +587,7 @@ function renderDashboard() {
             <p class="eyebrow">Life balance</p>
             <h2>ภาพรวมสมดุลชีวิต</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-setting="dashboard">แก้เป้ากราฟ</button>
+          <button class="tiny-button" type="button" data-open-setting="dashboard">แก้ไขเป้ากราฟ</button>
         </div>
         ${lifeRadarChart([
           { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" },
@@ -782,7 +782,7 @@ function renderWeeklyFocus(goals) {
 function renderDailyFeed(pageId) {
   const page = pages.find((item) => item.id === pageId);
   const suggestions = feedSuggestions(pageId);
-  const news = matchedDailyNews(pageId).slice(0, 4);
+  const news = matchedDailyNews(pageId, suggestions).slice(0, 4);
   return `
     <div class="card feed-card">
       <div class="section-head">
@@ -853,22 +853,25 @@ function newsThumbnailLabel(item) {
   }[item.pageId] || "Read";
 }
 
-function matchedDailyNews(pageId) {
-  const topics = feedTopicKeywords(pageId);
+function matchedDailyNews(pageId, suggestions = feedSuggestions(pageId)) {
+  const queryIds = suggestions.flatMap((item) => item.queryIds || []);
+  const topics = feedTopicKeywords(pageId, suggestions);
   const pageNews = dailyNewsItems.filter((item) => item.pageId === pageId);
+  const suggestionNews = dailyNewsItems.filter((item) => queryIds.includes(item.queryId));
   const behaviorNews = dailyNewsItems.filter((item) => {
-    const text = `${item.title || ""} ${item.category || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
+    const text = `${item.title || ""} ${item.category || ""} ${item.queryId || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
     return topics.some((topic) => text.includes(topic));
   });
-  return [...pageNews, ...behaviorNews].filter((item, index, array) => (
+  return [...suggestionNews, ...behaviorNews, ...pageNews].filter((item, index, array) => (
     item.url && array.findIndex((candidate) => candidate.url === item.url) === index
   ));
 }
 
-function feedTopicKeywords(pageId) {
+function feedTopicKeywords(pageId, suggestions = []) {
   const week = entriesInRange("week");
   const today = getEntry();
-  const topics = {
+  const topics = suggestions.flatMap((item) => item.keywords || []);
+  topics.push(...({
     dashboard: ["habit", "productivity", "personal finance", "wellness"],
     goals: ["goal", "planning", "habit", "weekly review"],
     checkin: ["journal", "mood", "reflection", "mindfulness"],
@@ -876,7 +879,7 @@ function feedTopicKeywords(pageId) {
     side: ["creator", "affiliate", "youtube", "tiktok", "resale"],
     health: ["sleep", "hydration", "fitness", "skincare"],
     skills: ["ux", "ui", "design system", "ai tools", "portfolio", "english"]
-  }[pageId] || [];
+  }[pageId] || []));
   if (sum(week, "sweetDrink") > 0) topics.push("spending", "sugar", "budget");
   if (Number(today.sleep || 0) < settings().sleepTarget) topics.push("sleep");
   if (sum(week, "exercise") < settings().exerciseWeeklyTarget) topics.push("fitness");
@@ -896,32 +899,32 @@ function feedSuggestions(pageId) {
   const skillCount = week.filter(([, entry]) => (entry.skills || []).length).length;
   const suggestions = {
     dashboard: [
-      { icon: "health", title: "ระบบพลังงานส่วนตัว", reason: Number(today.water || 0) < cfg.waterDailyTarget ? "น้ำวันนี้ยังต่ำกว่าเป้า ลองอ่านเรื่อง habit loop หรือ hydration routine" : "สุขภาพวันนี้โอเค ลองอ่านเรื่อง weekly review เพื่อรักษาจังหวะ" },
-      { icon: "money", title: "การเงินที่ลด friction", reason: sweetWeek > 0 ? `สัปดาห์นี้น้ำหวาน ${money(sweetWeek)} บาท เหมาะกับบทความลด impulse spending` : "รายจ่ายไม่จำเป็นยังนิ่ง เหมาะกับบทความ money system หรือ debt payoff" }
+      { icon: "health", title: "ระบบพลังงานส่วนตัว", queryIds: ["energy-habit"], keywords: ["นิสัย", "สุขภาพ", "น้ำ", "habit", "hydration"], reason: Number(today.water || 0) < cfg.waterDailyTarget ? "น้ำวันนี้ยังต่ำกว่าเป้า ลองอ่านเรื่อง habit loop หรือ hydration routine" : "สุขภาพวันนี้โอเค ลองอ่านเรื่อง weekly review เพื่อรักษาจังหวะ" },
+      { icon: "money", title: "การเงินที่ลด friction", queryIds: sweetWeek > 0 ? ["impulse-spending"] : ["money-system", "debt-payoff"], keywords: ["การเงิน", "รายจ่าย", "หนี้", "budget", "spending"], reason: sweetWeek > 0 ? `สัปดาห์นี้น้ำหวาน ${money(sweetWeek)} บาท เหมาะกับบทความลด impulse spending` : "รายจ่ายไม่จำเป็นยังนิ่ง เหมาะกับบทความ money system หรือ debt payoff" }
     ],
     goals: [
-      { icon: "debt", title: "Goal review", reason: "หา reference เรื่อง weekly planning, OKR ส่วนตัว หรือ habit tracking เพื่อปรับเป้ารายสัปดาห์" },
-      { icon: "calendar", title: "Trend ที่ควรทดลอง", reason: exerciseWeek < cfg.exerciseWeeklyTarget ? `ออกกำลังยังขาด ${money(Math.max(0, cfg.exerciseWeeklyTarget - exerciseWeek))} นาที ลองหา routine สั้น 10-15 นาที` : "เป้าออกกำลังเดินดี ลองหา trend เรื่อง recovery หรือ sleep quality" }
+      { icon: "debt", title: "Goal review", queryIds: ["weekly-planning"], keywords: ["เป้าหมาย", "วางแผน", "planning", "goal"], reason: "หา reference เรื่อง weekly planning, OKR ส่วนตัว หรือ habit tracking เพื่อปรับเป้ารายสัปดาห์" },
+      { icon: "calendar", title: "Trend ที่ควรทดลอง", queryIds: exerciseWeek < cfg.exerciseWeeklyTarget ? ["short-workout"] : ["sleep-hygiene"], keywords: ["ออกกำลัง", "routine", "recovery", "sleep"], reason: exerciseWeek < cfg.exerciseWeeklyTarget ? `ออกกำลังยังขาด ${money(Math.max(0, cfg.exerciseWeeklyTarget - exerciseWeek))} นาที ลองหา routine สั้น 10-15 นาที` : "เป้าออกกำลังเดินดี ลองหา trend เรื่อง recovery หรือ sleep quality" }
     ],
     checkin: [
-      { icon: "mood", title: "Mood journaling", reason: "เหมาะกับบทความ emotional check-in, reflection prompts หรือ tiny wins" },
-      { icon: "win", title: "Small wins", reason: today.win ? "วันนี้มีชัยชนะแล้ว ลองเก็บบทความที่ช่วยต่อยอด momentum" : "ยังไม่มีชัยชนะวันนี้ ลองหา prompt สั้น ๆ สำหรับ reflection" }
+      { icon: "mood", title: "Mood journaling", queryIds: ["mood-journaling"], keywords: ["อารมณ์", "journaling", "reflection", "สุขภาพใจ"], reason: "เหมาะกับบทความ emotional check-in, reflection prompts หรือ tiny wins" },
+      { icon: "win", title: "Small wins", queryIds: ["small-wins"], keywords: ["แรงจูงใจ", "motivation", "พัฒนาตัวเอง"], reason: today.win ? "วันนี้มีชัยชนะแล้ว ลองเก็บบทความที่ช่วยต่อยอด momentum" : "ยังไม่มีชัยชนะวันนี้ ลองหา prompt สั้น ๆ สำหรับ reflection" }
     ],
     money: [
-      { icon: "sweet", title: "ลดรายจ่ายไม่จำเป็น", reason: sweetWeek > 0 ? `น้ำหวานคือรายจ่ายไม่จำเป็นหลักของสัปดาห์นี้ (${money(sweetWeek)} บาท)` : "ยังไม่มีน้ำหวานสัปดาห์นี้ ลองเก็บไอเดีย no-spend หรือ budget template" },
-      { icon: "debt", title: "Debt payoff", reason: "เหมาะกับลิงก์เรื่อง snowball/avalanche หรือวิธีทำ debt tracker ที่อ่านง่าย" }
+      { icon: "sweet", title: "ลดรายจ่ายไม่จำเป็น", queryIds: ["impulse-spending"], keywords: ["รายจ่าย", "น้ำหวาน", "งบประมาณ", "spending"], reason: sweetWeek > 0 ? `น้ำหวานคือรายจ่ายไม่จำเป็นหลักของสัปดาห์นี้ (${money(sweetWeek)} บาท)` : "ยังไม่มีน้ำหวานสัปดาห์นี้ ลองเก็บไอเดีย no-spend หรือ budget template" },
+      { icon: "debt", title: "Debt payoff", queryIds: ["debt-payoff"], keywords: ["หนี้", "ปิดหนี้", "การเงิน", "debt"], reason: "เหมาะกับลิงก์เรื่อง snowball/avalanche หรือวิธีทำ debt tracker ที่อ่านง่าย" }
     ],
     side: [
-      { icon: "side", title: "ทดลองช่องทางที่ทำเงินจริง", reason: sideMonth > 0 ? `เดือนนี้รายได้เสริม ${money(sideMonth)} บาท ลองหา case study การ scale ช่องทางที่เริ่มติด` : "ยังไม่มีรายได้เสริมเดือนนี้ ลอง feed ไอเดียสินค้าหรือ affiliate content ที่ทำได้เร็ว" },
-      { icon: "income", title: "Content monetization", reason: "เหมาะกับลิงก์ YouTube/TikTok affiliate hooks และ pricing ของของมือสอง" }
+      { icon: "side", title: "ทดลองช่องทางที่ทำเงินจริง", queryIds: ["side-experiment"], keywords: ["รายได้เสริม", "ขายของ", "ทดลองธุรกิจ"], reason: sideMonth > 0 ? `เดือนนี้รายได้เสริม ${money(sideMonth)} บาท ลองหา case study การ scale ช่องทางที่เริ่มติด` : "ยังไม่มีรายได้เสริมเดือนนี้ ลอง feed ไอเดียสินค้าหรือ affiliate content ที่ทำได้เร็ว" },
+      { icon: "income", title: "Content monetization", queryIds: ["content-monetization"], keywords: ["creator", "affiliate", "tiktok", "youtube"], reason: "เหมาะกับลิงก์ YouTube/TikTok affiliate hooks และ pricing ของของมือสอง" }
     ],
     health: [
-      { icon: "sleep", title: "Sleep & recovery", reason: Number(today.sleep || 0) < cfg.sleepTarget ? "นอนวันนี้ต่ำกว่าเป้า ลองอ่านเรื่อง sleep hygiene" : "การนอนโอเค ลองอ่านเรื่อง skincare consistency หรือ strength training เบา ๆ" },
-      { icon: "confidence", title: "Confidence habit", reason: "หา reference เรื่อง body confidence, skincare streak หรือ self-care routine ที่ทำซ้ำง่าย" }
+      { icon: "sleep", title: "Sleep & recovery", queryIds: ["sleep-hygiene"], keywords: ["นอน", "sleep", "recovery", "สุขภาพ"], reason: Number(today.sleep || 0) < cfg.sleepTarget ? "นอนวันนี้ต่ำกว่าเป้า ลองอ่านเรื่อง sleep hygiene" : "การนอนโอเค ลองอ่านเรื่อง skincare consistency หรือ strength training เบา ๆ" },
+      { icon: "confidence", title: "Confidence habit", queryIds: ["confidence-care"], keywords: ["ดูแลตัวเอง", "skincare", "ความมั่นใจ"], reason: "หา reference เรื่อง body confidence, skincare streak หรือ self-care routine ที่ทำซ้ำง่าย" }
     ],
     skills: [
-      { icon: "career", title: "UX/UI growth", reason: skillCount ? `สัปดาห์นี้มีวันฝึก skill ${skillCount} วัน ลองหา case study teardown หรือ design system pattern` : "ยังไม่มี skill log สัปดาห์นี้ ลองเริ่มจาก UX Research หรือ AI tools แบบ micro-learning" },
-      { icon: "language", title: "ภาษาอังกฤษ & อาหรับ", reason: languageWeek > 0 ? `ฝึกภาษารวม ${money(languageWeek)} นาที เหมาะกับลิงก์ vocabulary หรือ speaking practice` : `ลอง feed บทเรียนภาษาอังกฤษ ${money(cfg.languageDailyTarget)} นาทีวันนี้` }
+      { icon: "career", title: "UX/UI growth", queryIds: ["ux-case-study"], keywords: ["ux", "ui", "design", "portfolio", "case study"], reason: skillCount ? `สัปดาห์นี้มีวันฝึก skill ${skillCount} วัน ลองหา case study teardown หรือ design system pattern` : "ยังไม่มี skill log สัปดาห์นี้ ลองเริ่มจาก UX Research หรือ AI tools แบบ micro-learning" },
+      { icon: "language", title: "ภาษาอังกฤษ & อาหรับ", queryIds: ["language-practice"], keywords: ["ภาษา", "english", "arabic"], reason: languageWeek > 0 ? `ฝึกภาษารวม ${money(languageWeek)} นาที เหมาะกับลิงก์ vocabulary หรือ speaking practice` : `ลอง feed บทเรียนภาษาอังกฤษ ${money(cfg.languageDailyTarget)} นาทีวันนี้` }
     ]
   };
   return suggestions[pageId] || suggestions.dashboard;
@@ -1025,7 +1028,7 @@ function renderSideIncome() {
           <h2>บันทึกการทดลอง</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="side">แก้เป้ารายได้</button>
+            <button class="tiny-button" type="button" data-open-setting="side">แก้ไขเป้ารายได้</button>
           <button class="primary-button" type="button" data-open-entry>เพิ่มรายได้เสริม</button>
         </div>
       </div>
@@ -1056,7 +1059,7 @@ function renderHealth() {
           <h2>🔥 streak การดูแลตัวเอง</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="health">แก้เป้าสุขภาพ</button>
+          <button class="tiny-button" type="button" data-open-setting="health">แก้ไขเป้าสุขภาพ</button>
           <button class="primary-button" type="button" data-open-entry>บันทึกสุขภาพ</button>
         </div>
       </div>
@@ -1087,7 +1090,7 @@ function renderSkills() {
           <h2>แผนพัฒนาทักษะ UX/UI</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="skills">แก้เป้าทักษะ</button>
+          <button class="tiny-button" type="button" data-open-setting="skills">แก้ไขเป้าทักษะ</button>
           <button class="primary-button" type="button" data-open-entry>บันทึกทักษะวันนี้</button>
         </div>
       </div>
@@ -1102,7 +1105,7 @@ function renderSkills() {
           <h2>${iconLabel("language", "ฝึกภาษาอังกฤษ & อาหรับ")}</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
+          <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
           <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
         </div>
       </div>
@@ -1219,7 +1222,7 @@ function languageDashboard(entries) {
           <h2>ฝึกภาษาอังกฤษ & อาหรับ</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="language">แก้เป้าภาษา</button>
+          <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
           <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
         </div>
       </div>
