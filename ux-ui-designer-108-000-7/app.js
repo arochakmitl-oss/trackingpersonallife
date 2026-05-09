@@ -26,6 +26,7 @@ const DEFAULT_SETTINGS = {
 };
 const EMPTY_SETTINGS = Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((key) => [key, 0]));
 EMPTY_SETTINGS.skillNames = [];
+EMPTY_SETTINGS.languageNames = [];
 
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "⌂", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
@@ -38,6 +39,7 @@ const pages = [
 ];
 
 const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
+const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
 const channels = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
 const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ"];
 const settingGroups = {
@@ -102,7 +104,7 @@ const settingGroups = {
   },
   language: {
     title: "แก้ไขเป้าฝึกภาษา",
-    description: "ใช้กับ dashboard ภาษาอังกฤษ/อาหรับ และ streak การฝึกภาษา",
+    description: "เพิ่ม/ลดภาษาที่อยากเรียน และตั้งเป้านาทีต่อวัน/สัปดาห์",
     fields: [
       { key: "languageDailyTarget", label: "เป้าฝึกภาษาต่อวัน", suffix: "นาที" },
       { key: "languageWeeklyTarget", label: "เป้าฝึกภาษาต่อสัปดาห์", suffix: "นาที" }
@@ -190,7 +192,7 @@ const modalConfigs = {
   checkin: {
     title: "เช็คอินชีวิตวันนี้",
     description: "บันทึกความรู้สึก ค่าใช้จ่าย สุขภาพ ชัยชนะเล็กๆ และ streak ของวันนี้",
-    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "thaiMinutes", "arabicMinutes", "languageFocus", "skills", "win"]
+    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
   },
   money: {
     title: "บันทึกเงิน & หนี้",
@@ -214,8 +216,8 @@ const modalConfigs = {
   },
   language: {
     title: "บันทึกการฝึกภาษา",
-    description: "ติดตามเวลาฝึกภาษาอังกฤษและอาหรับ พร้อมโฟกัสของรอบฝึกวันนี้",
-    fields: ["thaiMinutes", "arabicMinutes", "languageFocus", "win"]
+    description: "ติดตามเวลาฝึกตามภาษาที่ตั้งไว้ พร้อมโฟกัสของรอบฝึกวันนี้",
+    fields: ["languageMinutes", "languageFocus", "win"]
   }
 };
 
@@ -255,12 +257,20 @@ function settings() {
   if (!Array.isArray(state.settings.skillNames)) {
     state.settings.skillNames = currentUser || state?.meta?.mockData ? [...DEFAULT_SKILLS] : [];
   }
+  if (!Array.isArray(state.settings.languageNames)) {
+    state.settings.languageNames = currentUser || state?.meta?.mockData ? [...DEFAULT_LANGUAGES] : [];
+  }
   return state.settings;
 }
 
 function skillsList() {
   const list = settings().skillNames;
   return Array.isArray(list) ? list.filter(Boolean) : [...DEFAULT_SKILLS];
+}
+
+function languagesList() {
+  const list = settings().languageNames;
+  return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_LANGUAGES];
 }
 
 function hasAnyEntryData() {
@@ -278,6 +288,7 @@ function hasGuestSetupData() {
     Number(cfg.languageDailyTarget || 0) > 0 ||
     Number(cfg.languageWeeklyTarget || 0) > 0 ||
     skillsList().length > 0 ||
+    languagesList().length > 0 ||
     hasAnyEntryData()
   );
 }
@@ -509,8 +520,24 @@ function sum(entries, key) {
   return entries.reduce((total, [, entry]) => total + Number(entry[key] || 0), 0);
 }
 
+function languageFieldKey(language) {
+  if (language === "อังกฤษ") return "thaiMinutes";
+  if (language === "อาหรับ") return "arabicMinutes";
+  return "";
+}
+
+function getLanguageMinutes(entry = {}, language) {
+  const legacyKey = languageFieldKey(language);
+  if (legacyKey) return Number(entry[legacyKey] || 0);
+  return Number(entry.languageMinutes?.[language] || 0);
+}
+
 function languageTotal(entry) {
-  return Number(entry?.thaiMinutes || 0) + Number(entry?.arabicMinutes || 0);
+  return languagesList().reduce((total, language) => total + getLanguageMinutes(entry, language), 0);
+}
+
+function sumLanguage(entries, language) {
+  return entries.reduce((total, [, entry]) => total + getLanguageMinutes(entry, language), 0);
 }
 
 function getExpenseItems(entry = {}) {
@@ -791,8 +818,7 @@ function renderWeeklyFocus(goals) {
   const exerciseWeek = sum(week, "exercise");
   const sweetWeek = sum(week, "sweetDrink");
   const sideMonth = sum(month, "sideIncome");
-  const englishWeek = sum(week, "thaiMinutes");
-  const arabicWeek = sum(week, "arabicMinutes");
+  const languageWeek = week.reduce((total, [, entry]) => total + languageTotal(entry), 0);
   const practicedSkills = [...new Set(week.flatMap(([, entry]) => entry.skills || []))];
   const channelTotals = channels.map((channel) => ({
     channel,
@@ -843,8 +869,8 @@ function renderWeeklyFocus(goals) {
     icon: "career",
     title: "ทักษะและภาษา",
     text: practicedSkills.length
-      ? `สัปดาห์นี้ฝึก ${practicedSkills.slice(0, 3).join(", ")} และภาษาอังกฤษ/อาหรับรวม ${money(englishWeek + arabicWeek)} นาที`
-      : `ยังไม่มี skill ที่บันทึกในสัปดาห์นี้ ลองเริ่ม 1 skill พร้อมภาษาอังกฤษ ${money(cfg.languageDailyTarget)} นาที`
+      ? `สัปดาห์นี้ฝึก ${practicedSkills.slice(0, 3).join(", ")} และภาษารวม ${money(languageWeek)} นาที`
+      : `ยังไม่มี skill ที่บันทึกในสัปดาห์นี้ ลองเริ่ม 1 skill พร้อมฝึกภาษา ${money(cfg.languageDailyTarget)} นาที`
   });
 
   return `
@@ -970,7 +996,7 @@ function feedTopicKeywords(pageId, suggestions = []) {
   if (sum(week, "sweetDrink") > 0) topics.push("spending", "sugar", "budget");
   if (Number(today.sleep || 0) < settings().sleepTarget) topics.push("sleep");
   if (sum(week, "exercise") < settings().exerciseWeeklyTarget) topics.push("fitness");
-  if (sum(week, "thaiMinutes") + sum(week, "arabicMinutes") > 0) topics.push("language", "english", "arabic");
+  if (week.reduce((total, [, entry]) => total + languageTotal(entry), 0) > 0) topics.push("language", "english", "arabic");
   return [...new Set(topics.map((topic) => topic.toLowerCase()))];
 }
 
@@ -982,7 +1008,7 @@ function feedSuggestions(pageId) {
   const sweetWeek = sum(week, "sweetDrink");
   const exerciseWeek = sum(week, "exercise");
   const sideMonth = sum(month, "sideIncome");
-  const languageWeek = sum(week, "thaiMinutes") + sum(week, "arabicMinutes");
+  const languageWeek = week.reduce((total, [, entry]) => total + languageTotal(entry), 0);
   const skillCount = week.filter(([, entry]) => (entry.skills || []).length).length;
   const suggestions = {
     dashboard: [
@@ -1011,7 +1037,7 @@ function feedSuggestions(pageId) {
     ],
     skills: [
       { icon: "career", title: "UX/UI growth", queryIds: ["ux-case-study"], keywords: ["ux", "ui", "design", "portfolio", "case study"], reason: skillCount ? `สัปดาห์นี้มีวันฝึก skill ${skillCount} วัน ลองหา case study teardown หรือ design system pattern` : "ยังไม่มี skill log สัปดาห์นี้ ลองเริ่มจาก UX Research หรือ AI tools แบบ micro-learning" },
-      { icon: "language", title: "ภาษาอังกฤษ & อาหรับ", queryIds: ["language-practice"], keywords: ["ภาษา", "english", "arabic"], reason: languageWeek > 0 ? `ฝึกภาษารวม ${money(languageWeek)} นาที เหมาะกับลิงก์ vocabulary หรือ speaking practice` : `ลอง feed บทเรียนภาษาอังกฤษ ${money(cfg.languageDailyTarget)} นาทีวันนี้` }
+      { icon: "language", title: "ภาษาเป้าหมาย", queryIds: ["language-practice"], keywords: ["ภาษา", "english", "arabic"], reason: languageWeek > 0 ? `ฝึกภาษารวม ${money(languageWeek)} นาที เหมาะกับลิงก์ vocabulary หรือ speaking practice` : `ลอง feed บทเรียนภาษาที่ตั้งไว้ ${money(cfg.languageDailyTarget)} นาทีวันนี้` }
     ]
   };
   return suggestions[pageId] || suggestions.dashboard;
@@ -1173,8 +1199,8 @@ function renderSkills() {
   const cfg = settings();
   const skills = skillsList();
   const week = entriesInRange("week");
-  const thaiWeek = sum(week, "thaiMinutes");
-  const arabicWeek = sum(week, "arabicMinutes");
+  const languageTotals = languagesList().map((language) => ({ language, minutes: sumLanguage(week, language) }));
+  const languageWeek = languageTotals.reduce((total, item) => total + item.minutes, 0);
   return `
     <div class="grid three">
       ${skills.map((skill) => statCard(skill, `${countSkillDays(skill)} วัน`, "จำนวนวันที่ฝึกทั้งหมด")).join("")}
@@ -1198,7 +1224,7 @@ function renderSkills() {
       <div class="section-head">
         <div>
           <p class="eyebrow">Language learning</p>
-          <h2>${iconLabel("language", "ฝึกภาษาอังกฤษ & อาหรับ")}</h2>
+          <h2>${iconLabel("language", "ฝึกภาษา")}</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
@@ -1206,9 +1232,8 @@ function renderSkills() {
         </div>
       </div>
       <div class="progress-list">
-        ${renderProgress({ name: "ภาษาอังกฤษ", type: "สัปดาห์นี้", progress: thaiWeek, target: cfg.languageWeeklyTarget })}
-        ${renderProgress({ name: "ภาษาอาหรับ", type: "สัปดาห์นี้", progress: arabicWeek, target: cfg.languageWeeklyTarget })}
-        ${renderProgress({ name: "รวมการฝึกภาษา", type: `เป้ารวม ${money(cfg.languageWeeklyTarget)} นาที`, progress: thaiWeek + arabicWeek, target: cfg.languageWeeklyTarget })}
+        ${languageTotals.map((item) => renderProgress({ name: item.language, type: "สัปดาห์นี้", progress: item.minutes, target: cfg.languageWeeklyTarget })).join("")}
+        ${renderProgress({ name: "รวมการฝึกภาษา", type: `เป้ารวม ${money(cfg.languageWeeklyTarget)} นาที`, progress: languageWeek, target: cfg.languageWeeklyTarget })}
       </div>
     </div>
   `;
@@ -1283,7 +1308,7 @@ function renderDayDetail(iso) {
     ` : ""}
     <p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
     <p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>
-    <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${iconLabel("thai", `อังกฤษ ${Number(entry.thaiMinutes || 0)} นาที`)} / ${iconLabel("arabic", `อาหรับ ${Number(entry.arabicMinutes || 0)} นาที`)} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
+    <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${languagesList().map((language) => iconLabel(language === "อาหรับ" ? "arabic" : language === "อังกฤษ" ? "thai" : "language", `${language} ${money(getLanguageMinutes(entry, language))} นาที`)).join(" / ") || "-"} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
   `;
 }
 
@@ -1303,22 +1328,22 @@ function miniSummary(label, value) {
 
 function languageDashboard(entries) {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาอังกฤษและอาหรับจะยังว่างสำหรับ guest จนกว่าจะจำลองข้อมูลหรือบันทึกการฝึกภาษาเอง");
+    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาที่อยากเรียนจะยังว่างสำหรับ guest จนกว่าจะจำลองข้อมูลหรือเพิ่มภาษาเอง");
   }
   const cfg = settings();
-  const thai = sum(entries, "thaiMinutes");
-  const arabic = sum(entries, "arabicMinutes");
-  const total = thai + arabic;
+  const languageTotals = languagesList().map((language) => ({ language, minutes: sumLanguage(entries, language) }));
+  const total = languageTotals.reduce((amount, item) => amount + item.minutes, 0);
   const week = entriesInRange("week");
-  const weekTotal = sum(week, "thaiMinutes") + sum(week, "arabicMinutes");
+  const weekTotal = week.reduce((amount, [, entry]) => amount + languageTotal(entry), 0);
   const streak = currentStreak((entry) => languageTotal(entry) > 0);
+  const [primaryLanguage, secondaryLanguage] = languageTotals;
 
   return `
     <div class="card language-card">
       <div class="section-head">
         <div>
           <p class="eyebrow">Language practice</p>
-          <h2>ฝึกภาษาอังกฤษ & อาหรับ</h2>
+          <h2>ฝึกภาษา</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
@@ -1326,17 +1351,16 @@ function languageDashboard(entries) {
         </div>
       </div>
       <div class="language-layout">
-        <div class="language-orbit" style="--thai:${progressValue(thai, total || cfg.languageWeeklyTarget)}%;--arabic:${progressValue(arabic, total || cfg.languageWeeklyTarget)}%">
+        <div class="language-orbit" style="--thai:${progressValue(primaryLanguage?.minutes || 0, total || cfg.languageWeeklyTarget)}%;--arabic:${progressValue(secondaryLanguage?.minutes || 0, total || cfg.languageWeeklyTarget)}%">
           <div class="language-core">
             <strong>${money(total)}</strong>
             <span>นาที</span>
           </div>
-          <span class="language-badge thai">${iconLabel("thai", "อังกฤษ")}</span>
-          <span class="language-badge arabic">${iconLabel("arabic", "عربي")}</span>
+          <span class="language-badge thai">${iconLabel(primaryLanguage?.language === "อังกฤษ" ? "thai" : "language", primaryLanguage?.language || "ภาษา")}</span>
+          <span class="language-badge arabic">${iconLabel(secondaryLanguage?.language === "อาหรับ" ? "arabic" : "language", secondaryLanguage?.language || "เพิ่มภาษา")}</span>
         </div>
         <div class="language-progress">
-          ${languageProgress(iconLabel("thai", "อังกฤษ"), thai, cfg.languageWeeklyTarget, "#a9dcc5")}
-          ${languageProgress(iconLabel("arabic", "อาหรับ"), arabic, cfg.languageWeeklyTarget, "#c6b2f2")}
+          ${languageTotals.map((item, index) => languageProgress(iconLabel(item.language === "อังกฤษ" ? "thai" : item.language === "อาหรับ" ? "arabic" : "language", item.language), item.minutes, cfg.languageWeeklyTarget, index % 2 ? "#c6b2f2" : "#a9dcc5")).join("")}
           ${languageProgress(iconLabel("language", "รวมสัปดาห์นี้"), weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
         </div>
         <div class="language-stats">
@@ -1557,10 +1581,16 @@ function openEntryModal(category = activePage) {
   $("#modalTitle").textContent = config.title;
   $("#modalDescription").textContent = config.description;
   $("#modalFields").innerHTML = renderModalFields(config.fields);
+  $("#modalFields").querySelectorAll("[data-open-setting]").forEach((button) => {
+    button.addEventListener("click", () => {
+      modal.close();
+      openSettingModal(button.dataset.openSetting);
+    });
+  });
   bindExpenseRows();
   form.reset();
   Object.entries(entry).forEach(([key, value]) => {
-    if (["skills", "expenseItems"].includes(key)) return;
+    if (["skills", "expenseItems", "languageMinutes"].includes(key)) return;
     const input = form.elements[key];
     if (input) input.value = value;
   });
@@ -1596,6 +1626,16 @@ function handleSubmit(event) {
       nextEntry.sweetDrink = totals.sweetDrink;
       return;
     }
+    if (field === "languageMinutes") {
+      nextEntry.languageMinutes = {};
+      languagesList().forEach((language) => {
+        const value = Number(data.get(`languageMinutes:${language}`) || 0);
+        const legacyKey = languageFieldKey(language);
+        if (legacyKey) nextEntry[legacyKey] = value;
+        else nextEntry.languageMinutes[language] = value;
+      });
+      return;
+    }
     if (numericFields.includes(field)) {
       nextEntry[field] = Number(data.get(field) || 0);
       return;
@@ -1616,15 +1656,17 @@ function handleSubmit(event) {
 
 function renderModalFields(fields) {
   const fieldHTML = fields
-    .filter((field) => !["win", "skills", "expenseRows"].includes(field))
+    .filter((field) => !["win", "skills", "expenseRows", "languageMinutes"].includes(field))
     .map(renderField)
     .join("");
   const expenseHTML = fields.includes("expenseRows") ? renderField("expenseRows") : "";
   const winHTML = fields.includes("win") ? renderField("win") : "";
   const skillsHTML = fields.includes("skills") ? renderField("skills") : "";
+  const languageHTML = fields.includes("languageMinutes") ? renderField("languageMinutes") : "";
   return `
     ${fieldHTML ? `<div class="form-grid">${fieldHTML}</div>` : ""}
     ${expenseHTML}
+    ${languageHTML}
     ${winHTML}
     ${skillsHTML}
   `;
@@ -1651,8 +1693,7 @@ function renderField(field) {
     expenseRows: renderExpenseRows(),
     debtPaid: textInput("debtPaid", "จ่ายหนี้วันนี้", "decimal"),
     sideIncome: textInput("sideIncome", "รายได้เสริม", "decimal"),
-    thaiMinutes: textInput("thaiMinutes", "ฝึกภาษาอังกฤษ (นาที)", "numeric", "[0-9]*"),
-    arabicMinutes: textInput("arabicMinutes", "ฝึกภาษาอาหรับ (นาที)", "numeric", "[0-9]*"),
+    languageMinutes: renderLanguageMinuteFields(),
     languageFocus: `
       <label>
         โฟกัสการฝึก
@@ -1691,6 +1732,43 @@ function renderField(field) {
     `
   };
   return fields[field] || "";
+}
+
+function renderLanguageMinuteFields() {
+  const languages = languagesList();
+  const entry = getEntry();
+  if (!languages.length) {
+    return `
+      <section class="skill-editor wide-label">
+        <div class="skill-editor-head">
+          <div>
+            <span>ยังไม่ได้เพิ่มภาษาที่อยากเรียน</span>
+            <small>ไปที่ แก้ไขเป้าภาษา เพื่อเพิ่มภาษา เช่น อังกฤษ อาหรับ ญี่ปุ่น หรือจีน</small>
+          </div>
+          <button class="tiny-button" type="button" data-open-setting="language">เพิ่มภาษา</button>
+        </div>
+      </section>
+    `;
+  }
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>เวลาฝึกภาษา</span>
+          <small>สร้างช่องตามภาษาที่ตั้งไว้เอง</small>
+        </div>
+        <button class="tiny-button" type="button" data-open-setting="language">แก้ไขภาษา</button>
+      </div>
+      <div class="form-grid">
+        ${languages.map((language) => `
+          <label>
+            ${escapeHTML(language)} (นาที)
+            <input name="languageMinutes:${escapeHTML(language)}" type="text" inputmode="numeric" pattern="[0-9]*" value="${getLanguageMinutes(entry, language) || ""}" />
+          </label>
+        `).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function renderExpenseRows(items = getExpenseItems(getEntry())) {
@@ -1754,6 +1832,61 @@ function renderSkillRow(skill = "") {
       <button class="icon-button skill-remove" type="button" data-remove-skill-row aria-label="ลบ skill">×</button>
     </div>
   `;
+}
+
+function renderLanguageEditor() {
+  const languages = languagesList();
+  const rows = languages.length ? languages : [""];
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>ภาษาที่อยากเรียน</span>
+          <small>เพิ่มภาษาเองได้ เช่น อังกฤษ อาหรับ ญี่ปุ่น จีน เกาหลี หรือภาษาอื่นๆ</small>
+        </div>
+        <button class="tiny-button" type="button" data-add-language-row>เพิ่มภาษา</button>
+      </div>
+      <div class="skill-rows" data-language-rows>
+        ${rows.map((language) => renderLanguageRow(language)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderLanguageRow(language = "") {
+  return `
+    <div class="skill-row">
+      <input name="languageName" type="text" value="${escapeHTML(language)}" placeholder="เช่น ญี่ปุ่น" />
+      <button class="icon-button skill-remove" type="button" data-remove-language-row aria-label="ลบภาษา">×</button>
+    </div>
+  `;
+}
+
+function bindLanguageRows() {
+  const rows = $("[data-language-rows]");
+  if (!rows) return;
+  const syncRemoveButtons = () => {
+    const buttons = [...rows.querySelectorAll("[data-remove-language-row]")];
+    buttons.forEach((button) => {
+      button.disabled = buttons.length <= 1;
+    });
+  };
+  const addButton = $("[data-add-language-row]");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      rows.insertAdjacentHTML("beforeend", renderLanguageRow());
+      const lastInput = rows.querySelector(".skill-row:last-child input");
+      if (lastInput) lastInput.focus();
+      syncRemoveButtons();
+    });
+  }
+  rows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-language-row]");
+    if (!button || rows.children.length <= 1) return;
+    button.closest(".skill-row").remove();
+    syncRemoveButtons();
+  });
+  syncRemoveButtons();
 }
 
 function bindSkillRows() {
@@ -1835,8 +1968,9 @@ function openSettingModal(group = "debt") {
       <span class="field-hint">${field.suffix}</span>
     </label>
   `).join("");
-  $("#settingFields").innerHTML = `${genericFields}${group === "skills" ? renderSkillEditor() : ""}`;
+  $("#settingFields").innerHTML = `${genericFields}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}`;
   if (group === "skills") bindSkillRows();
+  if (group === "language") bindLanguageRows();
   $("#settingModal").showModal();
 }
 
@@ -1851,6 +1985,10 @@ function handleSettingSubmit(event) {
     const nextSkills = [...new Set(data.getAll("skillName").map((skill) => skill.trim()).filter(Boolean))];
     settings().skillNames = nextSkills;
   }
+  if (settingGroup === "language") {
+    const nextLanguages = [...new Set(data.getAll("languageName").map((language) => language.trim()).filter(Boolean))];
+    settings().languageNames = nextLanguages;
+  }
   saveState();
   syncSettings();
   $("#settingModal").close();
@@ -1864,6 +2002,9 @@ function resetSettingGroup() {
   });
   if (settingGroup === "skills") {
     settings().skillNames = [...DEFAULT_SKILLS];
+  }
+  if (settingGroup === "language") {
+    settings().languageNames = [...DEFAULT_LANGUAGES];
   }
   saveState();
   syncSettings();
@@ -1933,6 +2074,7 @@ function createMockEntries() {
       confidence: Math.min(10, 6 + (cycle % 5)),
       thaiMinutes: cycle % 2 ? 25 : 15,
       arabicMinutes: cycle >= 3 ? 20 : 0,
+      languageMinutes: {},
       languageFocus: focuses[cycle],
       skills: cycle % 2 ? ["UI Design", "AI Tools"] : ["UX Research", "Portfolio"],
       win: cycle === 5 ? "จ่ายหนี้เพิ่มและไม่ซื้อน้ำหวาน" : "อัปเดตชีวิตวันนี้ครบ"
@@ -1958,7 +2100,8 @@ function createMockData() {
         meta: { kind: "guest", mockData: true },
         settings: {
           ...DEFAULT_SETTINGS,
-          skillNames: [...DEFAULT_SKILLS, "UX Writing"]
+          skillNames: [...DEFAULT_SKILLS, "UX Writing"],
+          languageNames: [...DEFAULT_LANGUAGES]
         }
       }, DEFAULT_SETTINGS);
       selectedDate = toISO(new Date());
