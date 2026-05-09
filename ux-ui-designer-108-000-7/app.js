@@ -2115,42 +2115,58 @@ function clearTargetValues() {
 
 function createMockEntries() {
   const today = new Date();
-  const moods = ["สดใส", "นิ่งๆ", "ภูมิใจ", "เหนื่อย", "สดใส", "กังวล", "นิ่งๆ"];
-  const focuses = ["คำศัพท์", "ฟัง", "พูด", "อ่าน", "ทบทวน", "เขียน", "คำศัพท์"];
-  return Object.fromEntries(Array.from({ length: 21 }, (_, index) => {
+  const mockMoods = ["สดใส", "นิ่งๆ", "ภูมิใจ", "เหนื่อย", "กังวล"];
+  const mockFocuses = ["คำศัพท์", "ฟัง", "พูด", "อ่าน", "ทบทวน", "เขียน"];
+  const mockWins = [
+    "อัปเดตชีวิตวันนี้ครบ",
+    "ทำ task สำคัญเสร็จ 1 เรื่อง",
+    "ไม่ซื้อน้ำหวานและเก็บเงินไว้",
+    "ฝึก skill สั้นๆ แต่ต่อเนื่อง",
+    "จัดเวลาให้ตัวเองได้ดีขึ้น"
+  ];
+  const mockSkills = [...DEFAULT_SKILLS, "UX Writing"];
+  const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  const sample = (items) => items[randomInt(0, items.length - 1)];
+  const maybe = (chance) => Math.random() < chance;
+  const randomAmount = (min, max, step = 5) => Math.round(randomInt(min, max) / step) * step;
+  return Object.fromEntries(Array.from({ length: randomInt(18, 28) }, (_, index, days) => {
     const day = new Date(today);
-    day.setDate(today.getDate() - (20 - index));
+    day.setDate(today.getDate() - (days.length - 1 - index));
     const iso = toISO(day);
-    const cycle = index % 7;
-    const sideIncome = cycle === 1 ? 320 : cycle === 4 ? 580 : cycle === 6 ? 220 : 0;
-    const debtPaid = cycle === 2 ? 500 : cycle === 5 ? 1000 : 0;
-    const sweetDrink = cycle === 0 || cycle === 3 ? 45 : 0;
+    const sideIncome = maybe(0.38) ? randomAmount(120, 950, 10) : 0;
+    const debtPaid = maybe(0.28) ? randomAmount(300, 1800, 100) : 0;
+    const sweetDrink = maybe(0.42) ? randomAmount(25, 95, 5) : 0;
     const expenseItems = [
-      { category: "ข้าวเที่ยง", amount: 65 + (cycle * 5) },
-      { category: "ค่ารถ", amount: cycle % 2 ? 35 : 0 },
+      { category: "ข้าวเที่ยง", amount: randomAmount(55, 120, 5) },
+      { category: "ข้าวเย็น", amount: maybe(0.48) ? randomAmount(60, 140, 5) : 0 },
+      { category: "ค่ารถ", amount: maybe(0.62) ? randomAmount(20, 80, 5) : 0 },
+      { category: "กาแฟ", amount: maybe(0.32) ? randomAmount(35, 95, 5) : 0 },
       { category: "น้ำหวาน", amount: sweetDrink }
     ].filter((item) => item.amount > 0);
     const totals = expenseTotals(expenseItems);
+    const practicedSkills = mockSkills.filter(() => maybe(0.24)).slice(0, randomInt(0, 2));
+    const thaiMinutes = maybe(0.56) ? randomInt(10, 45) : 0;
+    const arabicMinutes = maybe(0.42) ? randomInt(8, 35) : 0;
     return [iso, {
-      mood: moods[cycle],
-      water: cycle >= 4 ? 8 : 5 + cycle,
-      exercise: cycle % 3 === 0 ? 0 : 20 + (cycle * 5),
-      sleep: cycle === 3 ? 5.5 : 6.5 + ((cycle % 3) * 0.5),
-      income: cycle === 0 ? 1200 : 0,
+      mood: sample(mockMoods),
+      water: randomInt(3, 10),
+      exercise: maybe(0.58) ? randomInt(10, 70) : 0,
+      sleep: Math.round((5.5 + Math.random() * 3) * 2) / 2,
+      income: maybe(0.16) ? randomAmount(500, 2200, 100) : 0,
       expenseItems,
       essential: totals.essential,
       nonEssential: totals.nonEssential,
       sweetDrink: totals.sweetDrink,
       debtPaid,
       sideIncome,
-      sideChannel: cycle % 2 ? "TikTok Cat Affiliate" : "ร้านเสื้อผ้ามือสอง",
-      confidence: Math.min(10, 6 + (cycle % 5)),
-      thaiMinutes: cycle % 2 ? 25 : 15,
-      arabicMinutes: cycle >= 3 ? 20 : 0,
+      sideChannel: sideIncome ? sample(DEFAULT_SIDE_CHANNELS) : "",
+      confidence: randomInt(4, 10),
+      thaiMinutes,
+      arabicMinutes,
       languageMinutes: {},
-      languageFocus: focuses[cycle],
-      skills: cycle % 2 ? ["UI Design", "AI Tools"] : ["UX Research", "Portfolio"],
-      win: cycle === 5 ? "จ่ายหนี้เพิ่มและไม่ซื้อน้ำหวาน" : "อัปเดตชีวิตวันนี้ครบ"
+      languageFocus: sample(mockFocuses),
+      skills: practicedSkills,
+      win: sample(mockWins)
     }];
   }));
 }
