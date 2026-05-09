@@ -41,7 +41,8 @@ const pages = [
 
 const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
 const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
-const DEFAULT_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
+const LEGACY_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
+const DEFAULT_SIDE_CHANNELS = ["รับทำ UX audit", "ขาย UI kit", "สอน Figma mini class", "ขาย digital planner", "รับออกแบบ landing page"];
 const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ"];
 const settingGroups = {
   debt: {
@@ -233,7 +234,8 @@ function readStoredState(key, defaults = DEFAULT_SETTINGS) {
 
 function loadGuestState() {
   const saved = readStoredState(GUEST_STORAGE_KEY, EMPTY_SETTINGS);
-  return saved.meta?.kind === "guest" ? saved : normalizeState({ meta: { kind: "guest" } }, EMPTY_SETTINGS);
+  if (saved.meta?.kind !== "guest") return normalizeState({ meta: { kind: "guest" } }, EMPTY_SETTINGS);
+  return sanitizeGuestMockState(saved);
 }
 
 function loadUserCache(userId) {
@@ -242,6 +244,24 @@ function loadUserCache(userId) {
 
 function guestHasMockData() {
   return Boolean(loadGuestState().meta?.mockData);
+}
+
+function sanitizeGuestMockState(saved) {
+  if (!saved.meta?.mockData) return saved;
+  const legacySet = new Set(LEGACY_SIDE_CHANNELS);
+  const next = normalizeState(saved, DEFAULT_SETTINGS);
+  const hasLegacyChannel = (next.settings.sideChannelNames || []).some((channel) => legacySet.has(channel)) ||
+    Object.values(next.entries || {}).some((entry) => legacySet.has(entry.sideChannel));
+  if (!hasLegacyChannel) return next;
+
+  next.settings.sideChannelNames = [...DEFAULT_SIDE_CHANNELS];
+  Object.values(next.entries || {}).forEach((entry, index) => {
+    if (legacySet.has(entry.sideChannel)) {
+      entry.sideChannel = DEFAULT_SIDE_CHANNELS[index % DEFAULT_SIDE_CHANNELS.length];
+    }
+  });
+  localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(next));
+  return next;
 }
 
 function normalizeState(saved = {}, defaults = DEFAULT_SETTINGS) {
