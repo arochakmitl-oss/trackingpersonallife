@@ -43,7 +43,7 @@ const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools",
 const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
 const LEGACY_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
 const DEFAULT_SIDE_CHANNELS = ["รับทำ UX audit", "ขาย UI kit", "สอน Figma mini class", "ขาย digital planner", "รับออกแบบ landing page"];
-const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ"];
+const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน", "ขนม7-11"];
 const settingGroups = {
   debt: {
     title: "แก้ไขค่าหนี้",
@@ -609,7 +609,8 @@ function getExpenseItems(entry = {}) {
 function expenseTotals(items = []) {
   return items.reduce((totals, item) => {
     const amount = Number(item.amount || 0);
-    if (["ข้าวเที่ยง", "ข้าวเย็น", "ค่ารถ"].includes(item.category)) totals.essential += amount;
+    if (["ข้าวเที่ยง", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน"].includes(item.category)) totals.essential += amount;
+    if (item.category === "ขนม7-11") totals.nonEssential += amount;
     if (item.category === "น้ำหวาน") {
       totals.nonEssential += amount;
       totals.sweetDrink += amount;
@@ -2181,7 +2182,9 @@ function createMockEntries() {
       { category: "ข้าวเที่ยง", amount: randomAmount(55, 120, 5) },
       { category: "ข้าวเย็น", amount: maybe(0.48) ? randomAmount(60, 140, 5) : 0 },
       { category: "ค่ารถ", amount: maybe(0.62) ? randomAmount(20, 80, 5) : 0 },
+      { category: "ค่าใช้จ่ายภายในบ้าน", amount: maybe(0.18) ? randomAmount(120, 650, 10) : 0 },
       { category: "กาแฟ", amount: maybe(0.32) ? randomAmount(35, 95, 5) : 0 },
+      { category: "ขนม7-11", amount: maybe(0.34) ? randomAmount(20, 120, 5) : 0 },
       { category: "น้ำหวาน", amount: sweetDrink }
     ].filter((item) => item.amount > 0);
     const totals = expenseTotals(expenseItems);
