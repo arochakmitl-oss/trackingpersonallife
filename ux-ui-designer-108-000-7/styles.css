@@ -53,15 +53,18 @@ svg {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-columns: 284px minmax(0, 1fr);
+  --sidebar-width: 284px;
+  display: block;
   min-height: 100vh;
 }
 
 .side-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
-  height: 100vh;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  height: 100dvh;
   z-index: 20;
   padding: 26px 18px;
   border-right: 1px solid rgba(234, 221, 229, 0.8);
@@ -70,6 +73,8 @@ svg {
   display: flex;
   flex-direction: column;
   gap: 22px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .brand {
@@ -142,8 +147,9 @@ svg {
 }
 
 .main {
-  width: min(1180px, 100%);
-  margin: 0 auto;
+  width: min(1180px, calc(100% - var(--sidebar-width)));
+  margin-left: calc(var(--sidebar-width) + max(0px, (100vw - var(--sidebar-width) - 1180px) / 2));
+  margin-right: auto;
   padding: 28px 28px 48px;
 }
 
@@ -1441,6 +1447,7 @@ textarea:focus {
 
   .main {
     width: 100%;
+    margin: 0 auto;
     padding: 18px 14px 32px;
   }
 
