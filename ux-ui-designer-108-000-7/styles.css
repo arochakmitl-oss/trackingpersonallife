@@ -276,6 +276,16 @@ h3 {
   white-space: nowrap;
 }
 
+.mock-data-button {
+  min-height: 42px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.mock-data-button[hidden] {
+  display: none;
+}
+
 .cover {
   min-height: 210px;
   display: grid;
@@ -1646,14 +1656,19 @@ textarea:focus {
   .top-actions {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) repeat(3, 42px);
+    grid-template-columns: minmax(0, 1fr) minmax(96px, auto) repeat(3, 42px);
     gap: 8px;
     justify-content: stretch;
   }
 
-  .auth-status-button {
+  .auth-status-button,
+  .mock-data-button {
     max-width: none;
     padding: 0 10px;
+  }
+
+  .is-authenticated .top-actions {
+    grid-template-columns: minmax(0, 1fr) repeat(3, 42px);
   }
 
   .icon-button {

@@ -1,4 +1,6 @@
-const STORAGE_KEY = "bloom-ux-life-tracker-v2";
+const LEGACY_STORAGE_KEY = "bloom-ux-life-tracker-v2";
+const GUEST_STORAGE_KEY = "bloom-ux-life-tracker-guest-v1";
+const userStorageKey = (userId) => `bloom-ux-life-tracker-user-${userId}`;
 const SUPABASE_URL = "https://rxbipastbsfmxyyksdxm.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_N1cDxWxXCS8nlXS7iZg8DQ_gJNvboZz";
 const DEFAULT_SETTINGS = {
@@ -106,7 +108,7 @@ const settingGroups = {
   }
 };
 
-let state = loadState();
+let state = loadGuestState();
 let activePage = "dashboard";
 let selectedDate = toISO(new Date());
 let filter = "month";
@@ -215,13 +217,21 @@ const modalConfigs = {
   }
 };
 
-function loadState() {
+function readStoredState(key) {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const saved = JSON.parse(localStorage.getItem(key));
     return normalizeState(saved);
   } catch {
     return normalizeState();
   }
+}
+
+function loadGuestState() {
+  return readStoredState(GUEST_STORAGE_KEY);
+}
+
+function loadUserCache(userId) {
+  return readStoredState(userStorageKey(userId));
 }
 
 function normalizeState(saved = {}) {
@@ -246,7 +256,9 @@ function skillsList() {
 }
 
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const key = currentUser ? userStorageKey(currentUser.id) : GUEST_STORAGE_KEY;
+  localStorage.setItem(key, JSON.stringify(state));
+  localStorage.removeItem(LEGACY_STORAGE_KEY);
 }
 
 function setAuthMessage(message, isError = false) {
@@ -258,12 +270,16 @@ function setAuthMessage(message, isError = false) {
 
 function updateAuthUI() {
   const authButton = $("#authButton");
+  const mockButton = $("#mockDataButton");
   if (!authButton) return;
+  document.body.classList.toggle("is-authenticated", Boolean(currentUser));
   if (isCloudLoading) {
     authButton.textContent = "กำลัง sync...";
+    if (mockButton) mockButton.hidden = true;
     return;
   }
   authButton.textContent = currentUser ? `DB: ${currentUser.email}` : "เข้าสู่ระบบ";
+  if (mockButton) mockButton.hidden = Boolean(currentUser);
 }
 
 async function initSupabase() {
@@ -274,10 +290,12 @@ async function initSupabase() {
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   const { data } = await supabaseClient.auth.getSession();
   currentUser = data.session?.user || null;
+  state = currentUser ? loadUserCache(currentUser.id) : loadGuestState();
   updateAuthUI();
   if (currentUser) await loadCloudState();
   supabaseClient.auth.onAuthStateChange(async (_event, session) => {
     currentUser = session?.user || null;
+    state = currentUser ? loadUserCache(currentUser.id) : loadGuestState();
     updateAuthUI();
     if (currentUser) await loadCloudState();
     render();
@@ -1797,6 +1815,75 @@ function clearTargetValues() {
   );
 }
 
+function createMockEntries() {
+  const today = new Date();
+  const moods = ["สดใส", "นิ่งๆ", "ภูมิใจ", "เหนื่อย", "สดใส", "กังวล", "นิ่งๆ"];
+  const focuses = ["คำศัพท์", "ฟัง", "พูด", "อ่าน", "ทบทวน", "เขียน", "คำศัพท์"];
+  return Object.fromEntries(Array.from({ length: 21 }, (_, index) => {
+    const day = new Date(today);
+    day.setDate(today.getDate() - (20 - index));
+    const iso = toISO(day);
+    const cycle = index % 7;
+    const sideIncome = cycle === 1 ? 320 : cycle === 4 ? 580 : cycle === 6 ? 220 : 0;
+    const debtPaid = cycle === 2 ? 500 : cycle === 5 ? 1000 : 0;
+    const sweetDrink = cycle === 0 || cycle === 3 ? 45 : 0;
+    const expenseItems = [
+      { category: "ข้าวเที่ยง", amount: 65 + (cycle * 5) },
+      { category: "ค่ารถ", amount: cycle % 2 ? 35 : 0 },
+      { category: "น้ำหวาน", amount: sweetDrink }
+    ].filter((item) => item.amount > 0);
+    const totals = expenseTotals(expenseItems);
+    return [iso, {
+      mood: moods[cycle],
+      water: cycle >= 4 ? 8 : 5 + cycle,
+      exercise: cycle % 3 === 0 ? 0 : 20 + (cycle * 5),
+      sleep: cycle === 3 ? 5.5 : 6.5 + ((cycle % 3) * 0.5),
+      income: cycle === 0 ? 1200 : 0,
+      expenseItems,
+      essential: totals.essential,
+      nonEssential: totals.nonEssential,
+      sweetDrink: totals.sweetDrink,
+      debtPaid,
+      sideIncome,
+      sideChannel: cycle % 2 ? "TikTok Cat Affiliate" : "ร้านเสื้อผ้ามือสอง",
+      confidence: Math.min(10, 6 + (cycle % 5)),
+      thaiMinutes: cycle % 2 ? 25 : 15,
+      arabicMinutes: cycle >= 3 ? 20 : 0,
+      languageFocus: focuses[cycle],
+      skills: cycle % 2 ? ["UI Design", "AI Tools"] : ["UX Research", "Portfolio"],
+      win: cycle === 5 ? "จ่ายหนี้เพิ่มและไม่ซื้อน้ำหวาน" : "อัปเดตชีวิตวันนี้ครบ"
+    }];
+  }));
+}
+
+function createMockData() {
+  if (currentUser) {
+    openConfirmModal(
+      "จำลองข้อมูลใช้กับ guest เท่านั้น",
+      "ตอนนี้กำลังเข้าสู่ระบบอยู่ ข้อมูลจำลองจะไม่ถูกสร้างเพื่อป้องกันการปนกับข้อมูลจริง",
+      () => {}
+    );
+    return;
+  }
+  openConfirmModal(
+    "จำลองข้อมูล",
+    "สร้างข้อมูลตัวอย่างสำหรับ guest เพื่อดู dashboard โดยไม่ใช้ข้อมูลจริงและไม่บันทึกลง Supabase",
+    () => {
+      state = normalizeState({
+        entries: createMockEntries(),
+        settings: {
+          ...DEFAULT_SETTINGS,
+          skillNames: [...DEFAULT_SKILLS, "UX Writing"]
+        }
+      });
+      selectedDate = toISO(new Date());
+      calendarCursor = new Date();
+      saveState();
+      render();
+    }
+  );
+}
+
 function openConfirmModal(title, description, action) {
   pendingConfirmAction = action;
   $("#confirmTitle").textContent = title;
@@ -1864,9 +1951,11 @@ async function signOutUser() {
   if (!supabaseClient) return;
   await supabaseClient.auth.signOut();
   currentUser = null;
+  state = loadGuestState();
   updateAuthUI();
-  setAuthMessage("ออกจากระบบแล้ว ข้อมูลใหม่จะบันทึกในเครื่องนี้");
+  setAuthMessage("ออกจากระบบแล้ว ตอนนี้กำลังดูข้อมูล guest แยกจากบัญชีที่ login");
   $("#authModal").close();
+  render();
 }
 
 $("#entryForm").addEventListener("submit", handleSubmit);
@@ -1891,6 +1980,7 @@ $("#clearDayButton").addEventListener("click", () => {
 });
 $("#clearEntriesButton").addEventListener("click", clearEntryData);
 $("#clearTargetsButton").addEventListener("click", clearTargetValues);
+$("#mockDataButton").addEventListener("click", createMockData);
 $("#exportButton").addEventListener("click", exportData);
 
 render();
