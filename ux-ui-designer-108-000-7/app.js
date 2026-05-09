@@ -27,6 +27,7 @@ const DEFAULT_SETTINGS = {
 const EMPTY_SETTINGS = Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((key) => [key, 0]));
 EMPTY_SETTINGS.skillNames = [];
 EMPTY_SETTINGS.languageNames = [];
+EMPTY_SETTINGS.sideChannelNames = [];
 
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "⌂", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
@@ -40,7 +41,7 @@ const pages = [
 
 const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
 const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
-const channels = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
+const DEFAULT_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
 const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ"];
 const settingGroups = {
   debt: {
@@ -89,7 +90,7 @@ const settingGroups = {
   },
   side: {
     title: "แก้ไขเป้ารายได้เสริม",
-    description: "ใช้กับ score รายได้เสริมและ progress ของแต่ละช่องทาง",
+    description: "เพิ่ม/ลดช่องทางรายได้เสริม และตั้งเป้ารายได้ต่อช่วงเวลา",
     fields: [
       { key: "sideIncomeWeeklyTarget", label: "เป้ารายสัปดาห์", suffix: "บาท" },
       { key: "sideIncomeMonthlyTarget", label: "เป้ารายเดือน", suffix: "บาท" },
@@ -260,6 +261,9 @@ function settings() {
   if (!Array.isArray(state.settings.languageNames)) {
     state.settings.languageNames = currentUser || state?.meta?.mockData ? [...DEFAULT_LANGUAGES] : [];
   }
+  if (!Array.isArray(state.settings.sideChannelNames)) {
+    state.settings.sideChannelNames = currentUser || state?.meta?.mockData ? [...DEFAULT_SIDE_CHANNELS] : [];
+  }
   return state.settings;
 }
 
@@ -271,6 +275,11 @@ function skillsList() {
 function languagesList() {
   const list = settings().languageNames;
   return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_LANGUAGES];
+}
+
+function sideChannelsList() {
+  const list = settings().sideChannelNames;
+  return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_SIDE_CHANNELS];
 }
 
 function hasAnyEntryData() {
@@ -289,6 +298,7 @@ function hasGuestSetupData() {
     Number(cfg.languageWeeklyTarget || 0) > 0 ||
     skillsList().length > 0 ||
     languagesList().length > 0 ||
+    sideChannelsList().length > 0 ||
     hasAnyEntryData()
   );
 }
@@ -820,7 +830,7 @@ function renderWeeklyFocus(goals) {
   const sideMonth = sum(month, "sideIncome");
   const languageWeek = week.reduce((total, [, entry]) => total + languageTotal(entry), 0);
   const practicedSkills = [...new Set(week.flatMap(([, entry]) => entry.skills || []))];
-  const channelTotals = channels.map((channel) => ({
+  const channelTotals = sideChannelsList().map((channel) => ({
     channel,
     value: sum(month.filter(([, entry]) => entry.sideChannel === channel), "sideIncome")
   })).sort((a, b) => b.value - a.value);
@@ -1120,13 +1130,14 @@ function renderMoney() {
 
 function renderSideIncome() {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้เสริม", "ช่องทางรายได้เสริมจะว่างสำหรับ guest และจะเติมเมื่อกดจำลองข้อมูลหรือเริ่มบันทึกรายได้เอง");
+    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้เสริม", "ช่องทางรายได้เสริมจะว่างสำหรับ guest จนกว่าจะจำลองข้อมูลหรือเพิ่มช่องทางเอง");
   }
   const entries = entriesInRange("month");
   const cfg = settings();
+  const channels = sideChannelsList();
   return `
     <div class="grid three">
-      ${channels.map((channel) => {
+      ${channels.length ? channels.map((channel) => {
         const channelEntries = entries.filter(([, entry]) => entry.sideChannel === channel);
         const income = sum(channelEntries, "sideIncome");
         return `
@@ -1138,7 +1149,7 @@ function renderSideIncome() {
             ${renderProgress({ name: "เป้าหมายเดือนนี้", type: "ช่องทาง", progress: income, target: cfg.sideChannelMonthlyTarget })}
           </div>
         `;
-      }).join("")}
+      }).join("") : renderGuestEmptyState("ยังไม่มีช่องทางรายได้เสริม", "กดแก้ไขเป้ารายได้เพื่อเพิ่มช่องทาง เช่น YouTube, ร้านออนไลน์, Affiliate")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -1147,7 +1158,7 @@ function renderSideIncome() {
           <h2>บันทึกการทดลอง</h2>
         </div>
         <div class="button-row">
-            <button class="tiny-button" type="button" data-open-setting="side">แก้ไขเป้ารายได้</button>
+          <button class="tiny-button" type="button" data-open-setting="side">แก้ไขช่องทาง/เป้ารายได้</button>
           <button class="primary-button" type="button" data-open-entry>เพิ่มรายได้เสริม</button>
         </div>
       </div>
@@ -1711,10 +1722,9 @@ function renderField(field) {
       <label>
         ช่องทางรายได้เสริม
         <select name="sideChannel">
-          <option value="AI Kids Song YouTube">AI Kids Song YouTube</option>
-          <option value="ร้านเสื้อผ้ามือสอง">ร้านเสื้อผ้ามือสอง</option>
-          <option value="TikTok Cat Affiliate">TikTok Cat Affiliate</option>
+          ${sideChannelsList().map((channel) => `<option value="${escapeHTML(channel)}">${escapeHTML(channel)}</option>`).join("")}
         </select>
+        ${sideChannelsList().length ? "" : `<span class="field-hint">ยังไม่มีช่องทาง ไปที่แก้ไขช่องทางรายได้เสริมเพื่อเพิ่มเอง</span>`}
       </label>
     `,
     confidence: textInput("confidence", "ความมั่นใจ (1-10)", "numeric", "[0-9]*"),
@@ -1862,6 +1872,61 @@ function renderLanguageRow(language = "") {
   `;
 }
 
+function renderSideChannelEditor() {
+  const channels = sideChannelsList();
+  const rows = channels.length ? channels : [""];
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>ช่องทางรายได้เสริม</span>
+          <small>เพิ่มช่องทางเองได้ เช่น YouTube, ร้านออนไลน์, รับ freelance, affiliate หรืออื่นๆ</small>
+        </div>
+        <button class="tiny-button" type="button" data-add-side-channel-row>เพิ่มช่องทาง</button>
+      </div>
+      <div class="skill-rows" data-side-channel-rows>
+        ${rows.map((channel) => renderSideChannelRow(channel)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderSideChannelRow(channel = "") {
+  return `
+    <div class="skill-row">
+      <input name="sideChannelName" type="text" value="${escapeHTML(channel)}" placeholder="เช่น รับออกแบบ landing page" />
+      <button class="icon-button skill-remove" type="button" data-remove-side-channel-row aria-label="ลบช่องทาง">×</button>
+    </div>
+  `;
+}
+
+function bindSideChannelRows() {
+  const rows = $("[data-side-channel-rows]");
+  if (!rows) return;
+  const syncRemoveButtons = () => {
+    const buttons = [...rows.querySelectorAll("[data-remove-side-channel-row]")];
+    buttons.forEach((button) => {
+      button.disabled = buttons.length <= 1;
+    });
+  };
+  const addButton = $("[data-add-side-channel-row]");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      rows.insertAdjacentHTML("beforeend", renderSideChannelRow());
+      const lastInput = rows.querySelector(".skill-row:last-child input");
+      if (lastInput) lastInput.focus();
+      syncRemoveButtons();
+    });
+  }
+  rows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-side-channel-row]");
+    if (!button || rows.children.length <= 1) return;
+    button.closest(".skill-row").remove();
+    syncRemoveButtons();
+  });
+  syncRemoveButtons();
+}
+
 function bindLanguageRows() {
   const rows = $("[data-language-rows]");
   if (!rows) return;
@@ -1968,7 +2033,8 @@ function openSettingModal(group = "debt") {
       <span class="field-hint">${field.suffix}</span>
     </label>
   `).join("");
-  $("#settingFields").innerHTML = `${genericFields}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}`;
+  $("#settingFields").innerHTML = `${genericFields}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}`;
+  if (group === "side") bindSideChannelRows();
   if (group === "skills") bindSkillRows();
   if (group === "language") bindLanguageRows();
   $("#settingModal").showModal();
@@ -1984,6 +2050,10 @@ function handleSettingSubmit(event) {
   if (settingGroup === "skills") {
     const nextSkills = [...new Set(data.getAll("skillName").map((skill) => skill.trim()).filter(Boolean))];
     settings().skillNames = nextSkills;
+  }
+  if (settingGroup === "side") {
+    const nextChannels = [...new Set(data.getAll("sideChannelName").map((channel) => channel.trim()).filter(Boolean))];
+    settings().sideChannelNames = nextChannels;
   }
   if (settingGroup === "language") {
     const nextLanguages = [...new Set(data.getAll("languageName").map((language) => language.trim()).filter(Boolean))];
@@ -2002,6 +2072,9 @@ function resetSettingGroup() {
   });
   if (settingGroup === "skills") {
     settings().skillNames = [...DEFAULT_SKILLS];
+  }
+  if (settingGroup === "side") {
+    settings().sideChannelNames = [...DEFAULT_SIDE_CHANNELS];
   }
   if (settingGroup === "language") {
     settings().languageNames = [...DEFAULT_LANGUAGES];
@@ -2101,7 +2174,8 @@ function createMockData() {
         settings: {
           ...DEFAULT_SETTINGS,
           skillNames: [...DEFAULT_SKILLS, "UX Writing"],
-          languageNames: [...DEFAULT_LANGUAGES]
+          languageNames: [...DEFAULT_LANGUAGES],
+          sideChannelNames: [...DEFAULT_SIDE_CHANNELS]
         }
       }, DEFAULT_SETTINGS);
       selectedDate = toISO(new Date());
