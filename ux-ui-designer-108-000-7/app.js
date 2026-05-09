@@ -24,6 +24,8 @@ const DEFAULT_SETTINGS = {
   trendExerciseTarget: 45,
   trendNonEssentialLimit: 500
 };
+const EMPTY_SETTINGS = Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((key) => [key, 0]));
+EMPTY_SETTINGS.skillNames = [];
 
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "⌂", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
@@ -217,35 +219,41 @@ const modalConfigs = {
   }
 };
 
-function readStoredState(key) {
+function readStoredState(key, defaults = DEFAULT_SETTINGS) {
   try {
     const saved = JSON.parse(localStorage.getItem(key));
-    return normalizeState(saved);
+    return normalizeState(saved, defaults);
   } catch {
-    return normalizeState();
+    return normalizeState({}, defaults);
   }
 }
 
 function loadGuestState() {
-  return readStoredState(GUEST_STORAGE_KEY);
+  const saved = readStoredState(GUEST_STORAGE_KEY, EMPTY_SETTINGS);
+  return saved.meta?.kind === "guest" ? saved : normalizeState({ meta: { kind: "guest" } }, EMPTY_SETTINGS);
 }
 
 function loadUserCache(userId) {
   return readStoredState(userStorageKey(userId));
 }
 
-function normalizeState(saved = {}) {
+function normalizeState(saved = {}, defaults = DEFAULT_SETTINGS) {
   return {
     entries: saved && saved.entries ? saved.entries : {},
-    settings: { ...DEFAULT_SETTINGS, ...(saved?.settings || {}) },
-    createdAt: saved?.createdAt || new Date().toISOString()
+    settings: { ...defaults, ...(saved?.settings || {}) },
+    createdAt: saved?.createdAt || new Date().toISOString(),
+    meta: saved?.meta || {}
   };
 }
 
+function defaultSettingsForState() {
+  return currentUser || state?.meta?.mockData ? DEFAULT_SETTINGS : EMPTY_SETTINGS;
+}
+
 function settings() {
-  state.settings = { ...DEFAULT_SETTINGS, ...(state.settings || {}) };
+  state.settings = { ...defaultSettingsForState(), ...(state.settings || {}) };
   if (!Array.isArray(state.settings.skillNames)) {
-    state.settings.skillNames = [...DEFAULT_SKILLS];
+    state.settings.skillNames = currentUser || state?.meta?.mockData ? [...DEFAULT_SKILLS] : [];
   }
   return state.settings;
 }
@@ -255,8 +263,50 @@ function skillsList() {
   return Array.isArray(list) ? list.filter(Boolean) : [...DEFAULT_SKILLS];
 }
 
+function hasAnyEntryData() {
+  return Object.keys(state.entries || {}).length > 0;
+}
+
+function hasGuestSetupData() {
+  const cfg = settings();
+  return Boolean(
+    Number(cfg.debtTotal || 0) > 0 ||
+    Number(cfg.sideIncomeWeeklyTarget || 0) > 0 ||
+    Number(cfg.sideIncomeMonthlyTarget || 0) > 0 ||
+    Number(cfg.sideIncomeYearlyTarget || 0) > 0 ||
+    Number(cfg.sideChannelMonthlyTarget || 0) > 0 ||
+    Number(cfg.languageDailyTarget || 0) > 0 ||
+    Number(cfg.languageWeeklyTarget || 0) > 0 ||
+    skillsList().length > 0 ||
+    hasAnyEntryData()
+  );
+}
+
+function isGuestEmptyState() {
+  return !currentUser && !state.meta?.mockData && !hasGuestSetupData();
+}
+
+function renderGuestEmptyState(title, description) {
+  return `
+    <div class="card empty-state-card">
+      <div>
+        <p class="eyebrow">Guest empty state</p>
+        <h2>${title}</h2>
+        <p class="muted">${description}</p>
+      </div>
+      <div class="button-row">
+        <button class="soft-button" type="button" data-mock-data>จำลองข้อมูล</button>
+        <button class="primary-button" type="button" data-open-entry>เริ่มบันทึกเอง</button>
+      </div>
+    </div>
+  `;
+}
+
 function saveState() {
   const key = currentUser ? userStorageKey(currentUser.id) : GUEST_STORAGE_KEY;
+  state.meta = currentUser
+    ? { ...(state.meta || {}), kind: "user" }
+    : { ...(state.meta || {}), kind: "guest" };
   localStorage.setItem(key, JSON.stringify(state));
   localStorage.removeItem(LEGACY_STORAGE_KEY);
 }
@@ -330,6 +380,7 @@ async function loadCloudState() {
   }
   state.entries = Object.fromEntries((rows || []).map((row) => [row.entry_date, row.data || {}]));
   state.settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.settings || {}) };
+  state.meta = { kind: "user" };
   saveState();
   render();
 }
@@ -571,6 +622,21 @@ function renderDashboard() {
   const entries = entriesInRange();
   const today = getEntry();
   const cfg = settings();
+  const guestEmpty = isGuestEmptyState();
+  if (guestEmpty) {
+    return `
+      <div class="section-head">
+        <div class="segmented" aria-label="ตัวกรองช่วงเวลา">
+          ${["week", "month", "year"].map((item) => `<button type="button" class="${filter === item ? "active" : ""}" data-filter="${item}">${item === "week" ? "สัปดาห์" : item === "month" ? "เดือน" : "ปี"}</button>`).join("")}
+        </div>
+        <button class="primary-button" type="button" data-open-entry>เริ่มบันทึกเอง</button>
+      </div>
+      <div class="grid two">
+        ${renderGuestEmptyState("ยังไม่มีข้อมูลสำหรับ guest", "หนี้ รายได้เสริม ทักษะ และภาษาเป้าหมายจะว่างทั้งหมด จนกว่าจะกดจำลองข้อมูลหรือเริ่มบันทึกเอง")}
+        ${renderCalendar()}
+      </div>
+    `;
+  }
   const debtPaid = sum(Object.entries(state.entries), "debtPaid");
   const sideIncome = sum(entries, "sideIncome");
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
@@ -615,7 +681,7 @@ function renderDashboard() {
         ])}
       </div>
 
-      <div class="card debt-visual-card">
+      ${guestEmpty ? renderGuestEmptyState("ยังไม่ได้ตั้งค่าหนี้และเป้าหมายเงิน", "guest จะเห็นพื้นที่ว่างก่อน เพื่อไม่ปนกับข้อมูลจริงของคนที่ login") : `<div class="card debt-visual-card">
         <div>
           <p class="eyebrow">Debt visual</p>
           <h2>ปิดหนี้ ${money(cfg.debtTotal)} บาท</h2>
@@ -628,7 +694,7 @@ function renderDashboard() {
             <span class="muted">จ่ายแล้ว ${Math.round((debtPaid / Math.max(cfg.debtTotal, 1)) * 100)}%</span>
           </div>
         </div>
-      </div>
+      </div>`}
     </div>
 
     <div class="grid two">
@@ -667,6 +733,9 @@ function renderDashboard() {
 }
 
 function renderGoals() {
+  if (isGuestEmptyState()) {
+    return renderGuestEmptyState("ยังไม่ได้ตั้งค่าเป้าหมาย", "guest จะไม่เห็นเป้าหมายหนี้ รายได้เสริม ทักษะ หรือภาษา จนกว่าจะจำลองข้อมูลหรือเริ่มเพิ่มเป้าหมายเอง");
+  }
   const entries = entriesInRange("month");
   const cfg = settings();
   const goalTemplates = [
@@ -969,6 +1038,9 @@ function renderCheckin() {
 }
 
 function renderMoney() {
+  if (isGuestEmptyState()) {
+    return renderGuestEmptyState("ยังไม่มีข้อมูลหนี้และการเงิน", "ระบบจะไม่โชว์หนี้ 108,000 หรือยอดเงินใดๆ ให้ guest จนกว่าจะจำลองข้อมูลหรือเริ่มบันทึกเอง");
+  }
   const all = Object.entries(state.entries);
   const entries = entriesInRange("month");
   const cfg = settings();
@@ -1021,6 +1093,9 @@ function renderMoney() {
 }
 
 function renderSideIncome() {
+  if (isGuestEmptyState()) {
+    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้เสริม", "ช่องทางรายได้เสริมจะว่างสำหรับ guest และจะเติมเมื่อกดจำลองข้อมูลหรือเริ่มบันทึกรายได้เอง");
+  }
   const entries = entriesInRange("month");
   const cfg = settings();
   return `
@@ -1092,6 +1167,9 @@ function renderHealth() {
 }
 
 function renderSkills() {
+  if (isGuestEmptyState()) {
+    return renderGuestEmptyState("ยังไม่มีทักษะและภาษาที่ตั้งไว้", "guest จะไม่เห็น skill default หรือภาษาเป้าหมายจนกว่าจะจำลองข้อมูลหรือเพิ่มรายการเอง");
+  }
   const cfg = settings();
   const skills = skillsList();
   const week = entriesInRange("week");
@@ -1224,6 +1302,9 @@ function miniSummary(label, value) {
 }
 
 function languageDashboard(entries) {
+  if (isGuestEmptyState()) {
+    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาอังกฤษและอาหรับจะยังว่างสำหรับ guest จนกว่าจะจำลองข้อมูลหรือบันทึกการฝึกภาษาเอง");
+  }
   const cfg = settings();
   const thai = sum(entries, "thaiMinutes");
   const arabic = sum(entries, "arabicMinutes");
@@ -1460,6 +1541,9 @@ function bindPageEvents() {
   });
   document.querySelectorAll("[data-open-setting]").forEach((button) => {
     button.addEventListener("click", () => openSettingModal(button.dataset.openSetting));
+  });
+  document.querySelectorAll("[data-mock-data]").forEach((button) => {
+    button.addEventListener("click", createMockData);
   });
 }
 
@@ -1871,11 +1955,12 @@ function createMockData() {
     () => {
       state = normalizeState({
         entries: createMockEntries(),
+        meta: { kind: "guest", mockData: true },
         settings: {
           ...DEFAULT_SETTINGS,
           skillNames: [...DEFAULT_SKILLS, "UX Writing"]
         }
-      });
+      }, DEFAULT_SETTINGS);
       selectedDate = toISO(new Date());
       calendarCursor = new Date();
       saveState();

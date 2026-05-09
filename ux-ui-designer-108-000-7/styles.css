@@ -364,6 +364,16 @@ h3 {
   padding: 18px;
 }
 
+.empty-state-card {
+  min-height: 220px;
+  display: grid;
+  align-content: center;
+  gap: 16px;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(198, 178, 242, 0.22), transparent 28%),
+    rgba(255, 255, 255, 0.74);
+}
+
 .stat-card {
   min-height: 132px;
   padding: 17px;
