@@ -1684,10 +1684,6 @@ textarea:focus {
     padding: 0 10px;
   }
 
-  .is-authenticated .top-actions {
-    grid-template-columns: minmax(0, 1fr) repeat(3, 42px);
-  }
-
   .icon-button {
     width: 42px;
     height: 42px;

@@ -240,6 +240,10 @@ function loadUserCache(userId) {
   return readStoredState(userStorageKey(userId));
 }
 
+function guestHasMockData() {
+  return Boolean(loadGuestState().meta?.mockData);
+}
+
 function normalizeState(saved = {}, defaults = DEFAULT_SETTINGS) {
   return {
     entries: saved && saved.entries ? saved.entries : {},
@@ -346,11 +350,11 @@ function updateAuthUI() {
   document.body.classList.toggle("is-authenticated", Boolean(currentUser));
   if (isCloudLoading) {
     authButton.textContent = "กำลัง sync...";
-    if (mockButton) mockButton.hidden = true;
+    if (mockButton) mockButton.hidden = false;
     return;
   }
   authButton.textContent = currentUser ? `DB: ${currentUser.email}` : "เข้าสู่ระบบ";
-  if (mockButton) mockButton.hidden = Boolean(currentUser);
+  if (mockButton) mockButton.hidden = false;
 }
 
 async function initSupabase() {
@@ -360,11 +364,27 @@ async function initSupabase() {
   }
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   const { data } = await supabaseClient.auth.getSession();
+  if (guestHasMockData()) {
+    currentUser = null;
+    state = loadGuestState();
+    supabaseClient.auth.signOut().catch(() => {});
+    updateAuthUI();
+    render();
+    return;
+  }
   currentUser = data.session?.user || null;
   state = currentUser ? loadUserCache(currentUser.id) : loadGuestState();
   updateAuthUI();
   if (currentUser) await loadCloudState();
   supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    if (guestHasMockData()) {
+      currentUser = null;
+      state = loadGuestState();
+      updateAuthUI();
+      render();
+      if (session?.user) supabaseClient.auth.signOut().catch(() => {});
+      return;
+    }
     currentUser = session?.user || null;
     state = currentUser ? loadUserCache(currentUser.id) : loadGuestState();
     updateAuthUI();
@@ -2129,9 +2149,10 @@ function createMockEntries() {
   const sample = (items) => items[randomInt(0, items.length - 1)];
   const maybe = (chance) => Math.random() < chance;
   const randomAmount = (min, max, step = 5) => Math.round(randomInt(min, max) / step) * step;
-  return Object.fromEntries(Array.from({ length: randomInt(18, 28) }, (_, index, days) => {
+  const mockDayCount = randomInt(18, 28);
+  return Object.fromEntries(Array.from({ length: mockDayCount }, (_, index) => {
     const day = new Date(today);
-    day.setDate(today.getDate() - (days.length - 1 - index));
+    day.setDate(today.getDate() - (mockDayCount - 1 - index));
     const iso = toISO(day);
     const sideIncome = maybe(0.38) ? randomAmount(120, 950, 10) : 0;
     const debtPaid = maybe(0.28) ? randomAmount(300, 1800, 100) : 0;
@@ -2171,35 +2192,29 @@ function createMockEntries() {
   }));
 }
 
-function createMockData() {
-  if (currentUser) {
-    openConfirmModal(
-      "จำลองข้อมูลใช้กับ guest เท่านั้น",
-      "ตอนนี้กำลังเข้าสู่ระบบอยู่ ข้อมูลจำลองจะไม่ถูกสร้างเพื่อป้องกันการปนกับข้อมูลจริง",
-      () => {}
-    );
-    return;
-  }
-  openConfirmModal(
-    "จำลองข้อมูล",
-    "สร้างข้อมูลตัวอย่างสำหรับ guest เพื่อดู dashboard โดยไม่ใช้ข้อมูลจริงและไม่บันทึกลง Supabase",
-    () => {
-      state = normalizeState({
-        entries: createMockEntries(),
-        meta: { kind: "guest", mockData: true },
-        settings: {
-          ...DEFAULT_SETTINGS,
-          skillNames: [...DEFAULT_SKILLS, "UX Writing"],
-          languageNames: [...DEFAULT_LANGUAGES],
-          sideChannelNames: [...DEFAULT_SIDE_CHANNELS]
-        }
-      }, DEFAULT_SETTINGS);
-      selectedDate = toISO(new Date());
-      calendarCursor = new Date();
-      saveState();
-      render();
+function applyRandomMockData() {
+  currentUser = null;
+  isCloudLoading = false;
+  state = normalizeState({
+    entries: createMockEntries(),
+    meta: { kind: "guest", mockData: true, generatedAt: new Date().toISOString() },
+    settings: {
+      ...DEFAULT_SETTINGS,
+      skillNames: [...DEFAULT_SKILLS, "UX Writing"],
+      languageNames: [...DEFAULT_LANGUAGES],
+      sideChannelNames: [...DEFAULT_SIDE_CHANNELS]
     }
-  );
+  }, DEFAULT_SETTINGS);
+  selectedDate = toISO(new Date());
+  calendarCursor = new Date();
+  saveState();
+  updateAuthUI();
+  render();
+}
+
+function createMockData() {
+  applyRandomMockData();
+  if (supabaseClient) supabaseClient.auth.signOut().catch(() => {});
 }
 
 function openConfirmModal(title, description, action) {
