@@ -382,17 +382,27 @@ function moneyGoalsList() {
   return MONEY_GOAL_MASTER.filter((item) => ids.includes(item.id));
 }
 
+function activeHealthGoals() {
+  const goals = healthGoalsList();
+  return goals.length ? goals : HEALTH_GOAL_MASTER;
+}
+
+function activeMoneyGoals() {
+  const goals = moneyGoalsList();
+  return goals.length ? goals : MONEY_GOAL_MASTER;
+}
+
 function settingFieldLabel(field) {
   return `${field.label} ${money(settings()[field.key] ?? 0)} ${field.suffix}`;
 }
 
 function featureSettingSummary(id) {
   if (id === "health") {
-    return healthGoalsList().map((goal) => `${goal.label}: ${money(settings()[goal.targetKey])} ${goal.unit}`);
+    return activeHealthGoals().map((goal) => `${goal.label}: ${money(settings()[goal.targetKey])} ${goal.unit}`);
   }
   if (id === "money") {
     return [
-      ...moneyGoalsList().map((goal) => `${goal.label}: ${money(settings()[goal.targetKey])} ${goal.unit}`),
+      ...activeMoneyGoals().map((goal) => `${goal.label}: ${money(settings()[goal.targetKey])} ${goal.unit}`),
       `${expenseCategoriesList().length} หมวดรายจ่าย`,
       `${paymentMethodsList().length} วิธีจ่าย`
     ];
@@ -986,19 +996,19 @@ function renderDashboard() {
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const trend = trendPeriod();
   const hasRangeData = entries.length > 0;
-  const healthGoalScores = healthGoalsList().map((goal) => {
+  const healthGoalScores = activeHealthGoals().map((goal) => {
     const value = goal.id === "exercise" ? sum(entriesInRange("week"), "exercise") : Number(today[goal.field] || 0);
     return progressValue(value, cfg[goal.targetKey]);
   });
   const healthScore = healthGoalScores.length ? average(healthGoalScores) : 0;
-  const moneyGoalScores = moneyGoalsList().map((goal) => progressValue(sum(entries, goal.field), cfg[goal.targetKey]));
+  const moneyGoalScores = activeMoneyGoals().map((goal) => progressValue(sum(entries, goal.field), cfg[goal.targetKey]));
   const moneyScore = hasRangeData ? average(moneyGoalScores.length ? moneyGoalScores : [progressValue(debtPaid, cfg.debtMonthlyTarget)]) : 0;
   const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
   const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
   const radarItems = [
-    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: healthGoalsList().map((item) => item.label).join(", ") || "ยังไม่เลือกเป้าหมาย", color: "#a9dcc5" } : null,
-    isFeatureEnabled("money") ? { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: moneyGoalsList().map((item) => item.label).join(", ") || "รายรับรายจ่าย", color: "#ffc39d" } : null,
+    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: activeHealthGoals().map((item) => item.label).join(", "), color: "#a9dcc5" } : null,
+    isFeatureEnabled("money") ? { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: activeMoneyGoals().map((item) => item.label).join(", "), color: "#ffc39d" } : null,
     isFeatureEnabled("side") ? { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" } : null,
     isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" } : null
   ].filter(Boolean);
@@ -1027,17 +1037,17 @@ function renderDashboard() {
             <p class="eyebrow">Financial health</p>
             <h2>สุขภาพทางการเงินตามข้อมูลที่ตั้งไว้</h2>
           </div>
-          <span class="pill">${moneyGoalsList().length} เป้าหมาย</span>
+          <span class="pill">${activeMoneyGoals().length} เป้าหมาย</span>
         </div>
         <div class="money-goal-rings">
-          ${moneyGoalsList().map((goal) => {
+          ${activeMoneyGoals().map((goal) => {
             const value = sum(entries, goal.field);
             return `
               <div class="mini-ring" style="--ring:${progressValue(value, cfg[goal.targetKey])}%">
                 <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
               </div>
             `;
-          }).join("") || `<p class="muted">ยังไม่ได้เลือกข้อมูลการเงินใน Settings</p>`}
+          }).join("")}
         </div>
         ${cfg.debtTotal ? `
           <div class="debt-inline">
@@ -1256,8 +1266,8 @@ function renderCheckinSummary() {
   const today = getEntry();
   const week = entriesInRange("week");
   const cfg = settings();
-  const healthGoal = healthGoalsList()[0];
-  const moneyGoal = moneyGoalsList()[0];
+  const healthGoal = activeHealthGoals()[0];
+  const moneyGoal = activeMoneyGoals()[0];
   const healthValue = healthGoal ? (healthGoal.id === "exercise" ? sum(week, "exercise") : Number(today[healthGoal.field] || 0)) : 0;
   const moneyValue = moneyGoal ? sum(entriesInRange("month"), moneyGoal.field) : 0;
   return `
@@ -1291,7 +1301,7 @@ function renderMoney() {
   const debtPaid = sum(all, "debtPaid");
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const debtAngle = `${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%`;
-  const goals = moneyGoalsList();
+  const goals = activeMoneyGoals();
   const categories = categoryTotals(entries);
   const cardDebt = entries.reduce((total, [, entry]) => total + cardDebtTotal(entry), 0);
   const income = sum(entries, "income");
@@ -1457,7 +1467,7 @@ function renderHealth() {
   const entry = getEntry();
   const week = entriesInRange("week");
   const cfg = settings();
-  const goals = healthGoalsList();
+  const goals = activeHealthGoals();
   const valueForGoal = (goal) => goal.id === "exercise" ? sum(week, "exercise") : Number(entry[goal.field] || 0);
   return `
     <div class="grid four">
@@ -1619,6 +1629,7 @@ function renderFeatureSettingCard(id) {
 function renderFeatureConfigPanel(id) {
   const groups = FEATURE_SETTING_GROUPS[id] || [];
   const summary = featureSettingSummary(id);
+  const enabled = isFeatureEnabled(id);
   return `
     <div class="feature-config-panel">
       <table class="settings-table">
@@ -1627,7 +1638,7 @@ function renderFeatureConfigPanel(id) {
         </tbody>
       </table>
       <div class="settings-submenu">
-        ${groups.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}">${hugeIcon(item.icon)} ${item.label}</button>`).join("")}
+        ${groups.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}" ${enabled ? "" : "disabled"}>${hugeIcon(item.icon)} ${item.label}</button>`).join("")}
       </div>
     </div>
   `;
@@ -1839,6 +1850,7 @@ function radarPoint(index, count, score) {
 
 function moneyMixChart(entries) {
   const categories = categoryTotals(entries);
+  const categoryItems = categories.length ? categories : [{ category: "ยังไม่มีรายจ่าย", amount: 0 }];
   const categoryExpense = categories.reduce((amount, item) => amount + item.amount, 0);
   const items = [
     { key: "income", icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
@@ -1857,6 +1869,14 @@ function moneyMixChart(entries) {
   const incomeTotal = items[0].value + items[1].value;
   const outflowTotal = items[2].value + items[3].value + sum(entries, "saving") + sum(entries, "investment");
   const net = incomeTotal - outflowTotal;
+  const categoryColors = ["#ffc39d", "#f5a7c6", "#c6b2f2", "#a9dcc5", "#9ac7e8", "#e874a8"];
+  let categoryCursor = 0;
+  const categoryStops = categoryItems.map((item, index) => {
+    const start = categoryCursor;
+    const size = categoryExpense ? (item.amount / categoryExpense) * 100 : (index === 0 ? 100 : 0);
+    categoryCursor += size;
+    return `${categoryColors[index % categoryColors.length]} ${start}% ${categoryCursor}%`;
+  }).join(", ");
 
   return `
     <div class="card money-mix-card">
@@ -1868,19 +1888,13 @@ function moneyMixChart(entries) {
         <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
       </div>
       <div class="money-mix-layout">
-        <div class="money-donut" style="--money-mix:${total ? stops : "#efe1e9 0 100%"}">
-          <div>
-            <span class="muted">คงเหลือสุทธิ</span>
-            <strong>${money(net)}</strong>
-            <span class="muted">บาท</span>
-          </div>
-        </div>
-        <div class="money-legend">
-          ${items.map((item) => `
+        <div class="money-stack-chart" style="--money-stack:${categoryExpense ? categoryStops : "#efe1e9 0 100%"}" aria-label="สัดส่วนรายจ่ายตามหมวด"></div>
+        <div class="money-legend compact">
+          ${categoryItems.map((item, index) => `
             <div class="money-legend-item">
-              <span class="legend-dot" style="background:${item.color}"></span>
-              <span>${iconLabel(item.icon, item.label)}</span>
-              <strong>${money(item.value)} บาท</strong>
+              <span class="legend-dot" style="background:${categoryColors[index % categoryColors.length]}"></span>
+              <span>${escapeHTML(item.category)}</span>
+              <strong>${money(item.amount)} บาท</strong>
             </div>
           `).join("")}
         </div>
@@ -1888,14 +1902,6 @@ function moneyMixChart(entries) {
           ${miniSummary(iconLabel("income", "เงินเข้า"), `${money(incomeTotal)} บาท`)}
           ${miniSummary(iconLabel("expense", "เงินออก"), `${money(outflowTotal)} บาท`)}
           ${miniSummary(iconLabel(net >= 0 ? "win" : "debt", net >= 0 ? "เหลือเก็บ" : "ติดลบ"), `${money(Math.abs(net))} บาท`)}
-        </div>
-        <div class="category-bars">
-          ${categories.slice(0, 5).map((item) => `
-            <div class="category-bar">
-              <div class="progress-meta"><span>${escapeHTML(item.category)}</span><strong>${money(item.amount)} บาท</strong></div>
-              <div class="bar"><span style="width:${progressValue(item.amount, Math.max(categories[0]?.amount || 1, 1))}%"></span></div>
-            </div>
-          `).join("") || `<p class="muted">ยังไม่มีรายจ่ายตามหมวด</p>`}
         </div>
       </div>
     </div>
@@ -1994,7 +2000,10 @@ function bindPageEvents() {
 function handleFeatureSettingsSubmit(event) {
   event.preventDefault();
   const data = new FormData(event.currentTarget);
-  settings().enabledFeatures = data.getAll("enabledFeature").filter((id) => DEFAULT_FEATURES.includes(id));
+  const nextFeatures = data.getAll("enabledFeature").filter((id) => DEFAULT_FEATURES.includes(id));
+  settings().enabledFeatures = nextFeatures;
+  if (!nextFeatures.includes("health")) settings().healthGoalIds = [];
+  if (!nextFeatures.includes("money")) settings().moneyGoalIds = [];
   saveState();
   syncSettings();
   render();
@@ -2639,6 +2648,8 @@ function visibleFieldsForSetting(config) {
 function openSettingModal(group = "debt") {
   const config = settingGroups[group] || settingGroups.debt;
   settingGroup = group;
+  const ownerFeature = group === "health" ? "health" : ["moneyGoals", "financeOptions", "debt"].includes(group) ? "money" : group === "side" ? "side" : ["skills", "language"].includes(group) ? "skills" : "";
+  const disabledByFeature = ownerFeature && !isFeatureEnabled(ownerFeature);
   $("#settingTitle").textContent = config.title;
   $("#settingDescription").textContent = config.description;
   const visibleSettingFields = visibleFieldsForSetting(config);
@@ -2658,6 +2669,9 @@ function openSettingModal(group = "debt") {
     bindExpenseCategoryRows();
     bindPaymentMethodRows();
   }
+  $("#settingFields").querySelectorAll("input, select, textarea, button").forEach((control) => {
+    control.disabled = Boolean(disabledByFeature);
+  });
   $("#settingModal").showModal();
 }
 
