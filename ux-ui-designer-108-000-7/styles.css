@@ -232,6 +232,8 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  width: fit-content;
+  white-space: nowrap;
 }
 
 .hgi {
@@ -1399,8 +1401,8 @@ input[type="checkbox"]:focus-visible {
 }
 
 .feature-toggle-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -1415,6 +1417,28 @@ input[type="checkbox"]:focus-visible {
   border-radius: 8px;
   background: var(--surface-soft);
   transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.feature-setting-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.feature-setting-card.enabled {
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 28px rgba(198, 178, 242, 0.12);
+}
+
+.feature-config-panel {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
 }
 
 .feature-toggle:has(input:checked) {
@@ -1502,22 +1526,47 @@ input[type="checkbox"]:focus-visible {
 
 .master-goal-card {
   position: relative;
-  width: 128px;
-  aspect-ratio: 1 / 1;
-  align-content: space-between;
+  width: 178px;
+  min-height: 178px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.64);
 }
 
+.master-target-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.master-target-field input {
+  min-height: 36px;
+  padding: 7px 9px;
+  border-radius: 12px;
+}
+
 .master-goal-card input {
+  position: static;
+}
+
+.master-check input {
   position: absolute;
   top: 10px;
   right: 10px;
 }
 
-.master-goal-card:has(input:checked) {
+.master-check {
+  display: grid;
+  gap: 8px;
+}
+
+.master-goal-card:has(.master-check input:checked) {
   border-color: rgba(183, 138, 222, 0.7);
   box-shadow: 0 12px 28px rgba(198, 178, 242, 0.16);
 }
@@ -1745,7 +1794,9 @@ input[type="checkbox"]:focus-visible {
   .language-layout,
   .summary-band,
   .money-split,
-  .form-grid {
+  .form-grid,
+  .feature-toggle-grid,
+  .feature-setting-card {
     grid-template-columns: 1fr;
   }
 
@@ -1909,7 +1960,7 @@ input[type="checkbox"]:focus-visible {
   .modal-actions .button-row,
   .modal-actions .primary-button,
   .modal-actions .ghost-button {
-    width: 100%;
+    width: fit-content;
   }
 }
 
@@ -2081,7 +2132,6 @@ input[type="checkbox"]:focus-visible {
     justify-content: stretch;
   }
 
-  .button-row,
   .chip-row,
   .segmented {
     width: 100%;

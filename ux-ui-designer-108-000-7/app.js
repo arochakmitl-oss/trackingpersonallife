@@ -39,7 +39,7 @@ EMPTY_SETTINGS.moneyGoalIds = [];
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "home-01", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
   { id: "checkin", label: "เช็คอินวันนี้", icon: "checkmark-circle-02", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
-  { id: "money", label: "เงิน & หนี้", icon: "wallet-01", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "สุขภาพการเงินรายวัน", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
+  { id: "money", label: "สุขภาพทางการเงิน", icon: "wallet-01", title: "สุขภาพทางการเงิน", cover: "assets/money.svg", kicker: "สุขภาพการเงินรายวัน", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
   { id: "side", label: "รายได้เสริม", icon: "arrow-up-right-01", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
   { id: "health", label: "สุขภาพ & ความสวย", icon: "heart-check", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
   { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "แผนเติบโตในแบบของคุณ", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
@@ -47,10 +47,10 @@ const pages = [
   { id: "settings", label: "ตั้งค่า", icon: "settings-01", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
 ];
 
-const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
-const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
+const DEFAULT_SKILLS = ["การสื่อสาร", "การวางแผน", "การจัดการเวลา", "AI Tools", "การเงินส่วนตัว", "สุขภาพ"];
+const DEFAULT_LANGUAGES = ["อังกฤษ"];
 const LEGACY_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
-const DEFAULT_SIDE_CHANNELS = ["รับทำ UX audit", "ขาย UI kit", "สอน Figma mini class", "ขาย digital planner", "รับออกแบบ landing page"];
+const DEFAULT_SIDE_CHANNELS = ["ขายของออนไลน์", "รับงานเสริม", "คอนเทนต์ออนไลน์"];
 const DEFAULT_FEATURES = ["money", "side", "health", "skills"];
 const CORE_PAGES = ["dashboard", "checkin", "membership", "settings"];
 const DEFAULT_EXPENSE_CATEGORIES = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน", "ขนม7-11"];
@@ -68,6 +68,19 @@ const MONEY_GOAL_MASTER = [
   { id: "saving", label: "ออมเงิน", icon: "safe", field: "saving", targetKey: "savingMonthlyTarget", unit: "บาท", period: "รายเดือน" },
   { id: "investment", label: "ลงทุน", icon: "chart-line-data-01", field: "investment", targetKey: "investmentMonthlyTarget", unit: "บาท", period: "รายเดือน" }
 ];
+const FEATURE_SETTING_GROUPS = {
+  money: [
+    { group: "moneyGoals", label: "Master + เป้าหมายการเงิน", icon: "target-02" },
+    { group: "financeOptions", label: "หมวดรายจ่าย / วิธีจ่าย", icon: "wallet-01" },
+    { group: "debt", label: "ยอดหนี้ปัจจุบัน", icon: "credit-card" }
+  ],
+  side: [{ group: "side", label: "ช่องทาง + เป้ารายได้เสริม", icon: "arrow-up-right-01" }],
+  health: [{ group: "health", label: "Master + เป้าสุขภาพ", icon: "heart-check" }],
+  skills: [
+    { group: "skills", label: "ทักษะ + เป้าการฝึก", icon: "pencil-edit-02" },
+    { group: "language", label: "ภาษา + เป้านาที", icon: "translation" }
+  ]
+};
 const trialDays = 7;
 const settingGroups = {
   debt: {
@@ -88,7 +101,16 @@ const settingGroups = {
       { key: "savingMonthlyTarget", label: "ออมเงินต่อเดือน", suffix: "บาท" },
       { key: "investmentMonthlyTarget", label: "ลงทุนต่อเดือน", suffix: "บาท" },
       { key: "sideIncomeMonthlyTarget", label: "รายได้เสริมต่อเดือน", suffix: "บาท" },
-      { key: "careerTargetDays", label: "วันฝึก portfolio/case study", suffix: "วัน" }
+      { key: "careerTargetDays", label: "วันฝึกทักษะอาชีพ", suffix: "วัน" }
+    ]
+  },
+  moneyGoals: {
+    title: "ตั้งค่า master สุขภาพทางการเงิน",
+    description: "เลือก master การเงินที่อยากติดตาม แล้วตั้งค่าเป้าหมายใต้ master แต่ละตัว",
+    fields: [
+      { key: "debtMonthlyTarget", label: "ปิดหนี้ต่อเดือน", suffix: "บาท" },
+      { key: "savingMonthlyTarget", label: "ออมเงินต่อเดือน", suffix: "บาท" },
+      { key: "investmentMonthlyTarget", label: "ลงทุนต่อเดือน", suffix: "บาท" }
     ]
   },
   dashboard: {
@@ -235,7 +257,7 @@ const modalConfigs = {
     fields: ["mood", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
   },
   money: {
-    title: "บันทึกเงิน & หนี้",
+    title: "บันทึกสุขภาพทางการเงิน",
     description: "แยกรายรับ รายจ่ายเป็นแถวตามหมวด และเงินที่จ่ายหนี้",
     fields: ["income", "expenseRows", "debtPaid", "saving", "investment", "win"]
   },
@@ -246,7 +268,7 @@ const modalConfigs = {
   },
   health: {
     title: "บันทึกสุขภาพ & ความสวย",
-    description: "โฟกัสน้ำ การนอน ออกกำลังกาย skincare streak และความมั่นใจ",
+    description: "โฟกัสเป้าหมายสุขภาพที่เลือกไว้ เช่น น้ำ การนอน ออกกำลังกาย และความมั่นใจ",
     fields: ["water", "sleep", "exercise", "confidence", "calories", "win"]
   },
   skills: {
@@ -359,6 +381,37 @@ function moneyGoalsList() {
   return MONEY_GOAL_MASTER.filter((item) => ids.includes(item.id));
 }
 
+function settingFieldLabel(field) {
+  return `${field.label} ${money(settings()[field.key] ?? 0)} ${field.suffix}`;
+}
+
+function featureSettingSummary(id) {
+  if (id === "health") {
+    return healthGoalsList().map((goal) => `${goal.label}: ${money(settings()[goal.targetKey])} ${goal.unit}`);
+  }
+  if (id === "money") {
+    return [
+      ...moneyGoalsList().map((goal) => `${goal.label}: ${money(settings()[goal.targetKey])} ${goal.unit}`),
+      `${expenseCategoriesList().length} หมวดรายจ่าย`,
+      `${paymentMethodsList().length} วิธีจ่าย`
+    ];
+  }
+  if (id === "side") {
+    return [
+      ...sideChannelsList().slice(0, 3),
+      settingFieldLabel({ key: "sideIncomeMonthlyTarget", label: "เป้าเดือน", suffix: "บาท" })
+    ];
+  }
+  if (id === "skills") {
+    return [
+      `${skillsList().length} ทักษะ`,
+      `${languagesList().join(", ") || "ยังไม่มีภาษา"}`,
+      settingFieldLabel({ key: "skillTargetDays", label: "เป้าทักษะ", suffix: "วัน" })
+    ];
+  }
+  return [];
+}
+
 function enabledFeaturesList() {
   const list = settings().enabledFeatures;
   return Array.isArray(list) ? list.filter((id) => DEFAULT_FEATURES.includes(id)) : [...DEFAULT_FEATURES];
@@ -409,9 +462,11 @@ function activeEntryCategory(category = activePage) {
 }
 
 function dashboardSectionOrder() {
-  const defaults = ["balance", "debt", "day", "trend", "language", "moneyMix"];
+  const defaults = ["balance", "financialGoals", "day", "trend", "language", "moneyMix"];
+  const legacyMap = { debt: "financialGoals" };
   const saved = Array.isArray(settings().dashboardSectionOrder) ? settings().dashboardSectionOrder : defaults;
-  return [...saved.filter((item) => defaults.includes(item)), ...defaults.filter((item) => !saved.includes(item))];
+  const normalized = saved.map((item) => legacyMap[item] || item);
+  return [...normalized.filter((item) => defaults.includes(item)), ...defaults.filter((item) => !normalized.includes(item))];
 }
 
 function moveDashboardSection(section, direction) {
@@ -746,7 +801,6 @@ function sum(entries, key) {
 
 function languageFieldKey(language) {
   if (language === "อังกฤษ") return "thaiMinutes";
-  if (language === "อาหรับ") return "arabicMinutes";
   return "";
 }
 
@@ -943,25 +997,37 @@ function renderDashboard() {
             <p class="eyebrow">Life balance</p>
             <h2>ภาพรวมสมดุลชีวิต</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-setting="dashboard">แก้ไขเป้ากราฟ</button>
+          <span class="pill">ล้อตาม master ที่เลือก</span>
         </div>
         ${lifeRadarChart(radarItems)}
       </div>
     `) : "",
-    debt: isFeatureEnabled("money") ? dashboardSection("debt", `
-      <div class="card debt-visual-card">
-        <div>
-          <p class="eyebrow">Debt visual</p>
-          <h2>ภาพรวมหนี้</h2>
-          <button class="tiny-button" type="button" data-open-setting="debt">แก้ค่าหนี้</button>
-        </div>
-        <div class="debt-ring dashboard-debt" style="--debt-angle: ${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%">
+    financialGoals: isFeatureEnabled("money") ? dashboardSection("financialGoals", `
+      <div class="card">
+        <div class="section-head">
           <div>
-            <span class="muted">คงเหลือ</span>
-            <strong>${money(debtLeft)}</strong>
-            <span class="muted">จ่ายแล้ว ${Math.round((debtPaid / Math.max(cfg.debtTotal, 1)) * 100)}%</span>
+            <p class="eyebrow">Financial health</p>
+            <h2>สุขภาพทางการเงินตาม master</h2>
           </div>
+          <span class="pill">${moneyGoalsList().length} เป้าหมาย</span>
         </div>
+        <div class="money-goal-rings">
+          ${moneyGoalsList().map((goal) => {
+            const value = sum(entries, goal.field);
+            return `
+              <div class="mini-ring" style="--ring:${progressValue(value, cfg[goal.targetKey])}%">
+                <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
+              </div>
+            `;
+          }).join("") || `<p class="muted">ยังไม่ได้เลือก master การเงินใน Settings</p>`}
+        </div>
+        ${cfg.debtTotal ? `
+          <div class="debt-inline">
+            <span>หนี้คงเหลือ</span>
+            <strong>${money(debtLeft)} บาท</strong>
+            <div class="bar"><span style="width:${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%"></span></div>
+          </div>
+        ` : ""}
       </div>
     `) : "",
     day: dashboardSection("day", `
@@ -1039,7 +1105,7 @@ function renderGoals() {
     { name: `ออกกำลังกาย ${money(cfg.exerciseWeeklyTarget)} นาที`, type: "รายสัปดาห์", target: cfg.exerciseWeeklyTarget, metric: "exercise" },
     { name: `จ่ายหนี้เดือนนี้ ${money(cfg.debtMonthlyTarget)} บาท`, type: "รายเดือน", target: cfg.debtMonthlyTarget, metric: "debtPaid" },
     { name: `สร้างรายได้เสริม ${money(cfg.sideIncomeMonthlyTarget)} บาท`, type: "รายเดือน", target: cfg.sideIncomeMonthlyTarget, metric: "sideIncome" },
-    { name: "ทำ Portfolio / Case Study ให้ต่อเนื่อง", type: "ระยะยาว", target: cfg.careerTargetDays, metric: "careerDays" }
+    { name: "ฝึกทักษะอาชีพให้ต่อเนื่อง", type: "ระยะยาว", target: cfg.careerTargetDays, metric: "careerDays" }
   ];
   const goals = goalTemplates.map((goal) => {
     let progress = 0;
@@ -1047,7 +1113,7 @@ function renderGoals() {
     if (goal.metric === "exercise") progress = sum(entriesInRange("week"), "exercise");
     if (goal.metric === "debtPaid") progress = sum(entries, "debtPaid");
     if (goal.metric === "sideIncome") progress = sum(entries, "sideIncome");
-    if (goal.metric === "careerDays") progress = Object.values(state.entries).filter((entry) => (entry.skills || []).some((skill) => ["Portfolio", "Case Study"].includes(skill))).length;
+    if (goal.metric === "careerDays") progress = Object.values(state.entries).filter((entry) => (entry.skills || []).length).length;
     return { ...goal, progress };
   });
 
@@ -1060,7 +1126,7 @@ function renderGoals() {
             <h2>เป้าหมายที่กำลังเดิน</h2>
           </div>
           <div class="button-row">
-            <button class="tiny-button" type="button" data-open-setting="goals">แก้ค่าเป้าหมาย</button>
+            <span class="pill">ตั้งค่าจาก Settings</span>
             <button class="primary-button" type="button" data-open-entry>อัปเดตวันนี้</button>
           </div>
         </div>
@@ -1164,10 +1230,18 @@ function renderWeeklyFocus(goals) {
 
 
 function renderCheckin() {
+  const today = getEntry();
+  const week = entriesInRange("week");
+  const cfg = settings();
+  const healthGoal = healthGoalsList()[0];
+  const moneyGoal = moneyGoalsList()[0];
+  const healthValue = healthGoal ? (healthGoal.id === "exercise" ? sum(week, "exercise") : Number(today[healthGoal.field] || 0)) : 0;
+  const moneyValue = moneyGoal ? sum(entriesInRange("month"), moneyGoal.field) : 0;
   return `
-    <div class="grid three">
+    <div class="grid four">
       ${statCard("🔥 เช็คอินต่อเนื่อง", `${currentStreak()} วัน`, "นับจากวันที่มีบันทึก")}
-      ${statCard("🔥 skincare streak", `${currentStreak((entry) => Number(entry?.confidence || 0) >= 6)} วัน`, "ใช้ความมั่นใจเป็น proxy")}
+      ${healthGoal ? statCard(iconLabel(healthGoal.id === "water" ? "health" : healthGoal.id, healthGoal.label), `${money(healthValue)} ${healthGoal.unit}`, `${healthGoal.period} เป้า ${money(cfg[healthGoal.targetKey])}`) : statCard("เป้าสุขภาพ", "ยังไม่ตั้ง", "เลือก master ใน Settings")}
+      ${moneyGoal ? statCard(iconLabel("money", moneyGoal.label), `${money(moneyValue)} ${moneyGoal.unit}`, `${moneyGoal.period} เป้า ${money(cfg[moneyGoal.targetKey])}`) : statCard("เป้าการเงิน", "ยังไม่ตั้ง", "เลือก master ใน Settings")}
       ${statCard(iconLabel("win", "ชัยชนะวันนี้"), getEntry().win || "ยังรอชัยชนะเล็กๆ", "คลิกบันทึกเพื่อเติมเรื่องดีๆ")}
     </div>
     <div class="card">
@@ -1211,8 +1285,7 @@ function renderMoney() {
             <h2>เป้าหมายเงินและหนี้</h2>
           </div>
           <div class="button-row">
-            <button class="tiny-button" type="button" data-open-setting="goals">ตั้งค่าเป้าหมาย</button>
-            <button class="primary-button" type="button" data-open-entry>บันทึกการเงิน</button>
+          <button class="primary-button" type="button" data-open-entry>บันทึกการเงิน</button>
           </div>
         </div>
         <div class="money-goal-rings">
@@ -1239,7 +1312,7 @@ function renderMoney() {
             <p class="eyebrow">Category spending</p>
             <h2>รายจ่ายตามหมวดที่มีข้อมูล</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-setting="financeOptions">แก้หมวด</button>
+          <span class="pill">${categories.length} หมวด</span>
         </div>
         <div class="category-bars">
           ${categories.map((item) => `
@@ -1286,7 +1359,7 @@ function renderSideIncome() {
             ${renderProgress({ name: "เป้าหมายเดือนนี้", type: "ช่องทาง", progress: income, target: cfg.sideChannelMonthlyTarget })}
           </div>
         `;
-      }).join("") : renderGuestEmptyState("ยังไม่มีช่องทางรายได้เสริม", "กดแก้ไขเป้ารายได้เพื่อเพิ่มช่องทาง เช่น YouTube, ร้านออนไลน์, Affiliate")}
+      }).join("") : renderGuestEmptyState("ยังไม่มีช่องทางรายได้เสริม", "เพิ่มช่องทางได้จากหน้า Settings เช่น ขายของออนไลน์ รับงานเสริม หรือคอนเทนต์ออนไลน์")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -1295,7 +1368,6 @@ function renderSideIncome() {
           <h2>บันทึกการทดลอง</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="side">แก้ไขช่องทาง/เป้ารายได้</button>
           <button class="primary-button" type="button" data-open-entry>เพิ่มรายได้เสริม</button>
         </div>
       </div>
@@ -1325,7 +1397,6 @@ function renderHealth() {
           <h2>🔥 streak การดูแลตัวเอง</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="health">แก้ไขเป้าสุขภาพ</button>
           <button class="primary-button" type="button" data-open-entry>บันทึกสุขภาพ</button>
         </div>
       </div>
@@ -1356,7 +1427,6 @@ function renderSkills() {
           <h2>แผนเติบโตทักษะตามอาชีพ</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="skills">แก้ไขเป้าทักษะ</button>
           <button class="primary-button" type="button" data-open-entry>บันทึกทักษะวันนี้</button>
         </div>
       </div>
@@ -1371,7 +1441,6 @@ function renderSkills() {
           <h2>ฝึกภาษา</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
           <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
         </div>
       </div>
@@ -1441,84 +1510,50 @@ function renderPlanCard(title, price, items, featured = false) {
 }
 
 function renderSettingsPage() {
-  const goalLinks = [
-    isFeatureEnabled("health") ? { group: "health", label: "เป้าสุขภาพ", icon: "heart-check" } : null,
-    isFeatureEnabled("money") ? { group: "goals", label: "เป้าการเงิน", icon: "wallet-01" } : null,
-    isFeatureEnabled("side") ? { group: "side", label: "เป้ารายได้เสริม", icon: "arrow-up-right-01" } : null,
-    isFeatureEnabled("skills") ? { group: "skills", label: "เป้าทักษะ", icon: "pencil-edit-02" } : null,
-    isFeatureEnabled("skills") ? { group: "language", label: "เป้าภาษา", icon: "translation" } : null
-  ].filter(Boolean);
   return `
-    <div class="settings-tabs" aria-label="เมนูย่อยตั้งค่า">
-      <button class="settings-tab active" type="button">${hugeIcon("settings-01")} ฟีเจอร์</button>
-      <button class="settings-tab" type="button" data-open-setting="goals">${hugeIcon("target-02")} ตั้งค่าเป้าหมาย</button>
-      <button class="settings-tab" type="button" data-open-setting="financeOptions">${hugeIcon("wallet-01")} เงินและหนี้</button>
-    </div>
     <div class="card">
       <div class="section-head">
         <div>
           <p class="eyebrow">Feature visibility</p>
-          <h2>เลือกฟีเจอร์ที่จะแสดงใน side navbar</h2>
+          <h2>เลือกฟีเจอร์ แล้วตั้ง master กับเป้าหมายใต้ฟีเจอร์นั้น</h2>
         </div>
         <button class="primary-button" type="submit" form="featureSettingsForm">บันทึกฟีเจอร์</button>
       </div>
       <form id="featureSettingsForm" class="feature-toggle-grid">
-        ${DEFAULT_FEATURES.map((id) => {
-          const page = pages.find((item) => item.id === id);
-          return `
-            <label class="feature-toggle">
-              <input type="checkbox" name="enabledFeature" value="${id}" ${isFeatureEnabled(id) ? "checked" : ""} />
-              <span class="feature-icon">${hugeIcon(page?.icon || "checkmark-circle-02")}</span>
-              <span>
-                <strong>${page?.label || id}</strong>
-                <small>${page?.kicker || ""}</small>
-              </span>
-            </label>
-          `;
-        }).join("")}
+        ${DEFAULT_FEATURES.map(renderFeatureSettingCard).join("")}
       </form>
     </div>
-    <div class="grid two">
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Goal settings</p>
-            <h2>ตั้งค่าเป้าหมายตามฟีเจอร์ที่เปิด</h2>
-          </div>
-          <button class="primary-button" type="button" data-open-entry data-modal="goals">บันทึกเป้าหมายวันนี้</button>
-        </div>
-        <div class="settings-submenu">
-          ${goalLinks.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}">${hugeIcon(item.icon)} ${item.label}</button>`).join("") || `<p class="muted">ยังไม่มีฟีเจอร์เสริมที่เปิดใช้งาน</p>`}
-        </div>
-        <div class="master-chip-row">
-          ${isFeatureEnabled("health") ? healthGoalsList().map((goal) => `<span>${hugeIcon(goal.icon)} ${goal.label}</span>`).join("") : ""}
-          ${isFeatureEnabled("money") ? moneyGoalsList().map((goal) => `<span>${hugeIcon(goal.icon)} ${goal.label}</span>`).join("") : ""}
-        </div>
+  `;
+}
+
+function renderFeatureSettingCard(id) {
+  const page = pages.find((item) => item.id === id);
+  const enabled = isFeatureEnabled(id);
+  return `
+    <article class="feature-setting-card ${enabled ? "enabled" : ""}">
+      <label class="feature-toggle">
+        <input type="checkbox" name="enabledFeature" value="${id}" ${enabled ? "checked" : ""} />
+        <span class="feature-icon">${hugeIcon(page?.icon || "checkmark-circle-02")}</span>
+        <span>
+          <strong>${page?.label || id}</strong>
+          <small>${page?.kicker || ""}</small>
+        </span>
+      </label>
+      ${enabled ? renderFeatureConfigPanel(id) : `<p class="muted">เปิดฟีเจอร์เพื่อจัด master และเป้าหมาย</p>`}
+    </article>
+  `;
+}
+
+function renderFeatureConfigPanel(id) {
+  const groups = FEATURE_SETTING_GROUPS[id] || [];
+  const summary = featureSettingSummary(id);
+  return `
+    <div class="feature-config-panel">
+      <div class="settings-submenu">
+        ${groups.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}">${hugeIcon(item.icon)} ${item.label}</button>`).join("")}
       </div>
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Money setup</p>
-            <h2>หมวดรายจ่ายและวิธีจ่ายเงิน</h2>
-          </div>
-          <button class="tiny-button" type="button" data-open-setting="financeOptions">แก้ไข</button>
-        </div>
-        <div class="expense-list">
-          ${expenseCategoriesList().map((category) => `<span>${escapeHTML(category)}</span>`).join("") || `<span>ยังไม่มีหมวดรายจ่าย</span>`}
-        </div>
-        <div class="timeline-expenses" style="margin-top:12px;">
-          ${paymentMethodsList().map((method) => `<span>${escapeHTML(method)}${isDebtPaymentMethod(method) ? " · เพิ่มยอดหนี้" : ""}</span>`).join("") || `<span>ยังไม่มีวิธีจ่ายเงิน</span>`}
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Trial</p>
-            <h2>ทดลองใช้ฟรีทุกฟีเจอร์</h2>
-          </div>
-          <button class="tiny-button" type="button" data-jump-page="membership">ดูสมาชิก</button>
-        </div>
-        <p class="muted">บัญชีใหม่จะเริ่ม trial 7 วัน และเปิดฟีเจอร์ทั้งหมดไว้ให้ใช้งานก่อน ปิดฟีเจอร์ที่ไม่ใช้ได้จากหน้านี้</p>
+      <div class="master-chip-row">
+        ${summary.map((item) => `<span>${escapeHTML(item)}</span>`).join("") || `<span>ยังไม่มี master data</span>`}
       </div>
     </div>
   `;
@@ -1631,7 +1666,6 @@ function languageDashboard(entries) {
           <h2>ฝึกภาษา</h2>
         </div>
         <div class="button-row">
-          <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
           <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
         </div>
       </div>
@@ -1642,7 +1676,7 @@ function languageDashboard(entries) {
             <span>นาที</span>
           </div>
           <span class="language-badge thai">${escapeHTML(primaryLanguage?.language || "ภาษา")}</span>
-          <span class="language-badge arabic">${escapeHTML(secondaryLanguage?.language || "เพิ่มภาษา")}</span>
+          <span class="language-badge arabic">${escapeHTML(secondaryLanguage?.language || "ภาษาเสริม")}</span>
         </div>
         <div class="language-progress">
           ${languageTotals.map((item, index) => languageProgress(escapeHTML(item.language), item.minutes, cfg.languageWeeklyTarget, index % 2 ? "#c6b2f2" : "#a9dcc5")).join("")}
@@ -2064,14 +2098,14 @@ function renderField(field) {
           <option value="">เลือกช่องทาง (กรอกข้อมูล)</option>
           ${sideChannelsList().map((channel) => `<option value="${escapeHTML(channel)}">${escapeHTML(channel)}</option>`).join("")}
         </select>
-        ${sideChannelsList().length ? "" : `<span class="field-hint">ยังไม่มีช่องทาง ไปที่แก้ไขช่องทางรายได้เสริมเพื่อเพิ่มเอง</span>`}
+        ${sideChannelsList().length ? "" : `<span class="field-hint">ยังไม่มีช่องทาง เพิ่มได้จากหน้า Settings</span>`}
       </label>
     `,
     confidence: textInput("confidence", "ความมั่นใจ (1-10)", "numeric", "[0-9]*"),
     win: `
       <label class="wide-label">
         ชัยชนะเล็กๆ / note ของหมวดนี้
-        <textarea name="win" rows="3" placeholder="เช่น ส่ง portfolio 1 เคส / ไม่ซื้อน้ำหวาน / เดิน 20 นาที"></textarea>
+        <textarea name="win" rows="3" placeholder="เช่น ทำสิ่งสำคัญเสร็จ 1 อย่าง / เดิน 20 นาที / เก็บเงินได้ตามตั้งใจ"></textarea>
       </label>
     `,
     skills: `
@@ -2093,9 +2127,8 @@ function renderLanguageMinuteFields() {
         <div class="skill-editor-head">
           <div>
             <span>ยังไม่ได้เพิ่มภาษาที่อยากเรียน</span>
-            <small>ไปที่ แก้ไขเป้าภาษา เพื่อเพิ่มภาษา เช่น อังกฤษ อาหรับ ญี่ปุ่น หรือจีน</small>
+            <small>เพิ่มภาษาได้จากหน้า Settings</small>
           </div>
-          <button class="tiny-button" type="button" data-open-setting="language">เพิ่มภาษา</button>
         </div>
       </section>
     `;
@@ -2107,7 +2140,6 @@ function renderLanguageMinuteFields() {
           <span>เวลาฝึกภาษา</span>
           <small>สร้างช่องตามภาษาที่ตั้งไว้เอง</small>
         </div>
-        <button class="tiny-button" type="button" data-open-setting="language">แก้ไขภาษา</button>
       </div>
       <div class="form-grid">
         ${languages.map((language) => `
@@ -2186,7 +2218,7 @@ function renderSkillEditor() {
 function renderSkillRow(skill = "") {
   return `
     <div class="skill-row">
-      <input name="skillName" type="text" value="${escapeHTML(skill)}" placeholder="เช่น UX Writing" />
+      <input name="skillName" type="text" value="${escapeHTML(skill)}" placeholder="เช่น การสื่อสาร" />
       <button class="icon-button skill-remove" type="button" data-remove-skill-row aria-label="ลบ skill">×</button>
     </div>
   `;
@@ -2200,7 +2232,7 @@ function renderLanguageEditor() {
       <div class="skill-editor-head">
         <div>
           <span>ภาษาที่อยากเรียน</span>
-          <small>เพิ่มภาษาเองได้ เช่น อังกฤษ อาหรับ ญี่ปุ่น จีน เกาหลี หรือภาษาอื่นๆ</small>
+          <small>เพิ่มภาษาเองได้ เช่น อังกฤษ ญี่ปุ่น จีน เกาหลี หรือภาษาอื่นๆ</small>
         </div>
         <button class="tiny-button" type="button" data-add-language-row>เพิ่มภาษา</button>
       </div>
@@ -2322,12 +2354,19 @@ function renderGoalMasterEditor(type) {
       </div>
       <div class="master-goal-grid">
         ${master.map((goal) => `
-          <label class="master-goal-card">
-            <input type="checkbox" name="${type}GoalId" value="${goal.id}" ${selected.has(goal.id) ? "checked" : ""} />
-            <span class="feature-icon">${hugeIcon(goal.icon)}</span>
-            <strong>${goal.label}</strong>
-            <small>${goal.period}</small>
-          </label>
+          <div class="master-goal-card">
+            <label class="master-check">
+              <input type="checkbox" name="${type}GoalId" value="${goal.id}" ${selected.has(goal.id) ? "checked" : ""} />
+              <span class="feature-icon">${hugeIcon(goal.icon)}</span>
+              <strong>${goal.label}</strong>
+              <small>${goal.period}</small>
+            </label>
+            <label class="master-target-field">
+              เป้าหมาย
+              <input name="${goal.targetKey}" type="text" inputmode="decimal" value="${settings()[goal.targetKey] ?? 0}" />
+              <small>${goal.unit}</small>
+            </label>
+          </div>
         `).join("")}
       </div>
     </section>
@@ -2529,14 +2568,15 @@ function openSettingModal(group = "debt") {
   $("#settingTitle").textContent = config.title;
   $("#settingDescription").textContent = config.description;
   const visibleSettingFields = visibleFieldsForSetting(config);
-  const genericFields = visibleSettingFields.map((field) => `
+  const useMasterTargetCards = ["health", "moneyGoals"].includes(group);
+  const genericFields = useMasterTargetCards ? "" : visibleSettingFields.map((field) => `
     <label>
       ${field.label}
       <input name="${field.key}" type="text" inputmode="decimal" value="${settings()[field.key] ?? 0}" />
       <span class="field-hint">${field.suffix}</span>
     </label>
   `).join("");
-  $("#settingFields").innerHTML = `${genericFields}${(group === "goals" || group === "health") && isFeatureEnabled("health") ? renderGoalMasterEditor("health") : ""}${group === "goals" && isFeatureEnabled("money") ? renderGoalMasterEditor("money") : ""}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}${group === "financeOptions" ? `${renderExpenseCategoryEditor()}${renderPaymentMethodEditor()}` : ""}`;
+  $("#settingFields").innerHTML = `${genericFields}${(group === "goals" || group === "health") && isFeatureEnabled("health") ? renderGoalMasterEditor("health") : ""}${(group === "goals" || group === "moneyGoals") && isFeatureEnabled("money") ? renderGoalMasterEditor("money") : ""}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}${group === "financeOptions" ? `${renderExpenseCategoryEditor()}${renderPaymentMethodEditor()}` : ""}`;
   if (group === "side") bindSideChannelRows();
   if (group === "skills") bindSkillRows();
   if (group === "language") bindLanguageRows();
@@ -2569,7 +2609,7 @@ function handleSettingSubmit(event) {
   if (settingGroup === "goals" || settingGroup === "health") {
     settings().healthGoalIds = data.getAll("healthGoalId").filter((id) => HEALTH_GOAL_MASTER.some((goal) => goal.id === id));
   }
-  if (settingGroup === "goals") {
+  if (settingGroup === "goals" || settingGroup === "moneyGoals") {
     settings().moneyGoalIds = data.getAll("moneyGoalId").filter((id) => MONEY_GOAL_MASTER.some((goal) => goal.id === id));
   }
   if (settingGroup === "financeOptions") {
@@ -2615,7 +2655,7 @@ function resetSettingGroup() {
   if (settingGroup === "goals" || settingGroup === "health") {
     settings().healthGoalIds = HEALTH_GOAL_MASTER.map((item) => item.id);
   }
-  if (settingGroup === "goals") {
+  if (settingGroup === "goals" || settingGroup === "moneyGoals") {
     settings().moneyGoalIds = MONEY_GOAL_MASTER.map((item) => item.id);
   }
   saveState();
@@ -2649,7 +2689,7 @@ function createMockEntries() {
     "ฝึก skill สั้นๆ แต่ต่อเนื่อง",
     "จัดเวลาให้ตัวเองได้ดีขึ้น"
   ];
-  const mockSkills = [...DEFAULT_SKILLS, "UX Writing"];
+  const mockSkills = [...DEFAULT_SKILLS, "การอ่าน"];
   const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
   const sample = (items) => items[randomInt(0, items.length - 1)];
   const maybe = (chance) => Math.random() < chance;
@@ -2677,7 +2717,6 @@ function createMockEntries() {
     const totals = expenseTotals(expenseItems);
     const practicedSkills = mockSkills.filter(() => maybe(0.24)).slice(0, randomInt(0, 2));
     const thaiMinutes = maybe(0.56) ? randomInt(10, 45) : 0;
-    const arabicMinutes = maybe(0.42) ? randomInt(8, 35) : 0;
     return [iso, {
       mood: sample(mockMoods),
       water: randomInt(3, 10),
@@ -2693,7 +2732,7 @@ function createMockEntries() {
       sideChannel: sideIncome ? sample(DEFAULT_SIDE_CHANNELS) : "",
       confidence: randomInt(4, 10),
       thaiMinutes,
-      arabicMinutes,
+      arabicMinutes: 0,
       languageMinutes: {},
       languageFocus: sample(mockFocuses),
       skills: practicedSkills,
@@ -2710,8 +2749,8 @@ function applyRandomMockData() {
     meta: { kind: "guest", mockData: true, generatedAt: new Date().toISOString() },
     settings: {
       ...DEFAULT_SETTINGS,
-      skillNames: [...DEFAULT_SKILLS, "UX Writing"],
-      languageNames: [...DEFAULT_LANGUAGES],
+      skillNames: [...DEFAULT_SKILLS, "การอ่าน"],
+      languageNames: ["อังกฤษ"],
       sideChannelNames: [...DEFAULT_SIDE_CHANNELS],
       enabledFeatures: [...DEFAULT_FEATURES],
       expenseCategoryNames: [...DEFAULT_EXPENSE_CATEGORIES],
