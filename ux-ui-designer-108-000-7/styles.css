@@ -1206,6 +1206,14 @@ h3 {
   box-shadow: var(--shadow);
 }
 
+#authForm[data-auth-mode="login"] .auth-signup-only {
+  display: none;
+}
+
+#authForm[data-auth-mode="signup"] .auth-signup-only {
+  display: grid;
+}
+
 .modal-header,
 .modal-actions {
   display: flex;
@@ -1431,7 +1439,7 @@ input[type="checkbox"]:focus-visible {
   min-width: 220px;
   min-height: 58px;
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 22px;
+  grid-template-columns: 48px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
@@ -1470,8 +1478,36 @@ input[type="checkbox"]:focus-visible {
 
 .feature-toggle > input {
   position: static;
-  grid-column: 3;
+  grid-column: 1;
   grid-row: 1;
+}
+
+.feature-toggle input[type="checkbox"] {
+  width: 42px;
+  min-width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: #eadde5;
+}
+
+.feature-toggle input[type="checkbox"]::after {
+  left: 11px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: white;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(53, 43, 52, 0.22);
+}
+
+.feature-toggle input[type="checkbox"]:checked::after {
+  transform: translate(10px, -50%);
+}
+
+.feature-toggle input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #c6b2f2, #f5a7c6);
 }
 
 .feature-icon {
@@ -1529,6 +1565,31 @@ input[type="checkbox"]:focus-visible {
   font-weight: 800;
 }
 
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.settings-table th,
+.settings-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(234, 221, 229, 0.8);
+  text-align: left;
+}
+
+.settings-table th {
+  width: 42%;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.settings-table td {
+  color: var(--ink);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
 .settings-tab.active {
   background: #352b34;
   color: white;
@@ -1555,22 +1616,25 @@ input[type="checkbox"]:focus-visible {
 }
 
 .master-goal-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 .master-goal-card {
   position: relative;
-  width: 178px;
-  min-height: 178px;
   display: grid;
-  align-content: start;
-  gap: 8px;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.8fr);
+  align-items: center;
+  gap: 12px;
   padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border-bottom: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.64);
+}
+
+.master-goal-card:last-child {
+  border-bottom: 0;
 }
 
 .master-target-field {
@@ -1592,14 +1656,18 @@ input[type="checkbox"]:focus-visible {
 }
 
 .master-check input {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: static;
 }
 
 .master-check {
   display: grid;
+  grid-template-columns: 22px 40px minmax(0, 1fr);
+  align-items: center;
   gap: 8px;
+}
+
+.master-check small {
+  grid-column: 3;
 }
 
 .master-goal-card:has(.master-check input:checked) {
@@ -1630,6 +1698,71 @@ input[type="checkbox"]:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.financial-health-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 86% 20%, rgba(169, 220, 197, 0.28), transparent 30%),
+    rgba(255, 255, 255, 0.72);
+  box-shadow: var(--soft-shadow);
+}
+
+.financial-health-hero h2 {
+  margin: 0;
+}
+
+.financial-score {
+  width: 108px;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(#a9dcc5 72%, #f0e5ed 0);
+}
+
+.financial-score strong {
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.financial-score span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.cashflow-bars {
+  display: grid;
+  gap: 12px;
+}
+
+.cashflow-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 128px;
+  align-items: center;
+  gap: 12px;
+}
+
+.cashflow-row > span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.cashflow-row .bar span {
+  width: var(--cashflow);
+  background: var(--cashflow-color);
+}
+
+.cashflow-row strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .mini-ring {
@@ -1840,12 +1973,19 @@ input[type="checkbox"]:focus-visible {
   .money-split,
   .form-grid,
   .feature-toggle-grid,
-  .feature-setting-card {
+  .feature-setting-card,
+  .master-goal-card,
+  .financial-health-hero,
+  .cashflow-row {
     grid-template-columns: 1fr;
   }
 
   .feature-toggle {
     min-width: 0;
+  }
+
+  .cashflow-row strong {
+    text-align: left;
   }
 
   .card,

@@ -185,6 +185,7 @@ let dashboardDraftOrder = null;
 let supabaseClient = null;
 let currentUser = null;
 let isCloudLoading = false;
+let authMode = "login";
 
 const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
@@ -462,7 +463,7 @@ function activeEntryCategory(category = activePage) {
 }
 
 function dashboardSectionOrder() {
-  const defaults = ["balance", "financialGoals", "day", "trend", "language", "moneyMix"];
+  const defaults = ["balance", "checkin", "financialGoals", "day", "trend", "language", "moneyMix"];
   const legacyMap = { debt: "financialGoals" };
   const saved = Array.isArray(settings().dashboardSectionOrder) ? settings().dashboardSectionOrder : defaults;
   const normalized = saved.map((item) => legacyMap[item] || item);
@@ -612,6 +613,22 @@ function setAuthMessage(message, isError = false) {
   if (!authMessage) return;
   authMessage.textContent = message || "";
   authMessage.style.color = isError ? "#b94b62" : "";
+}
+
+function setAuthMode(mode = "login") {
+  authMode = mode;
+  const form = $("#authForm");
+  if (!form) return;
+  form.dataset.authMode = authMode;
+  $("#authModal h2").textContent = authMode === "signup" ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
+  $("#authDescription").textContent = authMode === "signup"
+    ? "กรอกข้อมูลเพื่อสร้างบัญชีและจัดเก็บข้อมูล"
+    : "เข้าสู่ระบบด้วยอีเมลและรหัสผ่าน";
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.textContent = authMode === "signup" ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
+  const signUpButton = $("#signUpButton");
+  if (signUpButton) signUpButton.textContent = authMode === "signup" ? "กลับไปเข้าสู่ระบบ" : "สมัครสมาชิก";
+  setAuthMessage("");
 }
 
 function updateAuthUI() {
@@ -900,7 +917,7 @@ function currentStreak(predicate = (entry) => Boolean(entry && Object.keys(entry
 }
 
 function renderNav() {
-  const navHTML = pages.filter((page) => isFeatureEnabled(page.id)).map((page) => `
+  const navHTML = pages.filter((page) => page.id !== "checkin" && isFeatureEnabled(page.id)).map((page) => `
     <button class="nav-item ${page.id === activePage ? "active" : ""}" type="button" data-page="${page.id}" title="${page.label}" aria-label="${page.label}">
       <span class="nav-icon" aria-hidden="true">${hugeIcon(page.icon)}</span>
       <span>${page.label}</span>
@@ -948,6 +965,7 @@ function renderDashboard() {
   const entries = entriesInRange();
   const today = getEntry(summaryEndDate());
   const cfg = settings();
+  const checkinSummary = renderCheckinSummary();
   const guestEmpty = isGuestEmptyState();
   if (guestEmpty) {
     return `
@@ -1045,6 +1063,7 @@ function renderDashboard() {
         </div>
       </div>
     `),
+    checkin: dashboardSection("checkin", checkinSummary),
     trend: trendCharts ? dashboardSection("trend", `
       <div class="card">
         <div class="section-head">
@@ -1230,6 +1249,10 @@ function renderWeeklyFocus(goals) {
 
 
 function renderCheckin() {
+  return renderCheckinSummary();
+}
+
+function renderCheckinSummary() {
   const today = getEntry();
   const week = entriesInRange("week");
   const cfg = settings();
@@ -1248,7 +1271,7 @@ function renderCheckin() {
       <div class="section-head">
         <div>
           <p class="eyebrow">${dateLabel(selectedDate)}</p>
-          <h2>ฟอร์มเช็คอิน</h2>
+          <h2>เช็คอินวันนี้</h2>
         </div>
         <button class="primary-button" type="button" data-open-entry>เปิดแบบบันทึก</button>
       </div>
@@ -1271,11 +1294,28 @@ function renderMoney() {
   const goals = moneyGoalsList();
   const categories = categoryTotals(entries);
   const cardDebt = entries.reduce((total, [, entry]) => total + cardDebtTotal(entry), 0);
+  const income = sum(entries, "income");
+  const saving = sum(entries, "saving");
+  const investment = sum(entries, "investment");
+  const netCashflow = income + sum(entries, "sideIncome") - monthExpense - debtPaid - saving - investment;
+  const savingsRate = income > 0 ? Math.round(((saving + investment) / income) * 100) : 0;
+  const debtRatio = income > 0 ? Math.round((debtPaid / income) * 100) : 0;
   return `
-    <div class="grid three">
-      ${statCard(iconLabel("income", "รายรับเดือนนี้"), `${money(sum(entries, "income"))} บาท`, "รายรับหลักที่บันทึก")}
-      ${statCard(iconLabel("expense", "รายจ่ายเดือนนี้"), `${money(monthExpense)} บาท`, categories[0] ? `หมวดสูงสุด ${escapeHTML(categories[0].category)}` : "รอข้อมูลตามหมวด")}
-      ${statCard(iconLabel("debt", "ยอดจากบัตร/หนี้"), `${money(cardDebt)} บาท`, "วิธีจ่ายที่ตั้งให้เพิ่มยอดหนี้")}
+    <div class="financial-health-hero">
+      <div>
+        <p class="eyebrow">Financial health</p>
+        <h2>ภาพรวมสุขภาพทางการเงินเดือนนี้</h2>
+      </div>
+      <div class="financial-score">
+        <strong>${clamp(50 + savingsRate - Math.min(debtRatio, 40), 0, 100)}</strong>
+        <span>คะแนน</span>
+      </div>
+    </div>
+    <div class="grid four">
+      ${statCard(iconLabel("income", "เงินเข้า"), `${money(income + sum(entries, "sideIncome"))} บาท`, "รายรับรวม")}
+      ${statCard(iconLabel("expense", "เงินออก"), `${money(monthExpense)} บาท`, categories[0] ? `สูงสุด: ${escapeHTML(categories[0].category)}` : "รอข้อมูลตามหมวด")}
+      ${statCard(iconLabel("win", "อัตราออม"), `${money(savingsRate)}%`, `ออม+ลงทุน ${money(saving + investment)} บาท`)}
+      ${statCard(iconLabel("debt", "กระแสเงินสด"), `${money(netCashflow)} บาท`, netCashflow >= 0 ? "เหลือหลังจ่าย" : "ติดลบเดือนนี้")}
     </div>
     <div class="money-split">
       <div class="card">
@@ -1322,6 +1362,21 @@ function renderMoney() {
             </div>
           `).join("") || `<p class="muted">ยังไม่มีรายจ่ายเดือนนี้</p>`}
         </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Cashflow story</p>
+          <h2>เงินไหลเข้าออก</h2>
+        </div>
+        <span class="pill">เดือนนี้</span>
+      </div>
+      <div class="cashflow-bars">
+        ${cashflowBar("เงินเข้า", income + sum(entries, "sideIncome"), "#a9dcc5")}
+        ${cashflowBar("รายจ่าย", monthExpense, "#ffc39d")}
+        ${cashflowBar("จ่ายหนี้", debtPaid + cardDebt, "#f5a7c6")}
+        ${cashflowBar("ออม/ลงทุน", saving + investment, "#c6b2f2")}
       </div>
     </div>
     <div class="card">
@@ -1376,6 +1431,24 @@ function renderSideIncome() {
           <div class="timeline-item"><strong>${dateLabel(iso, "medium")}</strong> ${entry.sideChannel}: ${money(entry.sideIncome)} บาท</div>
         `).join("") || `<p class="muted">ยังไม่มีรายได้เสริมเดือนนี้</p>`}
       </div>
+    </div>
+  `;
+}
+
+function cashflowBar(label, value, color) {
+  const entries = entriesInRange("month");
+  const maxValue = Math.max(
+    sum(entries, "income") + sum(entries, "sideIncome"),
+    entries.reduce((total, [, entry]) => total + expenseTotal(entry), 0),
+    sum(entries, "debtPaid"),
+    sum(entries, "saving") + sum(entries, "investment"),
+    1
+  );
+  return `
+    <div class="cashflow-row" style="--cashflow:${progressValue(value, maxValue)}%;--cashflow-color:${color}">
+      <span>${label}</span>
+      <div class="bar"><span></span></div>
+      <strong>${money(value)} บาท</strong>
     </div>
   `;
 }
@@ -1533,7 +1606,6 @@ function renderFeatureSettingCard(id) {
     <article class="feature-setting-card ${enabled ? "enabled" : ""}">
       <label class="feature-toggle">
         <input type="checkbox" name="enabledFeature" value="${id}" ${enabled ? "checked" : ""} />
-        <span class="feature-icon">${hugeIcon(page?.icon || "checkmark-circle-02")}</span>
         <span>
           <strong>${page?.label || id}</strong>
           <small>${enabled ? "เปิดใช้งาน" : "ปิดอยู่"}</small>
@@ -1549,11 +1621,13 @@ function renderFeatureConfigPanel(id) {
   const summary = featureSettingSummary(id);
   return `
     <div class="feature-config-panel">
+      <table class="settings-table">
+        <tbody>
+          ${summary.map((item) => `<tr><th>${escapeHTML(item.split(":")[0])}</th><td>${escapeHTML(item.includes(":") ? item.split(":").slice(1).join(":").trim() : item)}</td></tr>`).join("") || `<tr><th>Master</th><td>ยังไม่มีข้อมูล</td></tr>`}
+        </tbody>
+      </table>
       <div class="settings-submenu">
         ${groups.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}">${hugeIcon(item.icon)} ${item.label}</button>`).join("")}
-      </div>
-      <div class="settings-summary-list">
-        ${summary.map((item) => `<span>${escapeHTML(item)}</span>`).join("") || `<span>ยังไม่มี master data</span>`}
       </div>
     </div>
   `;
@@ -2352,9 +2426,9 @@ function renderGoalMasterEditor(type) {
           <small>เลือกเฉพาะเป้าหมายที่อยากติดตาม ระบบจะใช้รายการนี้สร้างฟอร์มและกราฟ</small>
         </div>
       </div>
-      <div class="master-goal-grid">
+      <div class="master-goal-grid" role="table">
         ${master.map((goal) => `
-          <div class="master-goal-card">
+          <div class="master-goal-card" role="row">
             <label class="master-check">
               <input type="checkbox" name="${type}GoalId" value="${goal.id}" ${selected.has(goal.id) ? "checked" : ""} />
               <span class="feature-icon">${hugeIcon(goal.icon)}</span>
@@ -2786,10 +2860,9 @@ function runPendingConfirmAction() {
 
 
 function openAuthModal() {
-  setAuthMessage(currentUser ? `กำลังเชื่อมกับ ${currentUser.email}` : "ยังไม่ได้เข้าสู่ระบบ ข้อมูลจะอยู่ในเครื่องนี้จนกว่าจะ login");
-  $("#authDescription").textContent = currentUser
-    ? "บัญชีนี้กำลังจัดเก็บข้อมูลให้คุณ"
-    : "สมัครสมาชิกเพื่อจัดเก็บข้อมูลและใช้ฟรีทุกฟีเจอร์ 7 วัน";
+  setAuthMode("login");
+  setAuthMessage(currentUser ? `กำลังเชื่อมกับ ${currentUser.email}` : "");
+  if (currentUser) $("#authDescription").textContent = "บัญชีนี้กำลังจัดเก็บข้อมูลให้คุณ";
   $("#authModal").showModal();
 }
 
@@ -2804,6 +2877,10 @@ function handleAuthButtonClick() {
 
 async function handleAuthSubmit(event) {
   event.preventDefault();
+  if (authMode === "signup") {
+    await signUpUser();
+    return;
+  }
   if (!supabaseClient) {
     setAuthMessage("ระบบบัญชียังไม่พร้อม", true);
     return;
@@ -2817,6 +2894,7 @@ async function handleAuthSubmit(event) {
     return;
   }
   setAuthMessage("เข้าสู่ระบบสำเร็จ กำลังโหลดข้อมูลจาก DB...");
+  $("#authModal").close();
 }
 
 async function signUpUser() {
@@ -2851,7 +2929,7 @@ async function signUpUser() {
   settings().enabledFeatures = [...DEFAULT_FEATURES];
   saveState();
   syncSettings();
-  setAuthMessage("สมัครแล้ว ใช้ได้ทุกฟีเจอร์ฟรี 7 วัน เช็กอีเมลเพื่อยืนยันบัญชี");
+  $("#authModal").close();
 }
 
 async function signOutUser() {
@@ -2870,7 +2948,7 @@ $("#settingForm").addEventListener("submit", handleSettingSubmit);
 $("#authForm").addEventListener("submit", handleAuthSubmit);
 $("#authButton").addEventListener("click", handleAuthButtonClick);
 $("#closeAuthButton").addEventListener("click", () => $("#authModal").close());
-$("#signUpButton").addEventListener("click", signUpUser);
+$("#signUpButton").addEventListener("click", () => setAuthMode(authMode === "signup" ? "login" : "signup"));
 $("#signOutButton").addEventListener("click", signOutUser);
 $("#profileLogoutButton")?.addEventListener("click", signOutUser);
 $("#quickAddButton").addEventListener("click", () => openEntryModal(activeEntryCategory(activePage)));
