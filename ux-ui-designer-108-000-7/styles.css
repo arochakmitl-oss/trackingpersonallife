@@ -1036,10 +1036,17 @@ h3 {
 
 .money-mix-layout {
   display: grid;
-  grid-template-columns: minmax(180px, 0.36fr) minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
+  grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
   margin-top: 14px;
+}
+
+.money-flow-panel,
+.money-category-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
 }
 
 .money-flow-donut {
@@ -1087,15 +1094,8 @@ h3 {
 
 .money-flow-legend {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
-}
-
-.money-stack-chart {
-  min-height: 22px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--money-stack));
-  box-shadow: inset 0 0 0 1px rgba(108, 79, 99, 0.08);
 }
 
 .money-legend,
@@ -1119,9 +1119,17 @@ h3 {
 }
 
 .legend-dot {
+  display: inline-block;
   width: 12px;
   height: 12px;
   border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.money-category-bars {
+  display: grid;
+  gap: 12px;
 }
 
 .language-layout {
@@ -1901,28 +1909,33 @@ input[type="checkbox"]:focus-visible {
 }
 
 .modal-date-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.modal-date-row .eyebrow {
-  margin: 0;
+  display: grid;
+  justify-items: start;
 }
 
 .modal-date-input {
-  width: auto;
-  min-height: 34px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 0.86rem;
+  width: min(220px, 100%);
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  font-weight: 800;
 }
 
 .money-goal-rings {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   gap: 12px;
+}
+
+.financial-goals-card .money-goal-rings {
+  width: 100%;
+}
+
+.financial-goals-card .mini-ring {
+  flex: 1 1 130px;
+  min-width: 130px;
 }
 
 .financial-health-hero {
@@ -2047,6 +2060,29 @@ input[type="checkbox"]:focus-visible {
 .membership-hero {
   display: grid;
   gap: 18px;
+}
+
+.coffee-top-button {
+  background: linear-gradient(135deg, rgba(247, 212, 122, 0.32), rgba(244, 167, 198, 0.32));
+  white-space: nowrap;
+}
+
+.coffee-top-button.active {
+  border-color: rgba(232, 116, 168, 0.45);
+  box-shadow: 0 10px 26px rgba(244, 167, 198, 0.22);
+}
+
+.price-drop {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: #b94b62;
+  white-space: nowrap;
+}
+
+.price-drop del {
+  color: var(--muted);
+  font-size: 0.78em;
 }
 
 .plan-compare {
@@ -2392,7 +2428,7 @@ input[type="checkbox"]:focus-visible {
   .top-actions {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 42px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 42px;
     gap: 8px;
     justify-content: stretch;
   }

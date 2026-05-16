@@ -43,7 +43,7 @@ const pages = [
   { id: "side", label: "รายได้เสริม", icon: "arrow-up-right-01", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
   { id: "health", label: "สุขภาพ & ความสวย", icon: "heart-check", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
   { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "แผนเติบโตในแบบของคุณ", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
-  { id: "membership", label: "ค่ากาแฟ", icon: "coffee-02", title: "Mood ช่วยค่ากาแฟ", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
+  { id: "membership", label: "ใช้แบบไม่จำกัด", icon: "coffee-02", title: "ใช้แบบไม่จำกัด", cover: "assets/goals.svg", kicker: "อุดหนุนค่ากาแฟผู้พัฒนา", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
   { id: "settings", label: "ตั้งค่า", icon: "settings-01", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
 ];
 
@@ -960,14 +960,16 @@ function currentStreak(predicate = (entry) => Boolean(entry && Object.keys(entry
 }
 
 function renderNav() {
-  const navHTML = pages.filter((page) => page.id !== "checkin" && isFeatureEnabled(page.id)).map((page) => `
+  const mainNavHTML = pages.filter((page) => !["checkin", "membership"].includes(page.id) && isFeatureEnabled(page.id)).map((page) => `
     <button class="nav-item ${page.id === activePage ? "active" : ""}" type="button" data-page="${page.id}" title="${page.label}" aria-label="${page.label}">
       <span class="nav-icon" aria-hidden="true">${hugeIcon(page.icon)}</span>
       <span>${page.label}</span>
     </button>
   `).join("");
-  $("#desktopNav").innerHTML = navHTML;
-  $("#mobileNav").innerHTML = navHTML;
+  $("#desktopNav").innerHTML = mainNavHTML;
+  $("#mobileNav").innerHTML = mainNavHTML;
+  const coffeeButton = document.querySelector(".coffee-top-button");
+  if (coffeeButton) coffeeButton.classList.toggle("active", activePage === "membership");
   document.querySelectorAll("[data-page]").forEach((button) => {
     button.addEventListener("click", () => {
       activePage = button.dataset.page;
@@ -1024,7 +1026,6 @@ function renderDashboard() {
     `;
   }
   const debtPaid = sum(Object.entries(state.entries), "debtPaid");
-  const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const trend = trendPeriod();
   const hasRangeData = entries.length > 0;
   const healthGoalScores = activeHealthGoals().map((goal) => {
@@ -1034,20 +1035,15 @@ function renderDashboard() {
   const healthScore = healthGoalScores.length ? average(healthGoalScores) : 0;
   const moneyGoalScores = activeMoneyGoals().map((goal) => progressValue(sum(entries, goal.field), rangeMoneyTarget(goal)));
   const moneyScore = hasRangeData ? average(moneyGoalScores.length ? moneyGoalScores : [progressValue(debtPaid, cfg.debtMonthlyTarget)]) : 0;
+  const sideIncome = sum(entries, "sideIncome");
+  const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
   const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
-  const relationshipEntries = entries.filter(([, entry]) => entry.mood || entry.win || Number(entry.confidence || 0) > 0);
-  const relationshipWins = entries.filter(([, entry]) => entry.win).length;
-  const relationshipScore = hasRangeData ? average([
-    progressValue(relationshipEntries.length, Math.max(entries.length, 1)),
-    progressValue(relationshipWins, Math.max(entries.length, 1)),
-    progressValue(currentStreak(), 7)
-  ]) : 0;
   const radarItems = [
-    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "Health", score: healthScore, note: activeHealthGoals().map((item) => item.label).join(", "), color: "#9FE6C8" } : null,
-    isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "Career", score: careerScore, note: "skill days", color: "#B8B7FF" } : null,
-    isFeatureEnabled("money") ? { key: "finance", icon: "money", label: "Finance", score: moneyScore, note: activeMoneyGoals().map((item) => item.label).join(", "), color: "#F7D47A" } : null,
-    { key: "relationships", icon: "win", label: "Relationships", score: relationshipScore, note: `${relationshipEntries.length} check-ins / ${relationshipWins} wins`, color: "#F4A7C6" }
+    isFeatureEnabled("money") ? { key: "finance", icon: "money", label: "การเงิน", score: moneyScore, note: activeMoneyGoals().map((item) => item.label).join(", "), color: "#F7D47A" } : null,
+    isFeatureEnabled("side") ? { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#F4A7C6" } : null,
+    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: activeHealthGoals().map((item) => item.label).join(", "), color: "#9FE6C8" } : null,
+    isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#B8B7FF" } : null
   ].filter(Boolean);
   const trendCharts = [
     isFeatureEnabled("health") ? trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว") : "",
@@ -1079,20 +1075,17 @@ function renderDashboard() {
         <div class="money-goal-rings">
           ${activeMoneyGoals().map((goal) => {
             const value = sum(entries, goal.field);
+            const isDebtGoal = goal.id === "debt";
+            const ringValue = isDebtGoal ? Math.max(0, cfg.debtTotal - debtPaid) : value;
+            const ringTarget = isDebtGoal ? Math.max(cfg.debtTotal, 1) : rangeMoneyTarget(goal);
+            const ringProgress = isDebtGoal ? clamp((ringValue / ringTarget) * 100, 0, 100) : progressValue(ringValue, ringTarget);
             return `
-              <div class="mini-ring" style="--ring:${progressValue(value, rangeMoneyTarget(goal))}%">
-                <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
+              <div class="mini-ring" style="--ring:${ringProgress}%">
+                <div>${hugeIcon(goal.icon)}<strong>${money(ringValue)}</strong><span>${isDebtGoal ? "หนี้คงเหลือ" : goal.label}</span></div>
               </div>
             `;
           }).join("")}
         </div>
-        ${cfg.debtTotal ? `
-          <div class="debt-inline">
-            <span>หนี้คงเหลือ</span>
-            <strong>${money(debtLeft)} บาท</strong>
-            <div class="bar"><span style="width:${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%"></span></div>
-          </div>
-        ` : ""}
       </div>
     `) : "",
     day: dashboardSection("day", `
@@ -1331,7 +1324,6 @@ function renderMoney() {
   if (isGuestEmptyState()) {
     return renderGuestEmptyState("ยังไม่มีข้อมูลหนี้และการเงิน", "ระบบจะไม่โชว์ยอดเงินใดๆ จนกว่าจะเริ่มบันทึกเอง");
   }
-  const all = Object.entries(state.entries);
   const entries = entriesInRange("month");
   const cfg = settings();
   const dayEntry = getEntry(selectedDate);
@@ -1345,10 +1337,9 @@ function renderMoney() {
   const dayOutflow = dayExpense + dayDebtPaid + daySaving + dayInvestment;
   const dayNet = dayInflow - dayOutflow;
   const monthExpense = entries.reduce((total, [, entry]) => total + expenseTotal(entry), 0);
-  const debtPaid = sum(all, "debtPaid");
+  const debtPaid = sum(Object.entries(state.entries), "debtPaid");
   const monthDebtPaid = sum(entries, "debtPaid") + entries.reduce((total, [, entry]) => total + cardDebtTotal(entry), 0);
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
-  const debtAngle = `${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%`;
   const goals = activeMoneyGoals();
   const categories = categoryTotals(entries);
   const income = sum(entries, "income");
@@ -1376,7 +1367,7 @@ function renderMoney() {
       ${statCard(iconLabel(dayNet >= 0 ? "win" : "debt", "คงเหลือวันนี้"), `${money(dayNet)} บาท`, dayNet >= 0 ? "เงินเข้าเกินเงินออก" : "เงินออกมากกว่าเงินเข้า")}
     </div>
     <div class="money-split">
-      <div class="card">
+      <div class="card financial-goals-card">
         <div class="section-head">
           <div>
             <p class="eyebrow">Financial goals</p>
@@ -1389,20 +1380,17 @@ function renderMoney() {
         <div class="money-goal-rings">
           ${goals.length ? goals.map((goal) => {
             const value = sum(entries, goal.field);
+            const isDebtGoal = goal.id === "debt";
+            const ringValue = isDebtGoal ? debtLeft : value;
+            const ringTarget = isDebtGoal ? Math.max(cfg.debtTotal, 1) : cfg[goal.targetKey];
+            const ringProgress = isDebtGoal ? clamp((ringValue / ringTarget) * 100, 0, 100) : progressValue(ringValue, ringTarget);
             return `
-              <div class="mini-ring" style="--ring:${progressValue(value, cfg[goal.targetKey])}%">
-                <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
+              <div class="mini-ring" style="--ring:${ringProgress}%">
+                <div>${hugeIcon(goal.icon)}<strong>${money(ringValue)}</strong><span>${isDebtGoal ? "หนี้คงเหลือ" : goal.label}</span></div>
               </div>
             `;
           }).join("") : `<p class="muted">เลือกเป้าหมายเงินจากหน้า Settings เพื่อแสดงกราฟ</p>`}
         </div>
-        ${cfg.debtTotal ? `
-          <div class="debt-inline">
-            <span>หนี้คงเหลือ</span>
-            <strong>${money(debtLeft)} บาท</strong>
-            <div class="bar"><span style="width:${debtAngle}"></span></div>
-          </div>
-        ` : ""}
       </div>
       <div class="card">
         <div class="section-head">
@@ -1435,17 +1423,6 @@ function renderMoney() {
         ${cashflowBar("รายจ่าย", monthExpense, "#ffc39d")}
         ${cashflowBar("จ่ายหนี้", monthDebtPaid, "#f5a7c6")}
         ${cashflowBar("ออม/ลงทุน", saving + investment, "#c6b2f2")}
-      </div>
-    </div>
-    <div class="card">
-      <h2>บันทึกล่าสุด</h2>
-      <div class="timeline">
-        ${all.slice(-8).reverse().map(([iso, entry]) => `
-          <div class="timeline-item">
-            <strong>${dateLabel(iso, "medium")}</strong> รายรับ ${money(entry.income)} / รายจ่าย ${money(expenseTotal(entry))} / จ่ายหนี้ ${money(entry.debtPaid)}
-            ${getExpenseItems(entry).length ? `<div class="timeline-expenses">${getExpenseItems(entry).map((item) => `<span>${escapeHTML(item.category)}${item.paymentMethod ? ` · ${escapeHTML(item.paymentMethod)}` : ""} ${money(item.amount)}</span>`).join("")}</div>` : ""}
-          </div>
-        `).join("") || `<p class="muted">ยังไม่มีข้อมูลการเงิน</p>`}
       </div>
     </div>
   `;
@@ -1592,18 +1569,18 @@ function renderMembership() {
     <div class="card membership-hero">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Mood Support</p>
-          <h2>Mood ช่วยค่ากาแฟ</h2>
-          <p class="muted">ทดลองใช้ฟรี 7 วัน แล้วถ้าช่วยให้ชีวิตจัดระเบียบขึ้น ค่อยช่วยค่ากาแฟเดือนละ 99 บาท</p>
+          <p class="eyebrow">Unlimited Support</p>
+          <h2>ใช้งานแบบไม่จำกัดและอุดหนุนค่ากาแฟผู้พัฒนา</h2>
+          <p class="muted">ทดลองใช้ฟรี 7 วัน แล้วถ้าช่วยให้ชีวิตจัดระเบียบขึ้น ค่อยอุดหนุนค่ากาแฟเดือนละ 39 บาท</p>
         </div>
         <div class="button-row">
           <button class="ghost-button" type="button" data-open-auth>สมัคร / เข้าสู่ระบบ</button>
-          <a class="primary-button" href="${COFFEE_STRIPE_URL}" target="_blank" rel="noreferrer">อุดหนุนค่ากาแฟ</a>
+          <a class="primary-button" href="${COFFEE_STRIPE_URL}" target="_blank" rel="noreferrer">ใช้แบบไม่จำกัด</a>
         </div>
       </div>
       <div class="grid three">
         ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
-        ${statCard("ค่ากาแฟ", "99 บาท", "ต่อเดือน หลัง trial")}
+        ${statCard("ค่ากาแฟ", `<span class="price-drop"><del>99</del> 39 บาท</span>`, "ต่อเดือน หลัง trial")}
         ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "จัดเก็บข้อมูลในบัญชี" : "ข้อมูลอยู่ในเครื่องนี้")}
       </div>
     </div>
@@ -1614,7 +1591,7 @@ function renderMembership() {
         "ดู dashboard พื้นฐานและปฏิทินย้อนหลัง",
         "ทดลองทุกฟีเจอร์ครบ 7 วัน"
       ])}
-      ${renderPlanCard("ช่วยค่ากาแฟ", "99 บาท / เดือน", [
+      ${renderPlanCard("ใช้แบบไม่จำกัด", `<span class="price-drop"><del>99</del> 39 บาท / เดือน</span>`, [
         "ใช้ทุกฟีเจอร์ต่อหลังครบ trial",
         "จัดเก็บข้อมูลกับบัญชีของคุณ",
         "ปรับหมวดรายจ่ายและวิธีจ่ายเงินเอง",
@@ -1843,7 +1820,8 @@ function lifeRadarChart(items) {
   const balanceTotal = items.reduce((total, item) => total + clamp(item.score, 0, 100), 0);
   let layerBottom = 0;
   const bodyLayers = items.map((item, index) => {
-    const layerShare = balanceTotal > 0 ? (clamp(item.score, 0, 100) / balanceTotal) * 100 : 100 / Math.max(items.length, 1);
+    const internalShare = balanceTotal > 0 ? clamp(item.score, 0, 100) / balanceTotal : 1 / Math.max(items.length, 1);
+    const layerShare = internalShare * clamp(averageScore, 0, 100);
     const layer = `
       <span
         class="body-level-layer"
@@ -1896,10 +1874,12 @@ function moneyMixChart(entries) {
   const categoryItems = categories.length ? categories : [{ category: "ยังไม่มีรายจ่าย", amount: 0 }];
   const categoryExpense = categories.reduce((amount, item) => amount + item.amount, 0);
   const incomeTotal = sum(entries, "income") + sum(entries, "sideIncome");
-  const outflowTotal = categoryExpense + sum(entries, "debtPaid") + sum(entries, "saving") + sum(entries, "investment");
+  const savingTotal = sum(entries, "saving") + sum(entries, "investment");
+  const outflowTotal = categoryExpense + sum(entries, "debtPaid");
   const flowItems = [
     { icon: "income", label: "เงินเข้า", value: incomeTotal, color: "#a9dcc5" },
-    { icon: "expense", label: "เงินออก", value: outflowTotal, color: "#ffc39d" }
+    { icon: "expense", label: "เงินออก", value: outflowTotal, color: "#ffc39d" },
+    { icon: "win", label: "เงินเก็บ", value: savingTotal, color: "#c6b2f2" }
   ];
   const total = flowItems.reduce((amount, item) => amount + item.value, 0);
   let cursor = 0;
@@ -1911,13 +1891,7 @@ function moneyMixChart(entries) {
   }).join(", ");
   const net = incomeTotal - outflowTotal;
   const categoryColors = ["#ffc39d", "#f5a7c6", "#c6b2f2", "#a9dcc5", "#9ac7e8", "#e874a8"];
-  let categoryCursor = 0;
-  const categoryStops = categoryItems.map((item, index) => {
-    const start = categoryCursor;
-    const size = categoryExpense ? (item.amount / categoryExpense) * 100 : (index === 0 ? 100 : 0);
-    categoryCursor += size;
-    return `${categoryColors[index % categoryColors.length]} ${start}% ${categoryCursor}%`;
-  }).join(", ");
+  const maxCategory = Math.max(...categoryItems.map((item) => item.amount), 1);
 
   return `
     <div class="card money-mix-card">
@@ -1929,28 +1903,28 @@ function moneyMixChart(entries) {
         <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
       </div>
       <div class="money-mix-layout">
-        <div class="money-flow-donut" style="--flow-mix:${total ? flowStops : "#efe1e9 0 100%"}" aria-label="สรุปเงินเข้าและเงินออก">
-          <div>
-            <span>สุทธิ</span>
-            <strong>${money(net)}</strong>
+        <div class="money-flow-panel">
+          <div class="money-flow-donut" style="--flow-mix:${total ? flowStops : "#efe1e9 0 100%"}" aria-label="สรุปเงินเข้า เงินออก และเงินเก็บ">
+            <div>
+              <span>สุทธิ</span>
+              <strong>${money(net)}</strong>
+            </div>
           </div>
-        </div>
-        <div class="money-mix-main">
           <div class="money-flow-legend">
             ${flowItems.map((item) => miniSummary(iconLabel(item.icon, item.label), `${money(item.value)} บาท`)).join("")}
           </div>
-          <div class="money-stack-chart" style="--money-stack:${categoryExpense ? categoryStops : "#efe1e9 0 100%"}" aria-label="สัดส่วนรายจ่ายตามหมวด"></div>
-          <div class="money-legend compact">
+        </div>
+        <div class="money-category-panel">
+          <div class="category-bars money-category-bars">
             ${categoryItems.map((item, index) => `
-              <div class="money-legend-item">
-                <span class="legend-dot" style="background:${categoryColors[index % categoryColors.length]}"></span>
-                <span>${escapeHTML(item.category)}</span>
-                <strong>${money(item.amount)} บาท</strong>
+              <div class="category-bar">
+                <div class="progress-meta">
+                  <span><span class="legend-dot" style="background:${categoryColors[index % categoryColors.length]}"></span>${escapeHTML(item.category)}</span>
+                  <strong>${money(item.amount)} บาท</strong>
+                </div>
+                <div class="bar"><span style="width:${progressValue(item.amount, maxCategory)}%;background:${categoryColors[index % categoryColors.length]}"></span></div>
               </div>
             `).join("")}
-          </div>
-          <div class="money-insight">
-            ${miniSummary(iconLabel(net >= 0 ? "win" : "debt", net >= 0 ? "เหลือเก็บ" : "ติดลบ"), `${money(Math.abs(net))} บาท`)}
           </div>
         </div>
       </div>
@@ -2077,10 +2051,10 @@ function openEntryModal(category = activePage) {
   const entry = getEntry();
   const config = modalConfigs[modalCategory];
   const fields = featureFields(config.fields);
-  $("#modalDateLabel").textContent = dateLabel(selectedDate);
   const dateInput = $("#modalDateInput");
   if (dateInput) {
     dateInput.value = selectedDate;
+    dateInput.setAttribute("aria-label", `วันที่บันทึก ${dateLabel(selectedDate)}`);
     dateInput.onchange = () => {
       selectedDate = dateInput.value || toISO(new Date());
       openEntryModal(modalCategory);
