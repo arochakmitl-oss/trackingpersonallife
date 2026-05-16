@@ -184,8 +184,6 @@ h3,
 .channel-row,
 .timeline-item,
 .focus-item,
-.feed-suggestion,
-.saved-link,
 .modal-note {
   overflow-wrap: anywhere;
 }
@@ -1100,134 +1098,7 @@ h3 {
   line-height: 1.5;
 }
 
-.feed-card {
-  display: grid;
-  gap: 16px;
-}
 
-.feed-suggestions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.feed-news {
-  display: grid;
-  gap: 10px;
-}
-
-.feed-subhead {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  color: var(--muted);
-  font-size: 0.88rem;
-  font-weight: 800;
-}
-
-.feed-subhead strong {
-  color: var(--ink);
-}
-
-.feed-suggestion,
-.saved-link {
-  display: grid;
-  gap: 7px;
-  padding: 13px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.62);
-}
-
-.feed-suggestion span,
-.saved-link span {
-  color: var(--muted);
-  line-height: 1.48;
-}
-
-.saved-link a {
-  color: var(--ink);
-  font-weight: 900;
-  text-decoration: none;
-  overflow-wrap: anywhere;
-}
-
-.saved-link a:hover {
-  text-decoration: underline;
-}
-
-.news-link {
-  grid-template-columns: 82px minmax(0, 1fr);
-  align-items: center;
-  border-left: 4px solid var(--lavender);
-}
-
-.news-thumb {
-  width: 82px;
-  height: 62px;
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.generated-thumb {
-  position: relative;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  place-items: center;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.8), transparent 30%),
-    linear-gradient(135deg, rgba(245, 167, 198, 0.34), rgba(198, 178, 242, 0.42)),
-    #fff;
-  box-shadow: inset 0 0 0 1px rgba(108, 79, 99, 0.08);
-}
-
-.generated-thumb .category-icon {
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.86);
-  z-index: 1;
-}
-
-.generated-thumb strong {
-  z-index: 1;
-  padding: 0 7px 7px;
-  color: rgba(53, 43, 52, 0.72);
-  font-size: 0.64rem;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.thumb-glow {
-  position: absolute;
-  inset: auto -16px -28px auto;
-  width: 58px;
-  height: 58px;
-  border-radius: 999px;
-  background: rgba(255, 195, 157, 0.46);
-}
-
-.thumb-money {
-  background: linear-gradient(135deg, rgba(255, 195, 157, 0.46), rgba(169, 220, 197, 0.42)), #fff;
-}
-
-.thumb-side,
-.thumb-skills {
-  background: linear-gradient(135deg, rgba(198, 178, 242, 0.46), rgba(154, 199, 232, 0.36)), #fff;
-}
-
-.thumb-health,
-.thumb-checkin {
-  background: linear-gradient(135deg, rgba(169, 220, 197, 0.48), rgba(245, 167, 198, 0.34)), #fff;
-}
-
-.thumb-goals {
-  background: linear-gradient(135deg, rgba(255, 241, 215, 0.88), rgba(245, 167, 198, 0.32)), #fff;
-}
-
-.link-list {
-  display: grid;
-  gap: 10px;
-}
 
 .modal {
   border: 0;
@@ -1309,6 +1180,47 @@ textarea:focus {
   box-shadow: 0 0 0 4px rgba(198, 178, 242, 0.22);
 }
 
+input[type="checkbox"] {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  min-width: 19px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+input[type="checkbox"]::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) scale(0);
+  transform-origin: center;
+  transition: transform 0.16s ease;
+}
+
+input[type="checkbox"]:checked {
+  border-color: #b78ade;
+  background: linear-gradient(135deg, #c6b2f2, #f5a7c6);
+  box-shadow: 0 8px 18px rgba(198, 178, 242, 0.24);
+}
+
+input[type="checkbox"]:checked::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(198, 178, 242, 0.22);
+}
+
 .wide-label,
 .skill-checks {
   margin-top: 14px;
@@ -1335,7 +1247,7 @@ textarea:focus {
 }
 
 .skill-checks input {
-  width: auto;
+  flex: 0 0 auto;
 }
 
 .expense-editor,
@@ -1423,6 +1335,13 @@ textarea:focus {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-soft);
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.feature-toggle:has(input:checked) {
+  border-color: rgba(183, 138, 222, 0.7);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 12px 28px rgba(198, 178, 242, 0.16);
 }
 
 .feature-toggle span {
@@ -1517,7 +1436,6 @@ textarea:focus {
   .grid.three,
   .grid.four,
   .trend-grid,
-  .feed-suggestions,
   .life-radar,
   .money-mix-layout,
   .language-layout,
@@ -1551,15 +1469,6 @@ textarea:focus {
   .payment-method-row,
   .feature-toggle-grid {
     grid-template-columns: 1fr;
-  }
-
-  .news-link {
-    grid-template-columns: 1fr;
-  }
-
-  .news-thumb {
-    width: 100%;
-    height: 132px;
   }
 
   .trend-bars {
@@ -1852,8 +1761,7 @@ textarea:focus {
   }
 
   .money-legend-item,
-  .channel-row,
-  .feed-subhead {
+  .channel-row {
     align-items: flex-start;
   }
 
@@ -1866,7 +1774,6 @@ textarea:focus {
   }
 
   .channel-row,
-  .feed-subhead,
   .progress-meta {
     display: grid;
     justify-content: stretch;
