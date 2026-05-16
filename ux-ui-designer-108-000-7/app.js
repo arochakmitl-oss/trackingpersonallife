@@ -1024,7 +1024,6 @@ function renderDashboard() {
     `;
   }
   const debtPaid = sum(Object.entries(state.entries), "debtPaid");
-  const sideIncome = sum(entries, "sideIncome");
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const trend = trendPeriod();
   const hasRangeData = entries.length > 0;
@@ -1035,14 +1034,20 @@ function renderDashboard() {
   const healthScore = healthGoalScores.length ? average(healthGoalScores) : 0;
   const moneyGoalScores = activeMoneyGoals().map((goal) => progressValue(sum(entries, goal.field), rangeMoneyTarget(goal)));
   const moneyScore = hasRangeData ? average(moneyGoalScores.length ? moneyGoalScores : [progressValue(debtPaid, cfg.debtMonthlyTarget)]) : 0;
-  const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
   const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
+  const relationshipEntries = entries.filter(([, entry]) => entry.mood || entry.win || Number(entry.confidence || 0) > 0);
+  const relationshipWins = entries.filter(([, entry]) => entry.win).length;
+  const relationshipScore = hasRangeData ? average([
+    progressValue(relationshipEntries.length, Math.max(entries.length, 1)),
+    progressValue(relationshipWins, Math.max(entries.length, 1)),
+    progressValue(currentStreak(), 7)
+  ]) : 0;
   const radarItems = [
-    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: activeHealthGoals().map((item) => item.label).join(", "), color: "#a9dcc5" } : null,
-    isFeatureEnabled("money") ? { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: activeMoneyGoals().map((item) => item.label).join(", "), color: "#ffc39d" } : null,
-    isFeatureEnabled("side") ? { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" } : null,
-    isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" } : null
+    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "Health", score: healthScore, note: activeHealthGoals().map((item) => item.label).join(", "), color: "#9FE6C8" } : null,
+    isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "Career", score: careerScore, note: "skill days", color: "#B8B7FF" } : null,
+    isFeatureEnabled("money") ? { key: "finance", icon: "money", label: "Finance", score: moneyScore, note: activeMoneyGoals().map((item) => item.label).join(", "), color: "#F7D47A" } : null,
+    { key: "relationships", icon: "win", label: "Relationships", score: relationshipScore, note: `${relationshipEntries.length} check-ins / ${relationshipWins} wins`, color: "#F4A7C6" }
   ].filter(Boolean);
   const trendCharts = [
     isFeatureEnabled("health") ? trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว") : "",
@@ -1835,25 +1840,26 @@ function languageProgress(label, progress, target, color) {
 
 function lifeRadarChart(items) {
   const averageScore = average(items.map((item) => item.score));
+  const balanceTotal = items.reduce((total, item) => total + clamp(item.score, 0, 100), 0);
   let layerBottom = 0;
-  const bodyLayers = items.map((item) => {
-    const layerHeight = clamp(item.score, 0, 100) / Math.max(items.length, 1);
+  const bodyLayers = items.map((item, index) => {
+    const layerShare = balanceTotal > 0 ? (clamp(item.score, 0, 100) / balanceTotal) * 100 : 100 / Math.max(items.length, 1);
     const layer = `
       <span
         class="body-level-layer"
-        style="--layer-bottom:${layerBottom}%;--layer-height:${layerHeight}%;--layer-color:${item.color}"
-        title="${escapeHTML(item.label)} ${Math.round(item.score)}%"
+        style="--layer-bottom:${layerBottom}%;--layer-height:${layerShare}%;--layer-color:${item.color};--layer-delay:${index * 90}ms"
+        title="${escapeHTML(item.label)} ${Math.round(item.score)}%, stack ${Math.round(layerShare)}%"
       ></span>
     `;
-    layerBottom += layerHeight;
+    layerBottom += layerShare;
     return layer;
   }).join("");
   return `
     <div class="life-radar">
       <div class="body-dashboard-panel" aria-label="ภาพคนแสดงระดับสมดุลชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
-        <img src="assets/dashboard.png" alt="" />
         <div class="body-silhouette-base" aria-hidden="true"></div>
         <div class="body-level-stack" aria-hidden="true">${bodyLayers}</div>
+        <img src="assets/dashboard.png" alt="" />
         <div class="radar-score">
           <strong>${averageScore}%</strong>
           <span>สมดุลรวม</span>
