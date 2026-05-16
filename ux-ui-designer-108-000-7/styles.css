@@ -1383,7 +1383,7 @@ textarea:focus {
 
 .expense-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) 46px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 0.85fr) 46px;
   gap: 10px;
   align-items: end;
 }
@@ -1393,6 +1393,45 @@ textarea:focus {
   grid-template-columns: minmax(0, 1fr) 46px;
   gap: 10px;
   align-items: center;
+}
+
+.payment-method-row {
+  grid-template-columns: minmax(0, 1fr) auto 46px;
+}
+
+.inline-check,
+.feature-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inline-check {
+  min-height: 42px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.feature-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.feature-toggle {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.feature-toggle span {
+  display: grid;
+  gap: 3px;
+}
+
+.feature-toggle small {
+  color: var(--muted);
 }
 
 .expense-remove,
@@ -1508,7 +1547,9 @@ textarea:focus {
   }
 
   .expense-row,
-  .skill-row {
+  .skill-row,
+  .payment-method-row,
+  .feature-toggle-grid {
     grid-template-columns: 1fr;
   }
 

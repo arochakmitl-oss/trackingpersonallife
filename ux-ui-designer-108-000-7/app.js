@@ -28,6 +28,10 @@ const EMPTY_SETTINGS = Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((key
 EMPTY_SETTINGS.skillNames = [];
 EMPTY_SETTINGS.languageNames = [];
 EMPTY_SETTINGS.sideChannelNames = [];
+EMPTY_SETTINGS.enabledFeatures = [];
+EMPTY_SETTINGS.expenseCategoryNames = [];
+EMPTY_SETTINGS.paymentMethodNames = [];
+EMPTY_SETTINGS.debtPaymentMethods = [];
 
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "⌂", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
@@ -36,14 +40,21 @@ const pages = [
   { id: "money", label: "เงิน & หนี้", icon: "฿", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "ปิดหนี้ 108,000 บาท", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
   { id: "side", label: "รายได้เสริม", icon: "↗", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
   { id: "health", label: "สุขภาพ & ความสวย", icon: "♡", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
-  { id: "skills", label: "ทักษะ & อาชีพ", icon: "▧", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" }
+  { id: "skills", label: "ทักษะ & อาชีพ", icon: "▧", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
+  { id: "membership", label: "สมาชิก", icon: "◇", title: "สมัครสมาชิก", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
+  { id: "settings", label: "ตั้งค่า", icon: "⚙", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
 ];
 
 const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
 const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
 const LEGACY_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
 const DEFAULT_SIDE_CHANNELS = ["รับทำ UX audit", "ขาย UI kit", "สอน Figma mini class", "ขาย digital planner", "รับออกแบบ landing page"];
-const expenseCategories = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน", "ขนม7-11"];
+const DEFAULT_FEATURES = ["goals", "checkin", "money", "side", "health", "skills"];
+const CORE_PAGES = ["dashboard", "membership", "settings"];
+const DEFAULT_EXPENSE_CATEGORIES = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน", "ขนม7-11"];
+const DEFAULT_PAYMENT_METHODS = ["เงินสด", "บัตรเครดิต", "บัตรเดบิต", "โอนเงิน"];
+const DEFAULT_DEBT_PAYMENT_METHODS = ["บัตรเครดิต"];
+const trialDays = 7;
 const settingGroups = {
   debt: {
     title: "แก้ไขค่าหนี้",
@@ -111,6 +122,11 @@ const settingGroups = {
       { key: "languageDailyTarget", label: "เป้าฝึกภาษาต่อวัน", suffix: "นาที" },
       { key: "languageWeeklyTarget", label: "เป้าฝึกภาษาต่อสัปดาห์", suffix: "นาที" }
     ]
+  },
+  financeOptions: {
+    title: "แก้ไขหมวดรายจ่ายและวิธีจ่าย",
+    description: "เพิ่มหมวดรายจ่ายเอง และเลือกว่าวิธีจ่ายไหนต้องบวกยอดเข้าเป็นหนี้ เช่น บัตรเครดิต",
+    fields: []
   }
 };
 
@@ -279,16 +295,38 @@ function defaultSettingsForState() {
 
 function settings() {
   state.settings = { ...defaultSettingsForState(), ...(state.settings || {}) };
+  const useDefaultLists = Boolean(currentUser || state?.meta?.mockData || Object.keys(state.entries || {}).length);
   if (!Array.isArray(state.settings.skillNames)) {
-    state.settings.skillNames = currentUser || state?.meta?.mockData ? [...DEFAULT_SKILLS] : [];
+    state.settings.skillNames = useDefaultLists ? [...DEFAULT_SKILLS] : [];
   }
   if (!Array.isArray(state.settings.languageNames)) {
-    state.settings.languageNames = currentUser || state?.meta?.mockData ? [...DEFAULT_LANGUAGES] : [];
+    state.settings.languageNames = useDefaultLists ? [...DEFAULT_LANGUAGES] : [];
   }
   if (!Array.isArray(state.settings.sideChannelNames)) {
-    state.settings.sideChannelNames = currentUser || state?.meta?.mockData ? [...DEFAULT_SIDE_CHANNELS] : [];
+    state.settings.sideChannelNames = useDefaultLists ? [...DEFAULT_SIDE_CHANNELS] : [];
+  }
+  if (!Array.isArray(state.settings.enabledFeatures)) {
+    state.settings.enabledFeatures = useDefaultLists ? [...DEFAULT_FEATURES] : [];
+  }
+  if (!Array.isArray(state.settings.expenseCategoryNames)) {
+    state.settings.expenseCategoryNames = useDefaultLists ? [...DEFAULT_EXPENSE_CATEGORIES] : [];
+  }
+  if (!Array.isArray(state.settings.paymentMethodNames)) {
+    state.settings.paymentMethodNames = useDefaultLists ? [...DEFAULT_PAYMENT_METHODS] : [];
+  }
+  if (!Array.isArray(state.settings.debtPaymentMethods)) {
+    state.settings.debtPaymentMethods = useDefaultLists ? [...DEFAULT_DEBT_PAYMENT_METHODS] : [];
   }
   return state.settings;
+}
+
+function enabledFeaturesList() {
+  const list = settings().enabledFeatures;
+  return Array.isArray(list) ? list.filter((id) => DEFAULT_FEATURES.includes(id)) : [...DEFAULT_FEATURES];
+}
+
+function isFeatureEnabled(pageId) {
+  return CORE_PAGES.includes(pageId) || enabledFeaturesList().includes(pageId);
 }
 
 function skillsList() {
@@ -304,6 +342,45 @@ function languagesList() {
 function sideChannelsList() {
   const list = settings().sideChannelNames;
   return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_SIDE_CHANNELS];
+}
+
+function expenseCategoriesList() {
+  const list = settings().expenseCategoryNames;
+  return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_EXPENSE_CATEGORIES];
+}
+
+function paymentMethodsList() {
+  const list = settings().paymentMethodNames;
+  return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_PAYMENT_METHODS];
+}
+
+function debtPaymentMethodsList() {
+  const list = settings().debtPaymentMethods;
+  return Array.isArray(list) ? list.map((item) => item.trim()).filter(Boolean) : [...DEFAULT_DEBT_PAYMENT_METHODS];
+}
+
+function isDebtPaymentMethod(method) {
+  return debtPaymentMethodsList().includes(method);
+}
+
+function trialStartedAt() {
+  if (!state.meta?.trialStartedAt) {
+    state.meta = { ...(state.meta || {}), trialStartedAt: new Date().toISOString() };
+  }
+  return state.meta.trialStartedAt;
+}
+
+function trialInfo() {
+  const start = new Date(trialStartedAt());
+  const end = new Date(start);
+  end.setDate(start.getDate() + trialDays);
+  const remainingMs = end.getTime() - Date.now();
+  return {
+    start,
+    end,
+    daysLeft: Math.max(0, Math.ceil(remainingMs / 86400000)),
+    active: remainingMs > 0
+  };
 }
 
 function hasAnyEntryData() {
@@ -323,6 +400,9 @@ function hasGuestSetupData() {
     skillsList().length > 0 ||
     languagesList().length > 0 ||
     sideChannelsList().length > 0 ||
+    enabledFeaturesList().length > 0 ||
+    expenseCategoriesList().length > 0 ||
+    paymentMethodsList().length > 0 ||
     hasAnyEntryData()
   );
 }
@@ -601,15 +681,16 @@ function getExpenseItems(entry = {}) {
   if (Array.isArray(entry.expenseItems) && entry.expenseItems.length) {
     return entry.expenseItems
       .map((item) => ({
-        category: expenseCategories.includes(item.category) ? item.category : expenseCategories[0],
-        amount: Number(item.amount || 0)
+        category: expenseCategoriesList().includes(item.category) ? item.category : item.category || expenseCategoriesList()[0] || "",
+        amount: Number(item.amount || 0),
+        paymentMethod: paymentMethodsList().includes(item.paymentMethod) ? item.paymentMethod : item.paymentMethod || ""
       }))
-      .filter((item) => item.amount > 0);
+      .filter((item) => item.category && item.amount > 0);
   }
   const fallback = [];
-  if (Number(entry.nonEssential || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.nonEssential || 0) });
-  if (Number(entry.sweetDrink || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.sweetDrink || 0) });
-  if (Number(entry.essential || 0) > 0) fallback.push({ category: "ข้าวเที่ยง", amount: Number(entry.essential || 0) });
+  if (Number(entry.nonEssential || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.nonEssential || 0), paymentMethod: "" });
+  if (Number(entry.sweetDrink || 0) > 0) fallback.push({ category: "น้ำหวาน", amount: Number(entry.sweetDrink || 0), paymentMethod: "" });
+  if (Number(entry.essential || 0) > 0) fallback.push({ category: "ข้าวเที่ยง", amount: Number(entry.essential || 0), paymentMethod: "" });
   return fallback;
 }
 
@@ -617,9 +698,8 @@ function expenseTotals(items = []) {
   return items.reduce((totals, item) => {
     const amount = Number(item.amount || 0);
     if (["ข้าวเที่ยง", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน"].includes(item.category)) totals.essential += amount;
-    if (item.category === "ขนม7-11") totals.nonEssential += amount;
+    else totals.nonEssential += amount;
     if (item.category === "น้ำหวาน") {
-      totals.nonEssential += amount;
       totals.sweetDrink += amount;
     }
     return totals;
@@ -628,6 +708,12 @@ function expenseTotals(items = []) {
 
 function expenseTotal(entry = {}) {
   return getExpenseItems(entry).reduce((total, item) => total + Number(item.amount || 0), 0);
+}
+
+function cardDebtTotal(entry = {}) {
+  return getExpenseItems(entry).reduce((total, item) => (
+    isDebtPaymentMethod(item.paymentMethod) ? total + Number(item.amount || 0) : total
+  ), 0);
 }
 
 function progressValue(value, target) {
@@ -662,7 +748,7 @@ function currentStreak(predicate = (entry) => Boolean(entry && Object.keys(entry
 }
 
 function renderNav() {
-  const navHTML = pages.map((page) => `
+  const navHTML = pages.filter((page) => isFeatureEnabled(page.id)).map((page) => `
     <button class="nav-item ${page.id === activePage ? "active" : ""}" type="button" data-page="${page.id}" title="${page.label}" aria-label="${page.label}">
       <span class="nav-icon" aria-hidden="true">${page.icon}</span>
       <span>${page.label}</span>
@@ -679,7 +765,8 @@ function renderNav() {
 }
 
 function render() {
-  const page = pages.find((item) => item.id === activePage);
+  if (!isFeatureEnabled(activePage)) activePage = "dashboard";
+  const page = pages.find((item) => item.id === activePage) || pages[0];
   $("#todayLabel").textContent = `วันนี้ ${dateLabel(toISO(new Date()))}`;
   $("#pageTitle").textContent = page.title;
   $("#pageKicker").textContent = page.id === "money" ? `ปิดหนี้ ${money(settings().debtTotal)} บาท` : page.kicker;
@@ -696,7 +783,9 @@ function render() {
     money: renderMoney,
     side: renderSideIncome,
     health: renderHealth,
-    skills: renderSkills
+    skills: renderSkills,
+    membership: renderMembership,
+    settings: renderSettingsPage
   }[activePage]();
 
   $("#pageContent").innerHTML = `${content}${renderDailyFeed(page.id)}`;
@@ -1168,7 +1257,7 @@ function renderMoney() {
         ${all.slice(-8).reverse().map(([iso, entry]) => `
           <div class="timeline-item">
             <strong>${dateLabel(iso, "medium")}</strong> รายรับ ${money(entry.income)} / รายจ่าย ${money(expenseTotal(entry))} / จ่ายหนี้ ${money(entry.debtPaid)}
-            ${getExpenseItems(entry).length ? `<div class="timeline-expenses">${getExpenseItems(entry).map((item) => `<span>${item.category} ${money(item.amount)}</span>`).join("")}</div>` : ""}
+            ${getExpenseItems(entry).length ? `<div class="timeline-expenses">${getExpenseItems(entry).map((item) => `<span>${escapeHTML(item.category)}${item.paymentMethod ? ` · ${escapeHTML(item.paymentMethod)}` : ""} ${money(item.amount)}</span>`).join("")}</div>` : ""}
           </div>
         `).join("") || `<p class="muted">ยังไม่มีข้อมูลการเงิน</p>`}
       </div>
@@ -1298,6 +1387,90 @@ function renderSkills() {
   `;
 }
 
+function renderMembership() {
+  const hadTrial = Boolean(state.meta?.trialStartedAt);
+  const trial = trialInfo();
+  if (!hadTrial) saveState();
+  const status = trial.active ? `เหลือ ${trial.daysLeft} วัน` : "หมดช่วงใช้ฟรีแล้ว";
+  return `
+    <div class="grid three">
+      ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
+      ${statCard("ฟีเจอร์ที่เปิดอยู่", `${enabledFeaturesList().length}/${DEFAULT_FEATURES.length}`, "ปรับได้ที่หน้า Settings")}
+      ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "sync กับ Supabase" : "ข้อมูลอยู่ในเครื่องนี้")}
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Membership</p>
+          <h2>สมัครสมาชิกและใช้ฟรีทุกฟีเจอร์ 7 วัน</h2>
+        </div>
+        <button class="primary-button" type="button" data-open-auth>สมัคร / เข้าสู่ระบบ</button>
+      </div>
+      <div class="summary-band">
+        ${DEFAULT_FEATURES.map((id) => {
+          const page = pages.find((item) => item.id === id);
+          return miniSummary(page?.label || id, isFeatureEnabled(id) ? "เปิดใช้งาน" : "ปิดไว้");
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderSettingsPage() {
+  return `
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Feature visibility</p>
+          <h2>เลือกฟีเจอร์ที่จะแสดงใน side navbar</h2>
+        </div>
+        <button class="primary-button" type="submit" form="featureSettingsForm">บันทึกฟีเจอร์</button>
+      </div>
+      <form id="featureSettingsForm" class="feature-toggle-grid">
+        ${DEFAULT_FEATURES.map((id) => {
+          const page = pages.find((item) => item.id === id);
+          return `
+            <label class="feature-toggle">
+              <input type="checkbox" name="enabledFeature" value="${id}" ${isFeatureEnabled(id) ? "checked" : ""} />
+              <span>
+                <strong>${page?.label || id}</strong>
+                <small>${page?.kicker || ""}</small>
+              </span>
+            </label>
+          `;
+        }).join("")}
+      </form>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Money setup</p>
+            <h2>หมวดรายจ่ายและวิธีจ่ายเงิน</h2>
+          </div>
+          <button class="tiny-button" type="button" data-open-setting="financeOptions">แก้ไข</button>
+        </div>
+        <div class="expense-list">
+          ${expenseCategoriesList().map((category) => `<span>${escapeHTML(category)}</span>`).join("") || `<span>ยังไม่มีหมวดรายจ่าย</span>`}
+        </div>
+        <div class="timeline-expenses" style="margin-top:12px;">
+          ${paymentMethodsList().map((method) => `<span>${escapeHTML(method)}${isDebtPaymentMethod(method) ? " · เพิ่มยอดหนี้" : ""}</span>`).join("") || `<span>ยังไม่มีวิธีจ่ายเงิน</span>`}
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Trial</p>
+            <h2>ทดลองใช้ฟรีทุกฟีเจอร์</h2>
+          </div>
+          <button class="tiny-button" type="button" data-jump-page="membership">ดูสมาชิก</button>
+        </div>
+        <p class="muted">บัญชีใหม่จะเริ่ม trial 7 วัน และเปิดฟีเจอร์ทั้งหมดไว้ให้ใช้งานก่อน ปิดฟีเจอร์ที่ไม่ใช้ได้จากหน้านี้</p>
+      </div>
+    </div>
+  `;
+}
+
 function renderCalendar() {
   const year = calendarCursor.getFullYear();
   const month = calendarCursor.getMonth();
@@ -1361,7 +1534,7 @@ function renderDayDetail(iso) {
     ${expenses.length ? `
       <div class="expense-list">
         ${expenses.map((item) => `
-          <span>${item.category}<strong>${money(item.amount)} บาท</strong></span>
+          <span>${escapeHTML(item.category)}${item.paymentMethod ? ` · ${escapeHTML(item.paymentMethod)}` : ""}<strong>${money(item.amount)} บาท</strong></span>
         `).join("")}
       </div>
     ` : ""}
@@ -1625,9 +1798,29 @@ function bindPageEvents() {
   document.querySelectorAll("[data-open-setting]").forEach((button) => {
     button.addEventListener("click", () => openSettingModal(button.dataset.openSetting));
   });
+  document.querySelectorAll("[data-open-auth]").forEach((button) => {
+    button.addEventListener("click", openAuthModal);
+  });
+  document.querySelectorAll("[data-jump-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      activePage = button.dataset.jumpPage;
+      render();
+    });
+  });
+  const featureForm = $("#featureSettingsForm");
+  if (featureForm) featureForm.addEventListener("submit", handleFeatureSettingsSubmit);
   document.querySelectorAll("[data-mock-data]").forEach((button) => {
     button.addEventListener("click", createMockData);
   });
+}
+
+function handleFeatureSettingsSubmit(event) {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  settings().enabledFeatures = data.getAll("enabledFeature").filter((id) => DEFAULT_FEATURES.includes(id));
+  saveState();
+  syncSettings();
+  render();
 }
 
 function openEntryModal(category = activePage) {
@@ -1665,6 +1858,7 @@ function handleSubmit(event) {
   const config = modalConfigs[modalCategory] || modalConfigs.checkin;
   const existing = getEntry();
   const nextEntry = { ...existing };
+  let shouldSyncSettings = false;
 
   config.fields.forEach((field) => {
     if (field === "skills") {
@@ -1674,15 +1868,24 @@ function handleSubmit(event) {
     if (field === "expenseRows") {
       const categories = data.getAll("expenseCategory");
       const amounts = data.getAll("expenseAmount");
+      const paymentMethods = data.getAll("expensePaymentMethod");
+      const previousCardDebt = cardDebtTotal(existing);
       const items = categories.map((category, index) => ({
-        category: expenseCategories.includes(category) ? category : "",
-        amount: Number(amounts[index] || 0)
+        category: expenseCategoriesList().includes(category) ? category : "",
+        amount: Number(amounts[index] || 0),
+        paymentMethod: paymentMethodsList().includes(paymentMethods[index]) ? paymentMethods[index] : ""
       })).filter((item) => item.category && item.amount > 0);
       const totals = expenseTotals(items);
       nextEntry.expenseItems = items;
       nextEntry.essential = totals.essential;
       nextEntry.nonEssential = totals.nonEssential;
       nextEntry.sweetDrink = totals.sweetDrink;
+      const nextCardDebt = cardDebtTotal(nextEntry);
+      const debtDelta = nextCardDebt - previousCardDebt;
+      if (debtDelta) {
+        settings().debtTotal = Math.max(0, Number(settings().debtTotal || 0) + debtDelta);
+        shouldSyncSettings = true;
+      }
       return;
     }
     if (field === "languageMinutes") {
@@ -1709,6 +1912,7 @@ function handleSubmit(event) {
   state.entries[selectedDate] = nextEntry;
   saveState();
   syncEntry(selectedDate);
+  if (shouldSyncSettings) syncSettings();
   $("#entryModal").close();
   render();
 }
@@ -1857,7 +2061,14 @@ function renderExpenseRow(item = { category: "", amount: "" }) {
         หมวดหมู่
         <select name="expenseCategory">
           <option value="" ${item.category ? "" : "selected"}>เลือกหมวด (เว้นว่างได้)</option>
-          ${expenseCategories.map((category) => `<option value="${category}" ${category === item.category ? "selected" : ""}>${category}</option>`).join("")}
+          ${expenseCategoriesList().map((category) => `<option value="${escapeHTML(category)}" ${category === item.category ? "selected" : ""}>${escapeHTML(category)}</option>`).join("")}
+        </select>
+      </label>
+      <label>
+        วิธีจ่ายเงิน
+        <select name="expensePaymentMethod">
+          <option value="" ${item.paymentMethod ? "" : "selected"}>เลือกวิธีจ่าย (เว้นว่างได้)</option>
+          ${paymentMethodsList().map((method) => `<option value="${escapeHTML(method)}" ${method === item.paymentMethod ? "selected" : ""}>${escapeHTML(method)}${isDebtPaymentMethod(method) ? " • เพิ่มหนี้" : ""}</option>`).join("")}
         </select>
       </label>
       <label>
@@ -1952,6 +2163,66 @@ function renderSideChannelRow(channel = "") {
   `;
 }
 
+function renderExpenseCategoryEditor() {
+  const categories = expenseCategoriesList();
+  const rows = categories.length ? categories : [""];
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>หมวดรายจ่าย</span>
+          <small>เพิ่มหมวดเองได้ เช่น ค่าเรียน ค่าสกินแคร์ หรือค่าเดินทาง</small>
+        </div>
+        <button class="tiny-button" type="button" data-add-expense-category-row>เพิ่มหมวด</button>
+      </div>
+      <div class="skill-rows" data-expense-category-rows>
+        ${rows.map((category) => renderExpenseCategoryRow(category)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderExpenseCategoryRow(category = "") {
+  return `
+    <div class="skill-row">
+      <input name="expenseCategoryName" type="text" value="${escapeHTML(category)}" placeholder="เช่น ค่าเรียน" />
+      <button class="icon-button skill-remove" type="button" data-remove-expense-category-row aria-label="ลบหมวด">×</button>
+    </div>
+  `;
+}
+
+function renderPaymentMethodEditor() {
+  const methods = paymentMethodsList();
+  const rows = methods.length ? methods : [""];
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>วิธีจ่ายเงิน</span>
+          <small>ติ๊ก “เพิ่มยอดหนี้” สำหรับบัตรเครดิตหรือวิธีจ่ายที่ควรบวกเข้า debt total</small>
+        </div>
+        <button class="tiny-button" type="button" data-add-payment-method-row>เพิ่มวิธีจ่าย</button>
+      </div>
+      <div class="skill-rows" data-payment-method-rows>
+        ${rows.map((method) => renderPaymentMethodRow(method)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderPaymentMethodRow(method = "") {
+  return `
+    <div class="skill-row payment-method-row">
+      <input name="paymentMethodName" type="text" value="${escapeHTML(method)}" placeholder="เช่น บัตรเครดิต KTC" />
+      <label class="inline-check">
+        <input type="checkbox" name="debtPaymentMethod" value="${escapeHTML(method)}" ${method && isDebtPaymentMethod(method) ? "checked" : ""} />
+        เพิ่มยอดหนี้
+      </label>
+      <button class="icon-button skill-remove" type="button" data-remove-payment-method-row aria-label="ลบวิธีจ่าย">×</button>
+    </div>
+  `;
+}
+
 function bindSideChannelRows() {
   const rows = $("[data-side-channel-rows]");
   if (!rows) return;
@@ -2003,6 +2274,64 @@ function bindLanguageRows() {
     button.closest(".skill-row").remove();
     syncRemoveButtons();
   });
+  syncRemoveButtons();
+}
+
+function bindExpenseCategoryRows() {
+  const rows = $("[data-expense-category-rows]");
+  if (!rows) return;
+  const syncRemoveButtons = () => {
+    const buttons = [...rows.querySelectorAll("[data-remove-expense-category-row]")];
+    buttons.forEach((button) => {
+      button.disabled = buttons.length <= 1;
+    });
+  };
+
+  const addButton = $("[data-add-expense-category-row]");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      rows.insertAdjacentHTML("beforeend", renderExpenseCategoryRow());
+      rows.querySelector(".skill-row:last-child input").focus();
+      syncRemoveButtons();
+    });
+  }
+
+  rows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-expense-category-row]");
+    if (!button || rows.children.length <= 1) return;
+    button.closest(".skill-row").remove();
+    syncRemoveButtons();
+  });
+
+  syncRemoveButtons();
+}
+
+function bindPaymentMethodRows() {
+  const rows = $("[data-payment-method-rows]");
+  if (!rows) return;
+  const syncRemoveButtons = () => {
+    const buttons = [...rows.querySelectorAll("[data-remove-payment-method-row]")];
+    buttons.forEach((button) => {
+      button.disabled = buttons.length <= 1;
+    });
+  };
+
+  const addButton = $("[data-add-payment-method-row]");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      rows.insertAdjacentHTML("beforeend", renderPaymentMethodRow());
+      rows.querySelector(".skill-row:last-child input").focus();
+      syncRemoveButtons();
+    });
+  }
+
+  rows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-payment-method-row]");
+    if (!button || rows.children.length <= 1) return;
+    button.closest(".skill-row").remove();
+    syncRemoveButtons();
+  });
+
   syncRemoveButtons();
 }
 
@@ -2085,10 +2414,14 @@ function openSettingModal(group = "debt") {
       <span class="field-hint">${field.suffix}</span>
     </label>
   `).join("");
-  $("#settingFields").innerHTML = `${genericFields}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}`;
+  $("#settingFields").innerHTML = `${genericFields}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}${group === "financeOptions" ? `${renderExpenseCategoryEditor()}${renderPaymentMethodEditor()}` : ""}`;
   if (group === "side") bindSideChannelRows();
   if (group === "skills") bindSkillRows();
   if (group === "language") bindLanguageRows();
+  if (group === "financeOptions") {
+    bindExpenseCategoryRows();
+    bindPaymentMethodRows();
+  }
   $("#settingModal").showModal();
 }
 
@@ -2111,6 +2444,21 @@ function handleSettingSubmit(event) {
     const nextLanguages = [...new Set(data.getAll("languageName").map((language) => language.trim()).filter(Boolean))];
     settings().languageNames = nextLanguages;
   }
+  if (settingGroup === "financeOptions") {
+    const nextCategories = [...new Set(data.getAll("expenseCategoryName").map((category) => category.trim()).filter(Boolean))];
+    const paymentRows = [...document.querySelectorAll("[data-payment-method-rows] .payment-method-row")];
+    const nextMethods = [];
+    const nextDebtMethods = [];
+    paymentRows.forEach((row) => {
+      const method = row.querySelector('input[name="paymentMethodName"]')?.value.trim();
+      if (!method || nextMethods.includes(method)) return;
+      nextMethods.push(method);
+      if (row.querySelector('input[name="debtPaymentMethod"]')?.checked) nextDebtMethods.push(method);
+    });
+    settings().expenseCategoryNames = nextCategories;
+    settings().paymentMethodNames = nextMethods;
+    settings().debtPaymentMethods = nextDebtMethods;
+  }
   saveState();
   syncSettings();
   $("#settingModal").close();
@@ -2131,6 +2479,11 @@ function resetSettingGroup() {
   if (settingGroup === "language") {
     settings().languageNames = [...DEFAULT_LANGUAGES];
   }
+  if (settingGroup === "financeOptions") {
+    settings().expenseCategoryNames = [...DEFAULT_EXPENSE_CATEGORIES];
+    settings().paymentMethodNames = [...DEFAULT_PAYMENT_METHODS];
+    settings().debtPaymentMethods = [...DEFAULT_DEBT_PAYMENT_METHODS];
+  }
   saveState();
   syncSettings();
   $("#settingModal").close();
@@ -2140,10 +2493,13 @@ function resetSettingGroup() {
 function clearEntryData() {
   openConfirmModal(
     "ล้างค่าข้อมูล",
-    "ล้างข้อมูลรายวันทั้งหมดให้เป็น 0 โดยค่าเป้าหมายและค่าหนี้จะยังอยู่เหมือนเดิม",
+    "ล้างข้อมูลรายวันทั้งหมดให้เป็น 0 และหักยอดหนี้ที่เคยเพิ่มจากรายการบัตรออกจากค่าหนี้รวม",
     () => {
+      const removedCardDebt = Object.values(state.entries || {}).reduce((total, entry) => total + cardDebtTotal(entry), 0);
+      if (removedCardDebt) settings().debtTotal = Math.max(0, Number(settings().debtTotal || 0) - removedCardDebt);
       state.entries = {};
       saveState();
+      if (removedCardDebt) syncSettings();
       clearCloudEntries();
       selectedDate = toISO(new Date());
       calendarCursor = new Date();
@@ -2197,7 +2553,10 @@ function createMockEntries() {
       { category: "กาแฟ", amount: maybe(0.32) ? randomAmount(35, 95, 5) : 0 },
       { category: "ขนม7-11", amount: maybe(0.34) ? randomAmount(20, 120, 5) : 0 },
       { category: "น้ำหวาน", amount: sweetDrink }
-    ].filter((item) => item.amount > 0);
+    ].filter((item) => item.amount > 0).map((item) => ({
+      ...item,
+      paymentMethod: maybe(0.22) ? "บัตรเครดิต" : "เงินสด"
+    }));
     const totals = expenseTotals(expenseItems);
     const practicedSkills = mockSkills.filter(() => maybe(0.24)).slice(0, randomInt(0, 2));
     const thaiMinutes = maybe(0.56) ? randomInt(10, 45) : 0;
@@ -2236,7 +2595,11 @@ function applyRandomMockData() {
       ...DEFAULT_SETTINGS,
       skillNames: [...DEFAULT_SKILLS, "UX Writing"],
       languageNames: [...DEFAULT_LANGUAGES],
-      sideChannelNames: [...DEFAULT_SIDE_CHANNELS]
+      sideChannelNames: [...DEFAULT_SIDE_CHANNELS],
+      enabledFeatures: [...DEFAULT_FEATURES],
+      expenseCategoryNames: [...DEFAULT_EXPENSE_CATEGORIES],
+      paymentMethodNames: [...DEFAULT_PAYMENT_METHODS],
+      debtPaymentMethods: [...DEFAULT_DEBT_PAYMENT_METHODS]
     }
   }, DEFAULT_SETTINGS);
   selectedDate = toISO(new Date());
@@ -2277,6 +2640,9 @@ function exportData() {
 
 function openAuthModal() {
   setAuthMessage(currentUser ? `กำลังเชื่อมกับ ${currentUser.email}` : "ยังไม่ได้เข้าสู่ระบบ ข้อมูลจะอยู่ในเครื่องนี้จนกว่าจะ login");
+  $("#authDescription").textContent = currentUser
+    ? "บัญชีนี้กำลัง sync ข้อมูลกับ Supabase"
+    : "สมัครสมาชิกเพื่อบันทึกข้อมูลลง Supabase และใช้ฟรีทุกฟีเจอร์ 7 วัน";
   $("#authModal").showModal();
 }
 
@@ -2311,7 +2677,11 @@ async function signUpUser() {
     setAuthMessage(error.message, true);
     return;
   }
-  setAuthMessage("สมัครแล้ว เช็กอีเมลเพื่อยืนยันบัญชี ถ้า Supabase ปิด confirm email จะ login ได้ทันที");
+  state.meta = { ...(state.meta || {}), trialStartedAt: new Date().toISOString(), trialDays };
+  settings().enabledFeatures = [...DEFAULT_FEATURES];
+  saveState();
+  syncSettings();
+  setAuthMessage("สมัครแล้ว ใช้ได้ทุกฟีเจอร์ฟรี 7 วัน เช็กอีเมลเพื่อยืนยันบัญชี ถ้า Supabase ปิด confirm email จะ login ได้ทันที");
 }
 
 async function signOutUser() {
@@ -2339,6 +2709,11 @@ $("#cancelConfirmButton").addEventListener("click", () => $("#confirmModal").clo
 $("#confirmActionButton").addEventListener("click", runPendingConfirmAction);
 $("#resetSettingsButton").addEventListener("click", resetSettingGroup);
 $("#clearDayButton").addEventListener("click", () => {
+  const removedCardDebt = cardDebtTotal(getEntry(selectedDate));
+  if (removedCardDebt) {
+    settings().debtTotal = Math.max(0, Number(settings().debtTotal || 0) - removedCardDebt);
+    syncSettings();
+  }
   delete state.entries[selectedDate];
   saveState();
   deleteCloudEntry(selectedDate);
