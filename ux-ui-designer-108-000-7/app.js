@@ -2036,8 +2036,18 @@ function handleFeatureSettingsSubmit(event) {
   const data = new FormData(event.currentTarget);
   const nextFeatures = data.getAll("enabledFeature").filter((id) => DEFAULT_FEATURES.includes(id));
   settings().enabledFeatures = nextFeatures;
-  if (!nextFeatures.includes("health")) settings().healthGoalIds = [];
-  if (!nextFeatures.includes("money")) settings().moneyGoalIds = [];
+  if (!nextFeatures.includes("health")) {
+    settings().healthGoalIds = [];
+    HEALTH_GOAL_MASTER.forEach((goal) => {
+      settings()[goal.targetKey] = 0;
+    });
+  }
+  if (!nextFeatures.includes("money")) {
+    settings().moneyGoalIds = [];
+    MONEY_GOAL_MASTER.forEach((goal) => {
+      settings()[goal.targetKey] = 0;
+    });
+  }
   saveState();
   syncSettings();
   render();
@@ -2470,24 +2480,46 @@ function renderGoalMasterEditor(type) {
         </div>
       </div>
       <div class="master-goal-grid" role="table">
-        ${goalOptions.map((goal) => `
+        ${goalOptions.map((goal) => {
+          const isSelected = selected.has(goal.id);
+          return `
           <div class="master-goal-card" role="row">
             <label class="master-check">
-              <input type="checkbox" name="${type}GoalId" value="${goal.id}" ${selected.has(goal.id) ? "checked" : ""} />
+              <input type="checkbox" name="${type}GoalId" value="${goal.id}" data-goal-toggle="${goal.targetKey}" ${isSelected ? "checked" : ""} />
               <span class="feature-icon">${hugeIcon(goal.icon)}</span>
               <strong>${goal.label}</strong>
               <small>${goal.period}</small>
             </label>
             <label class="master-target-field">
               เป้าหมาย
-              <input name="${goal.targetKey}" type="text" inputmode="decimal" value="${settings()[goal.targetKey] ?? 0}" />
+              <input name="${goal.targetKey}" type="text" inputmode="decimal" value="${isSelected ? settings()[goal.targetKey] ?? 0 : ""}" ${isSelected ? "" : "disabled"} />
               <small>${goal.unit}</small>
             </label>
           </div>
-        `).join("")}
+        `;
+        }).join("")}
       </div>
     </section>
   `;
+}
+
+function bindGoalTargetToggles() {
+  const fields = $("#settingFields");
+  if (!fields) return;
+  const syncCard = (toggle) => {
+    const targetKey = toggle.dataset.goalToggle;
+    const card = toggle.closest(".master-goal-card");
+    const targetInput = card?.querySelector(`input[name="${targetKey}"]`);
+    if (!targetInput) return;
+    targetInput.disabled = !toggle.checked;
+    card.classList.toggle("target-disabled", !toggle.checked);
+    if (!toggle.checked) targetInput.value = "";
+  };
+  fields.querySelectorAll("[data-goal-toggle]").forEach(syncCard);
+  fields.addEventListener("change", (event) => {
+    const toggle = event.target.closest("[data-goal-toggle]");
+    if (toggle) syncCard(toggle);
+  });
 }
 
 function bindSideChannelRows() {
@@ -2687,7 +2719,7 @@ function openSettingModal(group = "debt") {
   $("#settingTitle").textContent = config.title;
   $("#settingDescription").textContent = config.description;
   const visibleSettingFields = visibleFieldsForSetting(config);
-  const useMasterTargetCards = ["health", "moneyGoals"].includes(group);
+  const useMasterTargetCards = ["goals", "health", "moneyGoals"].includes(group);
   const genericFields = useMasterTargetCards ? "" : visibleSettingFields.map((field) => `
     <label>
       ${field.label}
@@ -2699,6 +2731,7 @@ function openSettingModal(group = "debt") {
   if (group === "side") bindSideChannelRows();
   if (group === "skills") bindSkillRows();
   if (group === "language") bindLanguageRows();
+  if (group === "goals" || group === "health" || group === "moneyGoals") bindGoalTargetToggles();
   if (group === "financeOptions") {
     bindExpenseCategoryRows();
     bindPaymentMethodRows();
@@ -2729,10 +2762,18 @@ function handleSettingSubmit(event) {
     settings().languageNames = nextLanguages;
   }
   if (settingGroup === "goals" || settingGroup === "health") {
-    settings().healthGoalIds = data.getAll("healthGoalId").filter((id) => HEALTH_GOAL_MASTER.some((goal) => goal.id === id));
+    const selectedHealthGoals = data.getAll("healthGoalId").filter((id) => HEALTH_GOAL_MASTER.some((goal) => goal.id === id));
+    settings().healthGoalIds = selectedHealthGoals;
+    HEALTH_GOAL_MASTER.forEach((goal) => {
+      settings()[goal.targetKey] = selectedHealthGoals.includes(goal.id) ? Number(data.get(goal.targetKey) || 0) : 0;
+    });
   }
   if (settingGroup === "goals" || settingGroup === "moneyGoals") {
-    settings().moneyGoalIds = data.getAll("moneyGoalId").filter((id) => MONEY_GOAL_MASTER.some((goal) => goal.id === id));
+    const selectedMoneyGoals = data.getAll("moneyGoalId").filter((id) => MONEY_GOAL_MASTER.some((goal) => goal.id === id));
+    settings().moneyGoalIds = selectedMoneyGoals;
+    MONEY_GOAL_MASTER.forEach((goal) => {
+      settings()[goal.targetKey] = selectedMoneyGoals.includes(goal.id) ? Number(data.get(goal.targetKey) || 0) : 0;
+    });
   }
   if (settingGroup === "financeOptions") {
     const nextCategories = [...new Set(data.getAll("expenseCategoryName").map((category) => category.trim()).filter(Boolean))];

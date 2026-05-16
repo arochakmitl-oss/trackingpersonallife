@@ -1814,6 +1814,16 @@ input[type="checkbox"]:focus-visible {
   box-shadow: 0 12px 28px rgba(198, 178, 242, 0.16);
 }
 
+.master-goal-card.target-disabled {
+  opacity: 0.66;
+}
+
+.master-target-field input:disabled {
+  background: rgba(239, 225, 233, 0.56);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
 .modal-date-row {
   display: flex;
   align-items: center;
