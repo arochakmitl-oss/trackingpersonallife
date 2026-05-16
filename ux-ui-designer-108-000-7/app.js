@@ -1791,32 +1791,16 @@ function languageProgress(label, progress, target, color) {
 }
 
 function lifeRadarChart(items) {
-  const points = items.map((item, index) => radarPoint(index, items.length, clamp(item.score, 0, 100))).join(" ");
   const averageScore = average(items.map((item) => item.score));
-  const grid = [100, 70, 40].map((score) => items.map((_, index) => radarPoint(index, items.length, score)).join(" "));
   return `
     <div class="life-radar">
-      <div class="radar-panel" aria-label="กราฟแมงมุมพลังชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
-        <svg viewBox="0 0 320 320" role="img" aria-hidden="true">
-          <polygon class="radar-grid" points="${grid[0]}" />
-          <polygon class="radar-grid inner" points="${grid[1]}" />
-          <polygon class="radar-grid inner faint" points="${grid[2]}" />
-          ${items.map((_, index) => {
-            const [x, y] = radarPoint(index, items.length, 100).split(",");
-            return `<line class="radar-axis" x1="160" y1="160" x2="${x}" y2="${y}" />`;
-          }).join("")}
-          <polygon class="radar-area" points="${points}" />
-          <polyline class="radar-line" points="${points} ${points.split(" ")[0]}" />
-          ${items.map((item, index) => {
-            const point = radarPoint(index, items.length, clamp(item.score, 0, 100));
-            const [x, y] = point.split(",");
-            return `<circle class="radar-point" cx="${x}" cy="${y}" r="7" style="--point-color:${item.color}" />`;
-          }).join("")}
-          ${items.map((item, index) => {
-            const [x, y] = radarPoint(index, items.length, 118).split(",");
-            return `<text class="radar-label" x="${x}" y="${y}">${item.label}</text>`;
-          }).join("")}
-        </svg>
+      <div class="body-dashboard-panel" aria-label="ภาพคนแสดงระดับสมดุลชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
+        <img src="assets/dashboard.png" alt="" />
+        <div class="body-level-zone" aria-hidden="true">
+          ${items.map((item) => `
+            <span class="body-level-bar" style="--level:${clamp(item.score, 0, 100)}%;--level-color:${item.color}"></span>
+          `).join("")}
+        </div>
         <div class="radar-score">
           <strong>${averageScore}%</strong>
           <span>สมดุลรวม</span>
