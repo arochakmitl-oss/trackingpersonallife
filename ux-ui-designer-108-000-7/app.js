@@ -634,7 +634,7 @@ function updateAuthUI() {
 
 async function initSupabase() {
   if (!window.supabase?.createClient) {
-    setAuthMessage("โหลด Supabase client ไม่สำเร็จ ใช้ localStorage ชั่วคราว", true);
+    setAuthMessage("เชื่อมระบบบัญชีไม่สำเร็จ ใช้ข้อมูลในเครื่องชั่วคราว", true);
     return;
   }
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
@@ -997,7 +997,7 @@ function renderDashboard() {
             <p class="eyebrow">Life balance</p>
             <h2>ภาพรวมสมดุลชีวิต</h2>
           </div>
-          <span class="pill">ล้อตาม master ที่เลือก</span>
+          <span class="pill">จากเป้าหมายที่เปิด</span>
         </div>
         ${lifeRadarChart(radarItems)}
       </div>
@@ -1473,7 +1473,7 @@ function renderMembership() {
       <div class="grid three">
         ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
         ${statCard("ค่ากาแฟ", "99 บาท", "ต่อเดือน หลัง trial")}
-        ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "sync กับ Supabase" : "ข้อมูลอยู่ในเครื่องนี้")}
+        ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "จัดเก็บข้อมูลในบัญชี" : "ข้อมูลอยู่ในเครื่องนี้")}
       </div>
     </div>
     <div class="plan-compare">
@@ -1485,7 +1485,7 @@ function renderMembership() {
       ])}
       ${renderPlanCard("ช่วยค่ากาแฟ", "99 บาท / เดือน", [
         "ใช้ทุกฟีเจอร์ต่อหลังครบ trial",
-        "sync ข้อมูลกับบัญชีผ่าน Supabase",
+        "จัดเก็บข้อมูลกับบัญชีของคุณ",
         "ปรับหมวดรายจ่ายและวิธีจ่ายเงินเอง",
         "จัดลำดับ section หน้าแรกให้เข้ากับ workflow",
         "อุดหนุนผู้พัฒนาเพื่อให้แอปเติบโตต่อ"
@@ -1511,11 +1511,11 @@ function renderPlanCard(title, price, items, featured = false) {
 
 function renderSettingsPage() {
   return `
-    <div class="card">
+    <div class="settings-layout">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Feature visibility</p>
-          <h2>เลือกฟีเจอร์ แล้วตั้ง master กับเป้าหมายใต้ฟีเจอร์นั้น</h2>
+          <p class="eyebrow">Settings</p>
+          <h2>ฟีเจอร์และเป้าหมาย</h2>
         </div>
         <button class="primary-button" type="submit" form="featureSettingsForm">บันทึกฟีเจอร์</button>
       </div>
@@ -1536,10 +1536,10 @@ function renderFeatureSettingCard(id) {
         <span class="feature-icon">${hugeIcon(page?.icon || "checkmark-circle-02")}</span>
         <span>
           <strong>${page?.label || id}</strong>
-          <small>${page?.kicker || ""}</small>
+          <small>${enabled ? "เปิดใช้งาน" : "ปิดอยู่"}</small>
         </span>
       </label>
-      ${enabled ? renderFeatureConfigPanel(id) : `<p class="muted">เปิดฟีเจอร์เพื่อจัด master และเป้าหมาย</p>`}
+      ${enabled ? renderFeatureConfigPanel(id) : `<p class="muted setting-muted">เปิดเพื่อกำหนด master และเป้าหมาย</p>`}
     </article>
   `;
 }
@@ -1552,7 +1552,7 @@ function renderFeatureConfigPanel(id) {
       <div class="settings-submenu">
         ${groups.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}">${hugeIcon(item.icon)} ${item.label}</button>`).join("")}
       </div>
-      <div class="master-chip-row">
+      <div class="settings-summary-list">
         ${summary.map((item) => `<span>${escapeHTML(item)}</span>`).join("") || `<span>ยังไม่มี master data</span>`}
       </div>
     </div>
@@ -1676,7 +1676,7 @@ function languageDashboard(entries) {
             <span>นาที</span>
           </div>
           <span class="language-badge thai">${escapeHTML(primaryLanguage?.language || "ภาษา")}</span>
-          <span class="language-badge arabic">${escapeHTML(secondaryLanguage?.language || "ภาษาเสริม")}</span>
+          <span class="language-badge arabic">${escapeHTML(secondaryLanguage?.language || "เพิ่มภาษา")}</span>
         </div>
         <div class="language-progress">
           ${languageTotals.map((item, index) => languageProgress(escapeHTML(item.language), item.minutes, cfg.languageWeeklyTarget, index % 2 ? "#c6b2f2" : "#a9dcc5")).join("")}
@@ -2788,8 +2788,8 @@ function runPendingConfirmAction() {
 function openAuthModal() {
   setAuthMessage(currentUser ? `กำลังเชื่อมกับ ${currentUser.email}` : "ยังไม่ได้เข้าสู่ระบบ ข้อมูลจะอยู่ในเครื่องนี้จนกว่าจะ login");
   $("#authDescription").textContent = currentUser
-    ? "บัญชีนี้กำลัง sync ข้อมูลกับ Supabase"
-    : "สมัครสมาชิกเพื่อบันทึกข้อมูลลง Supabase และใช้ฟรีทุกฟีเจอร์ 7 วัน";
+    ? "บัญชีนี้กำลังจัดเก็บข้อมูลให้คุณ"
+    : "สมัครสมาชิกเพื่อจัดเก็บข้อมูลและใช้ฟรีทุกฟีเจอร์ 7 วัน";
   $("#authModal").showModal();
 }
 
@@ -2805,7 +2805,7 @@ function handleAuthButtonClick() {
 async function handleAuthSubmit(event) {
   event.preventDefault();
   if (!supabaseClient) {
-    setAuthMessage("Supabase client ยังไม่พร้อม", true);
+    setAuthMessage("ระบบบัญชียังไม่พร้อม", true);
     return;
   }
   const data = new FormData(event.currentTarget);
@@ -2821,7 +2821,7 @@ async function handleAuthSubmit(event) {
 
 async function signUpUser() {
   if (!supabaseClient) {
-    setAuthMessage("Supabase client ยังไม่พร้อม", true);
+    setAuthMessage("ระบบบัญชียังไม่พร้อม", true);
     return;
   }
   const form = $("#authForm");
@@ -2851,7 +2851,7 @@ async function signUpUser() {
   settings().enabledFeatures = [...DEFAULT_FEATURES];
   saveState();
   syncSettings();
-  setAuthMessage("สมัครแล้ว ใช้ได้ทุกฟีเจอร์ฟรี 7 วัน เช็กอีเมลเพื่อยืนยันบัญชี ถ้า Supabase ปิด confirm email จะ login ได้ทันที");
+  setAuthMessage("สมัครแล้ว ใช้ได้ทุกฟีเจอร์ฟรี 7 วัน เช็กอีเมลเพื่อยืนยันบัญชี");
 }
 
 async function signOutUser() {

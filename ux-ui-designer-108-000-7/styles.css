@@ -432,14 +432,17 @@ h3 {
 .stat-card {
   min-height: 132px;
   padding: 17px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
 }
 
 .stat-value {
   font-size: 1.7rem;
   font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
 }
 
 .stat-label {
@@ -664,6 +667,15 @@ h3 {
   padding: 12px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.58);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.mini-summary .stat-value {
+  text-align: right;
+  white-space: nowrap;
 }
 
 .dashboard-visual-grid {
@@ -1400,33 +1412,43 @@ input[type="checkbox"]:focus-visible {
   font-weight: 700;
 }
 
+.settings-layout {
+  padding: 20px;
+  border: 1px solid rgba(234, 221, 229, 0.8);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--soft-shadow);
+}
+
 .feature-toggle-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .feature-toggle {
   position: relative;
-  width: clamp(118px, 15vw, 146px);
-  aspect-ratio: 1 / 1;
+  width: auto;
+  min-width: 220px;
+  min-height: 58px;
   display: grid;
-  align-content: space-between;
-  padding: 12px;
-  border: 1px solid var(--line);
+  grid-template-columns: 40px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
   border-radius: 8px;
-  background: var(--surface-soft);
-  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  background: transparent;
+  transition: background 0.18s ease;
 }
 
 .feature-setting-card {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-  padding: 12px;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.54);
 }
 
@@ -1437,20 +1459,19 @@ input[type="checkbox"]:focus-visible {
 
 .feature-config-panel {
   display: grid;
-  gap: 10px;
+  align-content: center;
+  gap: 8px;
   min-width: 0;
 }
 
 .feature-toggle:has(input:checked) {
-  border-color: rgba(183, 138, 222, 0.7);
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: 0 12px 28px rgba(198, 178, 242, 0.16);
+  background: rgba(255, 255, 255, 0.62);
 }
 
 .feature-toggle > input {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+  position: static;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .feature-icon {
@@ -1471,19 +1492,21 @@ input[type="checkbox"]:focus-visible {
 .feature-toggle span {
   display: grid;
   gap: 3px;
+  min-width: 0;
 }
 
 .feature-toggle small {
-  display: none;
   color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .settings-tabs,
 .settings-submenu,
-.master-chip-row {
+.master-chip-row,
+.settings-summary-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .settings-tabs {
@@ -1492,7 +1515,8 @@ input[type="checkbox"]:focus-visible {
 
 .settings-tab,
 .settings-link,
-.master-chip-row span {
+.master-chip-row span,
+.settings-summary-list span {
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -1514,8 +1538,20 @@ input[type="checkbox"]:focus-visible {
   margin-top: 14px;
 }
 
-.master-chip-row span {
+.master-chip-row span,
+.settings-summary-list span {
   color: var(--muted);
+}
+
+.settings-summary-list span {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 0.82rem;
+}
+
+.setting-muted {
+  align-self: center;
+  margin: 0;
 }
 
 .master-goal-grid {
@@ -1624,6 +1660,14 @@ input[type="checkbox"]:focus-visible {
 
 .mini-ring strong {
   font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.money-legend-item strong,
+.progress-meta strong,
+.debt-inline strong {
+  font-variant-numeric: tabular-nums;
 }
 
 .debt-inline,
@@ -1798,6 +1842,10 @@ input[type="checkbox"]:focus-visible {
   .feature-toggle-grid,
   .feature-setting-card {
     grid-template-columns: 1fr;
+  }
+
+  .feature-toggle {
+    min-width: 0;
   }
 
   .card,
