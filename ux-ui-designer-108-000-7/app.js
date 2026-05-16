@@ -1835,19 +1835,25 @@ function languageProgress(label, progress, target, color) {
 
 function lifeRadarChart(items) {
   const averageScore = average(items.map((item) => item.score));
-  const fillStops = items.length
-    ? items.map((item, index) => {
-      const start = (index / items.length) * 100;
-      const end = ((index + 1) / items.length) * 100;
-      return `${item.color} ${start}% ${end}%`;
-    }).join(", ")
-    : "#cddf62 0 100%";
+  let layerBottom = 0;
+  const bodyLayers = items.map((item) => {
+    const layerHeight = clamp(item.score, 0, 100) / Math.max(items.length, 1);
+    const layer = `
+      <span
+        class="body-level-layer"
+        style="--layer-bottom:${layerBottom}%;--layer-height:${layerHeight}%;--layer-color:${item.color}"
+        title="${escapeHTML(item.label)} ${Math.round(item.score)}%"
+      ></span>
+    `;
+    layerBottom += layerHeight;
+    return layer;
+  }).join("");
   return `
     <div class="life-radar">
       <div class="body-dashboard-panel" aria-label="ภาพคนแสดงระดับสมดุลชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
         <img src="assets/dashboard.png" alt="" />
         <div class="body-silhouette-base" aria-hidden="true"></div>
-        <div class="body-level-fill" style="--body-level:${clamp(averageScore, 0, 100)}%;--body-fill:${fillStops}" aria-hidden="true"></div>
+        <div class="body-level-stack" aria-hidden="true">${bodyLayers}</div>
         <div class="radar-score">
           <strong>${averageScore}%</strong>
           <span>สมดุลรวม</span>

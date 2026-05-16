@@ -741,10 +741,14 @@ h3 {
 }
 
 .body-silhouette-base,
-.body-level-fill {
+.body-level-stack {
   position: absolute;
   inset: 6.5% 30% 7.5%;
   pointer-events: none;
+}
+
+.body-silhouette-base,
+.body-level-stack {
   clip-path: polygon(
     50% 0,
     60% 4%,
@@ -785,12 +789,20 @@ h3 {
   filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0.9));
 }
 
-.body-level-fill {
+.body-level-stack {
   z-index: 3;
+  overflow: hidden;
+}
+
+.body-level-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--layer-bottom);
+  height: var(--layer-height);
+  min-height: 0;
   opacity: 0.9;
-  background: linear-gradient(90deg, var(--body-fill));
-  -webkit-mask-image: linear-gradient(to top, #000 0 var(--body-level), transparent var(--body-level) 100%);
-  mask-image: linear-gradient(to top, #000 0 var(--body-level), transparent var(--body-level) 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--layer-color), white 22%), var(--layer-color));
   mix-blend-mode: multiply;
 }
 
