@@ -367,7 +367,7 @@ function settings() {
     state.settings.moneyGoalIds = useDefaultLists ? MONEY_GOAL_MASTER.map((item) => item.id) : [];
   }
   if (!Array.isArray(state.settings.dashboardSectionOrder)) {
-    state.settings.dashboardSectionOrder = ["balance", "debt", "day", "trend", "language", "moneyMix"];
+    state.settings.dashboardSectionOrder = ["balance", "checkin", "financialGoals", "day", "trend", "language", "moneyMix"];
   }
   return state.settings;
 }
@@ -826,6 +826,39 @@ function sum(entries, key) {
   return entries.reduce((total, [, entry]) => total + Number(entry[key] || 0), 0);
 }
 
+function rangeDayCount(entries) {
+  if (filter === "week") return 7;
+  if (filter === "month") {
+    const end = new Date(`${summaryEndDate()}T00:00:00`);
+    return end.getDate();
+  }
+  if (filter === "year") {
+    const end = new Date(`${summaryEndDate()}T00:00:00`);
+    const start = new Date(end.getFullYear(), 0, 1);
+    return Math.floor((end - start) / 86400000) + 1;
+  }
+  return Math.max(entries.length, 1);
+}
+
+function rangeHealthTarget(goal, entries) {
+  const cfg = settings();
+  const days = rangeDayCount(entries);
+  if (goal.id === "exercise") {
+    return filter === "week"
+      ? cfg.exerciseWeeklyTarget
+      : (Number(cfg.exerciseWeeklyTarget || cfg.exerciseDailyTarget * 7 || 0) / 7) * days;
+  }
+  return Number(cfg[goal.targetKey] || 0) * days;
+}
+
+function rangeMoneyTarget(goal) {
+  const cfg = settings();
+  const monthlyTarget = Number(cfg[goal.targetKey] || 0);
+  if (filter === "week") return monthlyTarget / 4;
+  if (filter === "year") return monthlyTarget * 12;
+  return monthlyTarget;
+}
+
 function languageFieldKey(language) {
   if (language === "อังกฤษ") return "thaiMinutes";
   return "";
@@ -973,7 +1006,6 @@ function render() {
 
 function renderDashboard() {
   const entries = entriesInRange();
-  const today = getEntry(summaryEndDate());
   const cfg = settings();
   const checkinSummary = renderCheckinSummary();
   const guestEmpty = isGuestEmptyState();
@@ -997,11 +1029,11 @@ function renderDashboard() {
   const trend = trendPeriod();
   const hasRangeData = entries.length > 0;
   const healthGoalScores = activeHealthGoals().map((goal) => {
-    const value = goal.id === "exercise" ? sum(entriesInRange("week"), "exercise") : Number(today[goal.field] || 0);
-    return progressValue(value, cfg[goal.targetKey]);
+    const value = sum(entries, goal.field);
+    return progressValue(value, rangeHealthTarget(goal, entries));
   });
   const healthScore = healthGoalScores.length ? average(healthGoalScores) : 0;
-  const moneyGoalScores = activeMoneyGoals().map((goal) => progressValue(sum(entries, goal.field), cfg[goal.targetKey]));
+  const moneyGoalScores = activeMoneyGoals().map((goal) => progressValue(sum(entries, goal.field), rangeMoneyTarget(goal)));
   const moneyScore = hasRangeData ? average(moneyGoalScores.length ? moneyGoalScores : [progressValue(debtPaid, cfg.debtMonthlyTarget)]) : 0;
   const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
@@ -1043,7 +1075,7 @@ function renderDashboard() {
           ${activeMoneyGoals().map((goal) => {
             const value = sum(entries, goal.field);
             return `
-              <div class="mini-ring" style="--ring:${progressValue(value, cfg[goal.targetKey])}%">
+              <div class="mini-ring" style="--ring:${progressValue(value, rangeMoneyTarget(goal))}%">
                 <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
               </div>
             `;
@@ -1297,24 +1329,35 @@ function renderMoney() {
   const all = Object.entries(state.entries);
   const entries = entriesInRange("month");
   const cfg = settings();
+  const dayEntry = getEntry(selectedDate);
+  const dayIncome = Number(dayEntry.income || 0);
+  const daySideIncome = Number(dayEntry.sideIncome || 0);
+  const dayExpense = expenseTotal(dayEntry);
+  const dayDebtPaid = Number(dayEntry.debtPaid || 0) + cardDebtTotal(dayEntry);
+  const daySaving = Number(dayEntry.saving || 0);
+  const dayInvestment = Number(dayEntry.investment || 0);
+  const dayInflow = dayIncome + daySideIncome;
+  const dayOutflow = dayExpense + dayDebtPaid + daySaving + dayInvestment;
+  const dayNet = dayInflow - dayOutflow;
   const monthExpense = entries.reduce((total, [, entry]) => total + expenseTotal(entry), 0);
   const debtPaid = sum(all, "debtPaid");
+  const monthDebtPaid = sum(entries, "debtPaid") + entries.reduce((total, [, entry]) => total + cardDebtTotal(entry), 0);
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const debtAngle = `${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%`;
   const goals = activeMoneyGoals();
   const categories = categoryTotals(entries);
-  const cardDebt = entries.reduce((total, [, entry]) => total + cardDebtTotal(entry), 0);
   const income = sum(entries, "income");
   const saving = sum(entries, "saving");
   const investment = sum(entries, "investment");
-  const netCashflow = income + sum(entries, "sideIncome") - monthExpense - debtPaid - saving - investment;
+  const netCashflow = income + sum(entries, "sideIncome") - monthExpense - monthDebtPaid - saving - investment;
   const savingsRate = income > 0 ? Math.round(((saving + investment) / income) * 100) : 0;
-  const debtRatio = income > 0 ? Math.round((debtPaid / income) * 100) : 0;
+  const debtRatio = income > 0 ? Math.round((monthDebtPaid / income) * 100) : 0;
   return `
     <div class="financial-health-hero">
       <div>
         <p class="eyebrow">Financial health</p>
-        <h2>ภาพรวมสุขภาพทางการเงินเดือนนี้</h2>
+        <h2>สรุปรายรับรายจ่ายรายวัน</h2>
+        <p class="muted">${dateLabel(selectedDate)} จากข้อมูลที่บันทึกไว้</p>
       </div>
       <div class="financial-score">
         <strong>${clamp(50 + savingsRate - Math.min(debtRatio, 40), 0, 100)}</strong>
@@ -1322,10 +1365,10 @@ function renderMoney() {
       </div>
     </div>
     <div class="grid four">
-      ${statCard(iconLabel("income", "เงินเข้า"), `${money(income + sum(entries, "sideIncome"))} บาท`, "รายรับรวม")}
-      ${statCard(iconLabel("expense", "เงินออก"), `${money(monthExpense)} บาท`, categories[0] ? `สูงสุด: ${escapeHTML(categories[0].category)}` : "รอข้อมูลตามหมวด")}
-      ${statCard(iconLabel("win", "อัตราออม"), `${money(savingsRate)}%`, `ออม+ลงทุน ${money(saving + investment)} บาท`)}
-      ${statCard(iconLabel("debt", "กระแสเงินสด"), `${money(netCashflow)} บาท`, netCashflow >= 0 ? "เหลือหลังจ่าย" : "ติดลบเดือนนี้")}
+      ${statCard(iconLabel("income", "เงินเข้า"), `${money(dayInflow)} บาท`, `หลัก ${money(dayIncome)} / เสริม ${money(daySideIncome)}`)}
+      ${statCard(iconLabel("expense", "รายจ่าย"), `${money(dayExpense)} บาท`, getExpenseItems(dayEntry)[0] ? `ล่าสุด: ${escapeHTML(getExpenseItems(dayEntry)[0].category)}` : "ยังไม่มีรายจ่ายวันนี้")}
+      ${statCard(iconLabel("debt", "หนี้/บัตร"), `${money(dayDebtPaid)} บาท`, dayDebtPaid ? "รวมรายการที่จ่ายด้วยบัตร" : "ยังไม่มีหนี้วันนี้")}
+      ${statCard(iconLabel(dayNet >= 0 ? "win" : "debt", "คงเหลือวันนี้"), `${money(dayNet)} บาท`, dayNet >= 0 ? "เงินเข้าเกินเงินออก" : "เงินออกมากกว่าเงินเข้า")}
     </div>
     <div class="money-split">
       <div class="card">
@@ -1385,7 +1428,7 @@ function renderMoney() {
       <div class="cashflow-bars">
         ${cashflowBar("เงินเข้า", income + sum(entries, "sideIncome"), "#a9dcc5")}
         ${cashflowBar("รายจ่าย", monthExpense, "#ffc39d")}
-        ${cashflowBar("จ่ายหนี้", debtPaid + cardDebt, "#f5a7c6")}
+        ${cashflowBar("จ่ายหนี้", monthDebtPaid, "#f5a7c6")}
         ${cashflowBar("ออม/ลงทุน", saving + investment, "#c6b2f2")}
       </div>
     </div>
@@ -1836,22 +1879,20 @@ function moneyMixChart(entries) {
   const categories = categoryTotals(entries);
   const categoryItems = categories.length ? categories : [{ category: "ยังไม่มีรายจ่าย", amount: 0 }];
   const categoryExpense = categories.reduce((amount, item) => amount + item.amount, 0);
-  const items = [
-    { key: "income", icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
-    { key: "sideIncome", icon: "side", label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
-    { key: "expense", icon: "expense", label: "รายจ่ายรวม", value: categoryExpense, color: "#ffc39d" },
-    { key: "debt", icon: "debt", label: "จ่ายหนี้", value: sum(entries, "debtPaid"), color: "#f5a7c6" }
+  const incomeTotal = sum(entries, "income") + sum(entries, "sideIncome");
+  const outflowTotal = categoryExpense + sum(entries, "debtPaid") + sum(entries, "saving") + sum(entries, "investment");
+  const flowItems = [
+    { icon: "income", label: "เงินเข้า", value: incomeTotal, color: "#a9dcc5" },
+    { icon: "expense", label: "เงินออก", value: outflowTotal, color: "#ffc39d" }
   ];
-  const total = items.reduce((amount, item) => amount + item.value, 0);
+  const total = flowItems.reduce((amount, item) => amount + item.value, 0);
   let cursor = 0;
-  const stops = items.map((item) => {
+  const flowStops = flowItems.map((item) => {
     const start = cursor;
     const size = total ? (item.value / total) * 100 : 0;
     cursor += size;
     return `${item.color} ${start}% ${cursor}%`;
   }).join(", ");
-  const incomeTotal = items[0].value + items[1].value;
-  const outflowTotal = items[2].value + items[3].value + sum(entries, "saving") + sum(entries, "investment");
   const net = incomeTotal - outflowTotal;
   const categoryColors = ["#ffc39d", "#f5a7c6", "#c6b2f2", "#a9dcc5", "#9ac7e8", "#e874a8"];
   let categoryCursor = 0;
@@ -1872,20 +1913,29 @@ function moneyMixChart(entries) {
         <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
       </div>
       <div class="money-mix-layout">
-        <div class="money-stack-chart" style="--money-stack:${categoryExpense ? categoryStops : "#efe1e9 0 100%"}" aria-label="สัดส่วนรายจ่ายตามหมวด"></div>
-        <div class="money-legend compact">
-          ${categoryItems.map((item, index) => `
-            <div class="money-legend-item">
-              <span class="legend-dot" style="background:${categoryColors[index % categoryColors.length]}"></span>
-              <span>${escapeHTML(item.category)}</span>
-              <strong>${money(item.amount)} บาท</strong>
-            </div>
-          `).join("")}
+        <div class="money-flow-donut" style="--flow-mix:${total ? flowStops : "#efe1e9 0 100%"}" aria-label="สรุปเงินเข้าและเงินออก">
+          <div>
+            <span>สุทธิ</span>
+            <strong>${money(net)}</strong>
+          </div>
         </div>
-        <div class="money-insight">
-          ${miniSummary(iconLabel("income", "เงินเข้า"), `${money(incomeTotal)} บาท`)}
-          ${miniSummary(iconLabel("expense", "เงินออก"), `${money(outflowTotal)} บาท`)}
-          ${miniSummary(iconLabel(net >= 0 ? "win" : "debt", net >= 0 ? "เหลือเก็บ" : "ติดลบ"), `${money(Math.abs(net))} บาท`)}
+        <div class="money-mix-main">
+          <div class="money-flow-legend">
+            ${flowItems.map((item) => miniSummary(iconLabel(item.icon, item.label), `${money(item.value)} บาท`)).join("")}
+          </div>
+          <div class="money-stack-chart" style="--money-stack:${categoryExpense ? categoryStops : "#efe1e9 0 100%"}" aria-label="สัดส่วนรายจ่ายตามหมวด"></div>
+          <div class="money-legend compact">
+            ${categoryItems.map((item, index) => `
+              <div class="money-legend-item">
+                <span class="legend-dot" style="background:${categoryColors[index % categoryColors.length]}"></span>
+                <span>${escapeHTML(item.category)}</span>
+                <strong>${money(item.amount)} บาท</strong>
+              </div>
+            `).join("")}
+          </div>
+          <div class="money-insight">
+            ${miniSummary(iconLabel(net >= 0 ? "win" : "debt", net >= 0 ? "เหลือเก็บ" : "ติดลบ"), `${money(Math.abs(net))} บาท`)}
+          </div>
         </div>
       </div>
     </div>
