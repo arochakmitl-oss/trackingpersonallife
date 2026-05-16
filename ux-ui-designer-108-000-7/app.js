@@ -3,14 +3,18 @@ const GUEST_STORAGE_KEY = "bloom-ux-life-tracker-guest-v1";
 const userStorageKey = (userId) => `bloom-ux-life-tracker-user-${userId}`;
 const SUPABASE_URL = "https://rxbipastbsfmxyyksdxm.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_N1cDxWxXCS8nlXS7iZg8DQ_gJNvboZz";
+const COFFEE_STRIPE_URL = "https://buy.stripe.com/";
 const DEFAULT_SETTINGS = {
-  debtTotal: 108000,
+  debtTotal: 0,
   waterDailyTarget: 8,
   exerciseDailyTarget: 30,
   sleepTarget: 7,
   confidenceTarget: 10,
+  calorieDailyTarget: 1800,
   exerciseWeeklyTarget: 150,
   debtMonthlyTarget: 12000,
+  savingMonthlyTarget: 5000,
+  investmentMonthlyTarget: 3000,
   sideIncomeMonthlyTarget: 8000,
   sideIncomeWeeklyTarget: 2000,
   sideIncomeYearlyTarget: 96000,
@@ -19,10 +23,7 @@ const DEFAULT_SETTINGS = {
   skillTargetDays: 20,
   languageDailyTarget: 20,
   languageWeeklyTarget: 140,
-  nonEssentialLimit: 6000,
-  sweetDrinkLimit: 1200,
-  trendExerciseTarget: 45,
-  trendNonEssentialLimit: 500
+  trendExerciseTarget: 45
 };
 const EMPTY_SETTINGS = Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((key) => [key, 0]));
 EMPTY_SETTINGS.skillNames = [];
@@ -32,15 +33,16 @@ EMPTY_SETTINGS.enabledFeatures = [];
 EMPTY_SETTINGS.expenseCategoryNames = [];
 EMPTY_SETTINGS.paymentMethodNames = [];
 EMPTY_SETTINGS.debtPaymentMethods = [];
+EMPTY_SETTINGS.healthGoalIds = [];
+EMPTY_SETTINGS.moneyGoalIds = [];
 
 const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "home-01", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
-  { id: "goals", label: "ตั้งค่าเป้าหมาย", icon: "target-02", title: "ตั้งค่าเป้าหมาย", cover: "assets/goals.svg", kicker: "ออกแบบชีวิตแบบมี milestone", quote: "เป้าหมายที่ดีไม่กดดันเรา แต่มันชวนเราเดินต่ออย่างชัดเจน" },
   { id: "checkin", label: "เช็คอินวันนี้", icon: "checkmark-circle-02", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
-  { id: "money", label: "เงิน & หนี้", icon: "wallet-01", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "ปิดหนี้ 108,000 บาท", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
+  { id: "money", label: "เงิน & หนี้", icon: "wallet-01", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "สุขภาพการเงินรายวัน", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
   { id: "side", label: "รายได้เสริม", icon: "arrow-up-right-01", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
   { id: "health", label: "สุขภาพ & ความสวย", icon: "heart-check", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
-  { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
+  { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "แผนเติบโตในแบบของคุณ", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
   { id: "membership", label: "ค่ากาแฟ", icon: "coffee-02", title: "Mood ช่วยค่ากาแฟ", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
   { id: "settings", label: "ตั้งค่า", icon: "settings-01", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
 ];
@@ -49,40 +51,57 @@ const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools",
 const DEFAULT_LANGUAGES = ["อังกฤษ", "อาหรับ"];
 const LEGACY_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
 const DEFAULT_SIDE_CHANNELS = ["รับทำ UX audit", "ขาย UI kit", "สอน Figma mini class", "ขาย digital planner", "รับออกแบบ landing page"];
-const DEFAULT_FEATURES = ["goals", "checkin", "money", "side", "health", "skills"];
-const CORE_PAGES = ["dashboard", "membership", "settings"];
+const DEFAULT_FEATURES = ["money", "side", "health", "skills"];
+const CORE_PAGES = ["dashboard", "checkin", "membership", "settings"];
 const DEFAULT_EXPENSE_CATEGORIES = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน", "ขนม7-11"];
 const DEFAULT_PAYMENT_METHODS = ["เงินสด", "บัตรเครดิต", "บัตรเดบิต", "โอนเงิน"];
 const DEFAULT_DEBT_PAYMENT_METHODS = ["บัตรเครดิต"];
+const HEALTH_GOAL_MASTER = [
+  { id: "water", label: "กินน้ำ", icon: "droplet", field: "water", targetKey: "waterDailyTarget", unit: "แก้ว", period: "รายวัน" },
+  { id: "exercise", label: "ออกกำลังกาย", icon: "body-part-muscle", field: "exercise", targetKey: "exerciseWeeklyTarget", unit: "นาที", period: "รายสัปดาห์" },
+  { id: "sleep", label: "นอน", icon: "moon-02", field: "sleep", targetKey: "sleepTarget", unit: "ชั่วโมง", period: "รายวัน" },
+  { id: "confidence", label: "ความมั่นใจ", icon: "heart-check", field: "confidence", targetKey: "confidenceTarget", unit: "คะแนน", period: "รายวัน" },
+  { id: "calories", label: "นับแคลลอรี่", icon: "fire", field: "calories", targetKey: "calorieDailyTarget", unit: "kcal", period: "รายวัน" }
+];
+const MONEY_GOAL_MASTER = [
+  { id: "debt", label: "ปิดหนี้", icon: "target-02", field: "debtPaid", targetKey: "debtMonthlyTarget", unit: "บาท", period: "รายเดือน" },
+  { id: "saving", label: "ออมเงิน", icon: "safe", field: "saving", targetKey: "savingMonthlyTarget", unit: "บาท", period: "รายเดือน" },
+  { id: "investment", label: "ลงทุน", icon: "chart-line-data-01", field: "investment", targetKey: "investmentMonthlyTarget", unit: "บาท", period: "รายเดือน" }
+];
 const trialDays = 7;
 const settingGroups = {
   debt: {
     title: "แก้ไขค่าหนี้",
-    description: "ค่าหนี้ทั้งหมดเป็นค่า fix ไม่ได้มาจากเช็คอินรายวัน",
+    description: "ตั้งยอดหนี้ปัจจุบันของคุณเอง หรือปล่อยไว้เป็น 0 แล้วให้ระบบเพิ่มจากวิธีจ่ายที่เลือกเป็นหนี้",
     fields: [{ key: "debtTotal", label: "หนี้ทั้งหมด", suffix: "บาท" }]
   },
   goals: {
-    title: "แก้ไขค่าเป้าหมาย",
-    description: "เป้าหมายเหล่านี้ใช้คำนวณ progress bar และวงแหวนบน dashboard",
+    title: "ตั้งค่าเป้าหมาย",
+    description: "เลือกเป้าหมายจาก master data และตั้งค่าตัวเลขที่ใช้คำนวณกราฟ",
     fields: [
       { key: "waterDailyTarget", label: "น้ำต่อวัน", suffix: "แก้ว" },
       { key: "exerciseWeeklyTarget", label: "ออกกำลังกายต่อสัปดาห์", suffix: "นาที" },
+      { key: "sleepTarget", label: "นอนต่อวัน", suffix: "ชั่วโมง" },
+      { key: "confidenceTarget", label: "ความมั่นใจ", suffix: "คะแนน" },
+      { key: "calorieDailyTarget", label: "แคลลอรี่ต่อวัน", suffix: "kcal" },
       { key: "debtMonthlyTarget", label: "จ่ายหนี้ต่อเดือน", suffix: "บาท" },
+      { key: "savingMonthlyTarget", label: "ออมเงินต่อเดือน", suffix: "บาท" },
+      { key: "investmentMonthlyTarget", label: "ลงทุนต่อเดือน", suffix: "บาท" },
       { key: "sideIncomeMonthlyTarget", label: "รายได้เสริมต่อเดือน", suffix: "บาท" },
       { key: "careerTargetDays", label: "วันฝึก portfolio/case study", suffix: "วัน" }
     ]
   },
   dashboard: {
     title: "แก้ไขเป้าสมดุลชีวิต",
-    description: "ค่าเหล่านี้ผูกกับกราฟแมงมุม 4 แกน: สุขภาพ เงิน รายได้เสริม และอาชีพ",
+    description: "ค่าเหล่านี้ผูกกับกราฟแมงมุมตามฟีเจอร์และเป้าหมายที่เปิดใช้งาน",
     fields: [
       { key: "waterDailyTarget", label: "สุขภาพ: น้ำต่อวัน", suffix: "แก้ว" },
       { key: "exerciseDailyTarget", label: "สุขภาพ: ออกกำลังกายต่อวัน", suffix: "นาที" },
       { key: "sleepTarget", label: "สุขภาพ: นอนต่อวัน", suffix: "ชั่วโมง" },
       { key: "confidenceTarget", label: "สุขภาพ: ความมั่นใจ", suffix: "คะแนน" },
-      { key: "debtTotal", label: "เงิน: หนี้ทั้งหมด", suffix: "บาท" },
-      { key: "nonEssentialLimit", label: "เงิน: เพดานรายจ่ายไม่จำเป็น", suffix: "บาท" },
-      { key: "sweetDrinkLimit", label: "เงิน: เพดานค่าน้ำหวาน", suffix: "บาท" },
+      { key: "debtMonthlyTarget", label: "เงิน: เป้าปิดหนี้ต่อเดือน", suffix: "บาท" },
+      { key: "savingMonthlyTarget", label: "เงิน: เป้าออมต่อเดือน", suffix: "บาท" },
+      { key: "investmentMonthlyTarget", label: "เงิน: เป้าลงทุนต่อเดือน", suffix: "บาท" },
       { key: "sideIncomeWeeklyTarget", label: "รายได้เสริม: เป้าสัปดาห์", suffix: "บาท" },
       { key: "sideIncomeMonthlyTarget", label: "รายได้เสริม: เป้าเดือน", suffix: "บาท" },
       { key: "sideIncomeYearlyTarget", label: "รายได้เสริม: เป้าปี", suffix: "บาท" },
@@ -97,7 +116,8 @@ const settingGroups = {
       { key: "exerciseDailyTarget", label: "ออกกำลังกายต่อวัน", suffix: "นาที" },
       { key: "exerciseWeeklyTarget", label: "ออกกำลังกายต่อสัปดาห์", suffix: "นาที" },
       { key: "sleepTarget", label: "นอนต่อวัน", suffix: "ชั่วโมง" },
-      { key: "confidenceTarget", label: "เป้าความมั่นใจ", suffix: "คะแนน" }
+      { key: "confidenceTarget", label: "เป้าความมั่นใจ", suffix: "คะแนน" },
+      { key: "calorieDailyTarget", label: "แคลลอรี่ต่อวัน", suffix: "kcal" }
     ]
   },
   side: {
@@ -147,7 +167,7 @@ let isCloudLoading = false;
 const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-const numericFields = ["water", "exercise", "sleep", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "sideIncome", "confidence", "thaiMinutes", "arabicMinutes"];
+const numericFields = ["water", "exercise", "sleep", "calories", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "saving", "investment", "sideIncome", "confidence", "thaiMinutes", "arabicMinutes"];
 const hugeIcon = (name) => `<i class="hgi hgi-stroke hgi-${name}" aria-hidden="true"></i>`;
 const categoryIcons = {
   health: `<svg viewBox="0 0 24 24"><path class="fill" d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M9.3 15.4c1.1 1.5 3.2 2 4.9.9"/></svg>`,
@@ -201,23 +221,23 @@ function safeURL(value) {
 const modalConfigs = {
   dashboard: {
     title: "บันทึกภาพรวมวันนี้",
-    description: "รวมข้อมูลสำคัญของวันเดียวในฟอร์มเดียว ครบทุกฟีเจอร์จากหน้าแรก และทุกช่องปล่อยว่างได้",
-    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
+    description: "รวมข้อมูลสำคัญของวันเดียวในฟอร์มเดียว ครบทุกฟีเจอร์จากหน้าแรก และทุกช่องกรอกข้อมูล",
+    fields: ["mood", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
   },
   goals: {
     title: "อัปเดตเป้าหมาย",
     description: "กรอกเฉพาะตัวเลขที่ส่งผลต่อ progress bar รายวัน/สัปดาห์/เดือน/ระยะยาว",
-    fields: ["water", "exercise", "debtPaid", "sideIncome", "skills", "win"]
+    fields: ["water", "exercise", "sleep", "calories", "confidence", "debtPaid", "saving", "investment", "sideIncome", "skills", "win"]
   },
   checkin: {
     title: "เช็คอินชีวิตวันนี้",
     description: "บันทึกความรู้สึก ค่าใช้จ่าย สุขภาพ ชัยชนะเล็กๆ และ streak ของวันนี้",
-    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
+    fields: ["mood", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
   },
   money: {
     title: "บันทึกเงิน & หนี้",
     description: "แยกรายรับ รายจ่ายเป็นแถวตามหมวด และเงินที่จ่ายหนี้",
-    fields: ["income", "expenseRows", "debtPaid", "win"]
+    fields: ["income", "expenseRows", "debtPaid", "saving", "investment", "win"]
   },
   side: {
     title: "บันทึกรายได้เสริม",
@@ -227,11 +247,11 @@ const modalConfigs = {
   health: {
     title: "บันทึกสุขภาพ & ความสวย",
     description: "โฟกัสน้ำ การนอน ออกกำลังกาย skincare streak และความมั่นใจ",
-    fields: ["water", "sleep", "exercise", "confidence", "win"]
+    fields: ["water", "sleep", "exercise", "confidence", "calories", "win"]
   },
   skills: {
     title: "บันทึกทักษะ & อาชีพ",
-    description: "เลือกทักษะ UX/UI ที่ฝึกวันนี้และบันทึกความคืบหน้าของ portfolio/case study",
+    description: "เลือกทักษะที่ฝึกวันนี้และบันทึกความคืบหน้าตามอาชีพของคุณ",
     fields: ["skills", "win"]
   },
   language: {
@@ -251,9 +271,7 @@ function readStoredState(key, defaults = DEFAULT_SETTINGS) {
 }
 
 function loadGuestState() {
-  const saved = readStoredState(GUEST_STORAGE_KEY, EMPTY_SETTINGS);
-  if (saved.meta?.kind !== "guest") return normalizeState({ meta: { kind: "guest" } }, EMPTY_SETTINGS);
-  return sanitizeGuestMockState(saved);
+  return normalizeState({ meta: { kind: "guest" } }, DEFAULT_SETTINGS);
 }
 
 function loadUserCache(userId) {
@@ -261,7 +279,7 @@ function loadUserCache(userId) {
 }
 
 function guestHasMockData() {
-  return Boolean(loadGuestState().meta?.mockData);
+  return false;
 }
 
 function sanitizeGuestMockState(saved) {
@@ -292,12 +310,12 @@ function normalizeState(saved = {}, defaults = DEFAULT_SETTINGS) {
 }
 
 function defaultSettingsForState() {
-  return currentUser || state?.meta?.mockData ? DEFAULT_SETTINGS : EMPTY_SETTINGS;
+  return DEFAULT_SETTINGS;
 }
 
 function settings() {
   state.settings = { ...defaultSettingsForState(), ...(state.settings || {}) };
-  const useDefaultLists = Boolean(currentUser || state?.meta?.mockData || Object.keys(state.entries || {}).length);
+  const useDefaultLists = true;
   if (!Array.isArray(state.settings.skillNames)) {
     state.settings.skillNames = useDefaultLists ? [...DEFAULT_SKILLS] : [];
   }
@@ -319,10 +337,26 @@ function settings() {
   if (!Array.isArray(state.settings.debtPaymentMethods)) {
     state.settings.debtPaymentMethods = useDefaultLists ? [...DEFAULT_DEBT_PAYMENT_METHODS] : [];
   }
+  if (!Array.isArray(state.settings.healthGoalIds)) {
+    state.settings.healthGoalIds = useDefaultLists ? HEALTH_GOAL_MASTER.map((item) => item.id) : [];
+  }
+  if (!Array.isArray(state.settings.moneyGoalIds)) {
+    state.settings.moneyGoalIds = useDefaultLists ? MONEY_GOAL_MASTER.map((item) => item.id) : [];
+  }
   if (!Array.isArray(state.settings.dashboardSectionOrder)) {
     state.settings.dashboardSectionOrder = ["balance", "debt", "day", "trend", "language", "moneyMix"];
   }
   return state.settings;
+}
+
+function healthGoalsList() {
+  const ids = Array.isArray(settings().healthGoalIds) ? settings().healthGoalIds : [];
+  return HEALTH_GOAL_MASTER.filter((item) => ids.includes(item.id));
+}
+
+function moneyGoalsList() {
+  const ids = Array.isArray(settings().moneyGoalIds) ? settings().moneyGoalIds : [];
+  return MONEY_GOAL_MASTER.filter((item) => ids.includes(item.id));
 }
 
 function enabledFeaturesList() {
@@ -345,17 +379,27 @@ function featureFields(fields = []) {
     water: "health",
     exercise: "health",
     sleep: "health",
+    calories: "health",
     confidence: "health",
     income: "money",
     expenseRows: "money",
     debtPaid: "money",
+    saving: "money",
+    investment: "money",
     sideIncome: "side",
     sideChannel: "side",
     skills: "skills",
     languageMinutes: "skills",
     languageFocus: "skills"
   };
-  return fields.filter((field) => !fieldMap[field] || isFeatureEnabled(fieldMap[field]));
+  const selectedHealthFields = new Set(healthGoalsList().map((goal) => goal.field));
+  const selectedMoneyFields = new Set(moneyGoalsList().map((goal) => goal.field));
+  return fields.filter((field) => {
+    if (fieldMap[field] && !isFeatureEnabled(fieldMap[field])) return false;
+    if (HEALTH_GOAL_MASTER.some((goal) => goal.field === field)) return selectedHealthFields.has(field);
+    if (MONEY_GOAL_MASTER.some((goal) => goal.field === field)) return selectedMoneyFields.has(field);
+    return true;
+  });
 }
 
 function activeEntryCategory(category = activePage) {
@@ -500,12 +544,12 @@ function renderGuestEmptyState(title, description) {
 }
 
 function saveState() {
-  const key = currentUser ? userStorageKey(currentUser.id) : GUEST_STORAGE_KEY;
   state.meta = currentUser
     ? { ...(state.meta || {}), kind: "user" }
     : { ...(state.meta || {}), kind: "guest" };
-  localStorage.setItem(key, JSON.stringify(state));
+  if (currentUser) localStorage.setItem(userStorageKey(currentUser.id), JSON.stringify(state));
   localStorage.removeItem(LEGACY_STORAGE_KEY);
+  localStorage.removeItem(GUEST_STORAGE_KEY);
 }
 
 function setAuthMessage(message, isError = false) {
@@ -518,18 +562,19 @@ function setAuthMessage(message, isError = false) {
 function updateAuthUI() {
   const authButton = $("#authButton");
   const profileMenu = $("#profileMenu");
+  const displayName = currentUser?.user_metadata?.name || currentUser?.email || "U";
   if (!authButton) return;
   document.body.classList.toggle("is-authenticated", Boolean(currentUser));
   authButton.classList.toggle("profile-avatar", Boolean(currentUser));
   if (profileMenu) profileMenu.hidden = true;
   if (isCloudLoading) {
-    authButton.textContent = currentUser ? (currentUser.email || "U").trim().slice(0, 1).toUpperCase() : "กำลัง sync...";
+    authButton.textContent = currentUser ? displayName.trim().slice(0, 1).toUpperCase() : "กำลัง sync...";
     authButton.title = "กำลัง sync...";
     return;
   }
-  authButton.textContent = currentUser ? (currentUser.email || "U").trim().slice(0, 1).toUpperCase() : "เข้าสู่ระบบ";
-  authButton.title = currentUser ? currentUser.email : "เข้าสู่ระบบ";
-  authButton.setAttribute("aria-label", currentUser ? `โปรไฟล์ ${currentUser.email}` : "เข้าสู่ระบบ");
+  authButton.textContent = currentUser ? displayName.trim().slice(0, 1).toUpperCase() : "เข้าสู่ระบบ";
+  authButton.title = currentUser ? displayName : "เข้าสู่ระบบ";
+  authButton.setAttribute("aria-label", currentUser ? `โปรไฟล์ ${displayName}` : "เข้าสู่ระบบ");
 }
 
 async function initSupabase() {
@@ -539,27 +584,11 @@ async function initSupabase() {
   }
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   const { data } = await supabaseClient.auth.getSession();
-  if (guestHasMockData()) {
-    currentUser = null;
-    state = loadGuestState();
-    supabaseClient.auth.signOut().catch(() => {});
-    updateAuthUI();
-    render();
-    return;
-  }
   currentUser = data.session?.user || null;
   state = currentUser ? loadUserCache(currentUser.id) : loadGuestState();
   updateAuthUI();
   if (currentUser) await loadCloudState();
   supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-    if (guestHasMockData()) {
-      currentUser = null;
-      state = loadGuestState();
-      updateAuthUI();
-      render();
-      if (session?.user) supabaseClient.auth.signOut().catch(() => {});
-      return;
-    }
     currentUser = session?.user || null;
     state = currentUser ? loadUserCache(currentUser.id) : loadGuestState();
     updateAuthUI();
@@ -755,17 +784,28 @@ function getExpenseItems(entry = {}) {
 function expenseTotals(items = []) {
   return items.reduce((totals, item) => {
     const amount = Number(item.amount || 0);
-    if (["ข้าวเที่ยง", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน"].includes(item.category)) totals.essential += amount;
-    else totals.nonEssential += amount;
     if (item.category === "น้ำหวาน") {
       totals.sweetDrink += amount;
     }
+    totals.total += amount;
     return totals;
-  }, { essential: 0, nonEssential: 0, sweetDrink: 0 });
+  }, { essential: 0, nonEssential: 0, sweetDrink: 0, total: 0 });
 }
 
 function expenseTotal(entry = {}) {
   return getExpenseItems(entry).reduce((total, item) => total + Number(item.amount || 0), 0);
+}
+
+function categoryTotals(entries = entriesInRange("month")) {
+  const totals = new Map();
+  entries.forEach(([, entry]) => {
+    getExpenseItems(entry).forEach((item) => {
+      totals.set(item.category, (totals.get(item.category) || 0) + Number(item.amount || 0));
+    });
+  });
+  return [...totals.entries()]
+    .map(([category, amount]) => ({ category, amount }))
+    .sort((a, b) => b.amount - a.amount);
 }
 
 function cardDebtTotal(entry = {}) {
@@ -827,7 +867,7 @@ function render() {
   const page = pages.find((item) => item.id === activePage) || pages[0];
   $("#todayLabel").textContent = `วันนี้ ${dateLabel(toISO(new Date()))}`;
   $("#pageTitle").textContent = page.title;
-  $("#pageKicker").textContent = page.id === "money" ? `ปิดหนี้ ${money(settings().debtTotal)} บาท` : page.kicker;
+  $("#pageKicker").textContent = page.kicker;
   $("#coverTitle").textContent = page.title;
   $("#pageQuote").textContent = page.quote;
   $("#coverImage").src = page.cover;
@@ -874,30 +914,26 @@ function renderDashboard() {
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const trend = trendPeriod();
   const hasRangeData = entries.length > 0;
-  const healthScore = average([
-    progressValue(Number(today.water || 0), cfg.waterDailyTarget),
-    progressValue(Number(today.exercise || 0), cfg.exerciseDailyTarget),
-    progressValue(Number(today.sleep || 0), cfg.sleepTarget),
-    progressValue(Number(today.confidence || 0), cfg.confidenceTarget)
-  ]);
-  const moneyScore = hasRangeData ? average([
-    progressValue(debtPaid, cfg.debtTotal),
-    inverseProgress(sum(entries, "sweetDrink"), cfg.nonEssentialLimit),
-    inverseProgress(sum(entries, "sweetDrink"), cfg.sweetDrinkLimit)
-  ]) : 0;
+  const healthGoalScores = healthGoalsList().map((goal) => {
+    const value = goal.id === "exercise" ? sum(entriesInRange("week"), "exercise") : Number(today[goal.field] || 0);
+    return progressValue(value, cfg[goal.targetKey]);
+  });
+  const healthScore = healthGoalScores.length ? average(healthGoalScores) : 0;
+  const moneyGoalScores = moneyGoalsList().map((goal) => progressValue(sum(entries, goal.field), cfg[goal.targetKey]));
+  const moneyScore = hasRangeData ? average(moneyGoalScores.length ? moneyGoalScores : [progressValue(debtPaid, cfg.debtMonthlyTarget)]) : 0;
   const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
   const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
   const radarItems = [
-    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" } : null,
-    isFeatureEnabled("money") ? { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: "หนี้ + ค่าใช้จ่าย", color: "#ffc39d" } : null,
+    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: healthGoalsList().map((item) => item.label).join(", ") || "ยังไม่เลือกเป้าหมาย", color: "#a9dcc5" } : null,
+    isFeatureEnabled("money") ? { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: moneyGoalsList().map((item) => item.label).join(", ") || "รายรับรายจ่าย", color: "#ffc39d" } : null,
     isFeatureEnabled("side") ? { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" } : null,
     isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" } : null
   ].filter(Boolean);
   const trendCharts = [
     isFeatureEnabled("health") ? trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว") : "",
     isFeatureEnabled("health") ? trendChart("ออกกำลังกาย", "exercise", trend.entries, cfg.trendExerciseTarget, "นาที") : "",
-    isFeatureEnabled("money") ? trendChart("รายจ่ายไม่จำเป็น", "sweetDrink", trend.entries, cfg.trendNonEssentialLimit, "บาท", true) : ""
+    isFeatureEnabled("money") ? trendChart("รายจ่าย", "expenseTotal", trend.entries.map(([iso, entry, labelText, tooltip]) => [iso, { expenseTotal: expenseTotal(entry) }, labelText, tooltip]), Math.max(...categoryTotals(entries).map((item) => item.amount), 1), "บาท", true) : ""
   ].filter(Boolean).join("");
   const sections = {
     balance: radarItems.length ? dashboardSection("balance", `
@@ -916,7 +952,7 @@ function renderDashboard() {
       <div class="card debt-visual-card">
         <div>
           <p class="eyebrow">Debt visual</p>
-          <h2>ปิดหนี้ ${money(cfg.debtTotal)} บาท</h2>
+          <h2>ภาพรวมหนี้</h2>
           <button class="tiny-button" type="button" data-open-setting="debt">แก้ค่าหนี้</button>
         </div>
         <div class="debt-ring dashboard-debt" style="--debt-angle: ${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%">
@@ -1049,7 +1085,8 @@ function renderWeeklyFocus(goals) {
     .sort((a, b) => a.percent - b.percent);
   const weakest = goalHealth[0];
   const exerciseWeek = sum(week, "exercise");
-  const sweetWeek = sum(week, "sweetDrink");
+  const weekCategories = categoryTotals(week);
+  const topWeekCategory = weekCategories[0];
   const sideMonth = sum(month, "sideIncome");
   const languageWeek = week.reduce((total, [, entry]) => total + languageTotal(entry), 0);
   const practicedSkills = [...new Set(week.flatMap(([, entry]) => entry.skills || []))];
@@ -1083,11 +1120,11 @@ function renderWeeklyFocus(goals) {
   }
 
   insights.push({
-    icon: sweetWeek > Number(cfg.sweetDrinkLimit || 0) ? "sweet" : "money",
+    icon: "money",
     title: "เงินและรายจ่าย",
-    text: sweetWeek > 0
-      ? `น้ำหวานสัปดาห์นี้ ${money(sweetWeek)} บาท ใช้เป็นตัวแทนรายจ่ายไม่จำเป็นใน dashboard`
-      : "สัปดาห์นี้ยังไม่มีรายจ่ายน้ำหวาน เป็นจังหวะดีในการรักษาเพดานรายจ่ายไม่จำเป็น"
+    text: topWeekCategory
+      ? `หมวดที่ใช้มากสุดสัปดาห์นี้คือ ${topWeekCategory.category} ${money(topWeekCategory.amount)} บาท`
+      : "สัปดาห์นี้ยังไม่มีรายจ่ายตามหมวด ลองบันทึกจากหน้าเงินและหนี้"
   });
 
   insights.push({
@@ -1153,37 +1190,64 @@ function renderMoney() {
   const all = Object.entries(state.entries);
   const entries = entriesInRange("month");
   const cfg = settings();
+  const monthExpense = entries.reduce((total, [, entry]) => total + expenseTotal(entry), 0);
   const debtPaid = sum(all, "debtPaid");
   const debtLeft = Math.max(0, cfg.debtTotal - debtPaid);
   const debtAngle = `${clamp((debtPaid / Math.max(cfg.debtTotal, 1)) * 100, 0, 100)}%`;
+  const goals = moneyGoalsList();
+  const categories = categoryTotals(entries);
+  const cardDebt = entries.reduce((total, [, entry]) => total + cardDebtTotal(entry), 0);
   return `
+    <div class="grid three">
+      ${statCard(iconLabel("income", "รายรับเดือนนี้"), `${money(sum(entries, "income"))} บาท`, "รายรับหลักที่บันทึก")}
+      ${statCard(iconLabel("expense", "รายจ่ายเดือนนี้"), `${money(monthExpense)} บาท`, categories[0] ? `หมวดสูงสุด ${escapeHTML(categories[0].category)}` : "รอข้อมูลตามหมวด")}
+      ${statCard(iconLabel("debt", "ยอดจากบัตร/หนี้"), `${money(cardDebt)} บาท`, "วิธีจ่ายที่ตั้งให้เพิ่มยอดหนี้")}
+    </div>
     <div class="money-split">
       <div class="card">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Debt payoff</p>
-            <h2>ติดตามหนี้ ${money(cfg.debtTotal)} บาท</h2>
+            <p class="eyebrow">Financial goals</p>
+            <h2>เป้าหมายเงินและหนี้</h2>
           </div>
           <div class="button-row">
-            <button class="tiny-button" type="button" data-open-setting="debt">แก้ค่าหนี้</button>
+            <button class="tiny-button" type="button" data-open-setting="goals">ตั้งค่าเป้าหมาย</button>
             <button class="primary-button" type="button" data-open-entry>บันทึกการเงิน</button>
           </div>
         </div>
-        <div class="debt-ring" style="--debt-angle: ${debtAngle}">
-          <div>
-            <span class="muted">คงเหลือ</span>
-            <strong>${money(debtLeft)}</strong>
-            <span class="muted">จ่ายแล้ว ${money(debtPaid)}</span>
-          </div>
+        <div class="money-goal-rings">
+          ${goals.length ? goals.map((goal) => {
+            const value = sum(entries, goal.field);
+            return `
+              <div class="mini-ring" style="--ring:${progressValue(value, cfg[goal.targetKey])}%">
+                <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
+              </div>
+            `;
+          }).join("") : `<p class="muted">เลือกเป้าหมายเงินจากหน้า Settings เพื่อแสดงกราฟ</p>`}
         </div>
+        ${cfg.debtTotal ? `
+          <div class="debt-inline">
+            <span>หนี้คงเหลือ</span>
+            <strong>${money(debtLeft)} บาท</strong>
+            <div class="bar"><span style="width:${debtAngle}"></span></div>
+          </div>
+        ` : ""}
       </div>
       <div class="card">
-        <h2>เดือนนี้</h2>
-        <div class="summary-band" style="grid-template-columns:1fr;">
-          ${miniSummary("รายรับ", `${money(sum(entries, "income"))} บาท`)}
-          ${miniSummary("รายจ่ายจำเป็น", `${money(sum(entries, "essential"))} บาท`)}
-          ${miniSummary("รายจ่ายไม่จำเป็น", `${money(sum(entries, "sweetDrink"))} บาท`)}
-          ${miniSummary("ค่าน้ำหวาน", `${money(sum(entries, "sweetDrink"))} บาท`)}
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Category spending</p>
+            <h2>รายจ่ายตามหมวดที่มีข้อมูล</h2>
+          </div>
+          <button class="tiny-button" type="button" data-open-setting="financeOptions">แก้หมวด</button>
+        </div>
+        <div class="category-bars">
+          ${categories.map((item) => `
+            <div class="category-bar">
+              <div class="progress-meta"><span>${escapeHTML(item.category)}</span><strong>${money(item.amount)} บาท</strong></div>
+              <div class="bar"><span style="width:${progressValue(item.amount, Math.max(categories[0]?.amount || 1, 1))}%"></span></div>
+            </div>
+          `).join("") || `<p class="muted">ยังไม่มีรายจ่ายเดือนนี้</p>`}
         </div>
       </div>
     </div>
@@ -1248,12 +1312,11 @@ function renderHealth() {
   const entry = getEntry();
   const week = entriesInRange("week");
   const cfg = settings();
+  const goals = healthGoalsList();
+  const valueForGoal = (goal) => goal.id === "exercise" ? sum(week, "exercise") : Number(entry[goal.field] || 0);
   return `
     <div class="grid four">
-      ${statCard(iconLabel("health", "น้ำวันนี้"), `${Number(entry.water || 0)}/${money(cfg.waterDailyTarget)}`, "แก้ว")}
-      ${statCard(iconLabel("sleep", "นอน"), `${Number(entry.sleep || 0)} ชม.`, `เป้าหมาย ${money(cfg.sleepTarget)} ชม.`)}
-      ${statCard(iconLabel("exercise", "ออกกำลังกายสัปดาห์นี้"), `${sum(week, "exercise")} นาที`, `เป้าหมาย ${money(cfg.exerciseWeeklyTarget)} นาที`)}
-      ${statCard(iconLabel("confidence", "ความมั่นใจ"), `${Number(entry.confidence || 0)}/${money(cfg.confidenceTarget)}`, "เช็คอินภาพรวมใจ")}
+      ${goals.length ? goals.slice(0, 4).map((goal) => statCard(iconLabel(goal.id === "water" ? "health" : goal.id, goal.label), `${money(valueForGoal(goal))} ${goal.unit}`, `${goal.period} เป้า ${money(cfg[goal.targetKey])}`)).join("") : renderGuestEmptyState("ยังไม่ได้เลือกเป้าหมายสุขภาพ", "ไปที่ Settings > ตั้งค่าเป้าหมาย เพื่อเลือกจาก master data")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -1267,10 +1330,7 @@ function renderHealth() {
         </div>
       </div>
       <div class="progress-list">
-        ${renderProgress({ name: "น้ำวันนี้", type: "รายวัน", progress: Number(entry.water || 0), target: cfg.waterDailyTarget })}
-        ${renderProgress({ name: "ออกกำลังกายสัปดาห์นี้", type: "รายสัปดาห์", progress: sum(week, "exercise"), target: cfg.exerciseWeeklyTarget })}
-        ${renderProgress({ name: "นอนเฉลี่ยสัปดาห์นี้", type: "รายสัปดาห์", progress: Math.round((sum(week, "sleep") / Math.max(week.length, 1)) * 10) / 10, target: cfg.sleepTarget })}
-        ${renderProgress({ name: "ความมั่นใจวันนี้", type: "รายวัน", progress: Number(entry.confidence || 0), target: cfg.confidenceTarget })}
+        ${goals.map((goal) => renderProgress({ name: goal.label, type: goal.period, progress: valueForGoal(goal), target: cfg[goal.targetKey] })).join("") || `<p class="muted">ยังไม่มีเป้าหมายสุขภาพที่เลือกไว้</p>`}
       </div>
     </div>
   `;
@@ -1293,7 +1353,7 @@ function renderSkills() {
       <div class="section-head">
         <div>
           <p class="eyebrow">Career growth</p>
-          <h2>แผนพัฒนาทักษะ UX/UI</h2>
+          <h2>แผนเติบโตทักษะตามอาชีพ</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="skills">แก้ไขเป้าทักษะ</button>
@@ -1336,7 +1396,10 @@ function renderMembership() {
           <h2>Mood ช่วยค่ากาแฟ</h2>
           <p class="muted">ทดลองใช้ฟรี 7 วัน แล้วถ้าช่วยให้ชีวิตจัดระเบียบขึ้น ค่อยช่วยค่ากาแฟเดือนละ 99 บาท</p>
         </div>
-        <button class="primary-button" type="button" data-open-auth>สมัคร / เข้าสู่ระบบ</button>
+        <div class="button-row">
+          <button class="ghost-button" type="button" data-open-auth>สมัคร / เข้าสู่ระบบ</button>
+          <a class="primary-button" href="${COFFEE_STRIPE_URL}" target="_blank" rel="noreferrer">อุดหนุนค่ากาแฟ</a>
+        </div>
       </div>
       <div class="grid three">
         ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
@@ -1355,7 +1418,8 @@ function renderMembership() {
         "ใช้ทุกฟีเจอร์ต่อหลังครบ trial",
         "sync ข้อมูลกับบัญชีผ่าน Supabase",
         "ปรับหมวดรายจ่ายและวิธีจ่ายเงินเอง",
-        "จัดลำดับ section หน้าแรกให้เข้ากับ workflow"
+        "จัดลำดับ section หน้าแรกให้เข้ากับ workflow",
+        "อุดหนุนผู้พัฒนาเพื่อให้แอปเติบโตต่อ"
       ], true)}
     </div>
   `;
@@ -1377,7 +1441,19 @@ function renderPlanCard(title, price, items, featured = false) {
 }
 
 function renderSettingsPage() {
+  const goalLinks = [
+    isFeatureEnabled("health") ? { group: "health", label: "เป้าสุขภาพ", icon: "heart-check" } : null,
+    isFeatureEnabled("money") ? { group: "goals", label: "เป้าการเงิน", icon: "wallet-01" } : null,
+    isFeatureEnabled("side") ? { group: "side", label: "เป้ารายได้เสริม", icon: "arrow-up-right-01" } : null,
+    isFeatureEnabled("skills") ? { group: "skills", label: "เป้าทักษะ", icon: "pencil-edit-02" } : null,
+    isFeatureEnabled("skills") ? { group: "language", label: "เป้าภาษา", icon: "translation" } : null
+  ].filter(Boolean);
   return `
+    <div class="settings-tabs" aria-label="เมนูย่อยตั้งค่า">
+      <button class="settings-tab active" type="button">${hugeIcon("settings-01")} ฟีเจอร์</button>
+      <button class="settings-tab" type="button" data-open-setting="goals">${hugeIcon("target-02")} ตั้งค่าเป้าหมาย</button>
+      <button class="settings-tab" type="button" data-open-setting="financeOptions">${hugeIcon("wallet-01")} เงินและหนี้</button>
+    </div>
     <div class="card">
       <div class="section-head">
         <div>
@@ -1403,6 +1479,22 @@ function renderSettingsPage() {
       </form>
     </div>
     <div class="grid two">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Goal settings</p>
+            <h2>ตั้งค่าเป้าหมายตามฟีเจอร์ที่เปิด</h2>
+          </div>
+          <button class="primary-button" type="button" data-open-entry data-modal="goals">บันทึกเป้าหมายวันนี้</button>
+        </div>
+        <div class="settings-submenu">
+          ${goalLinks.map((item) => `<button class="settings-link" type="button" data-open-setting="${item.group}">${hugeIcon(item.icon)} ${item.label}</button>`).join("") || `<p class="muted">ยังไม่มีฟีเจอร์เสริมที่เปิดใช้งาน</p>`}
+        </div>
+        <div class="master-chip-row">
+          ${isFeatureEnabled("health") ? healthGoalsList().map((goal) => `<span>${hugeIcon(goal.icon)} ${goal.label}</span>`).join("") : ""}
+          ${isFeatureEnabled("money") ? moneyGoalsList().map((goal) => `<span>${hugeIcon(goal.icon)} ${goal.label}</span>`).join("") : ""}
+        </div>
+      </div>
       <div class="card">
         <div class="section-head">
           <div>
@@ -1580,35 +1672,30 @@ function languageProgress(label, progress, target, color) {
 }
 
 function lifeRadarChart(items) {
-  const points = items.map((item, index) => radarPoint(index, clamp(item.score, 0, 100))).join(" ");
+  const points = items.map((item, index) => radarPoint(index, items.length, clamp(item.score, 0, 100))).join(" ");
   const averageScore = average(items.map((item) => item.score));
-  const labelPositions = [
-    { className: "top", x: 160, y: 22 },
-    { className: "left", x: 24, y: 166 },
-    { className: "right", x: 296, y: 166 },
-    { className: "bottom", x: 160, y: 310 }
-  ];
+  const grid = [100, 70, 40].map((score) => items.map((_, index) => radarPoint(index, items.length, score)).join(" "));
   return `
     <div class="life-radar">
       <div class="radar-panel" aria-label="กราฟแมงมุมพลังชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
         <svg viewBox="0 0 320 320" role="img" aria-hidden="true">
-          <polygon class="radar-grid" points="160,36 284,160 160,284 36,160" />
-          <polygon class="radar-grid inner" points="160,72 248,160 160,248 72,160" />
-          <polygon class="radar-grid inner faint" points="160,108 212,160 160,212 108,160" />
-          <line class="radar-axis" x1="160" y1="160" x2="160" y2="36" />
-          <line class="radar-axis" x1="160" y1="160" x2="284" y2="160" />
-          <line class="radar-axis" x1="160" y1="160" x2="160" y2="284" />
-          <line class="radar-axis" x1="160" y1="160" x2="36" y2="160" />
+          <polygon class="radar-grid" points="${grid[0]}" />
+          <polygon class="radar-grid inner" points="${grid[1]}" />
+          <polygon class="radar-grid inner faint" points="${grid[2]}" />
+          ${items.map((_, index) => {
+            const [x, y] = radarPoint(index, items.length, 100).split(",");
+            return `<line class="radar-axis" x1="160" y1="160" x2="${x}" y2="${y}" />`;
+          }).join("")}
           <polygon class="radar-area" points="${points}" />
           <polyline class="radar-line" points="${points} ${points.split(" ")[0]}" />
           ${items.map((item, index) => {
-            const point = radarPoint(index, clamp(item.score, 0, 100));
+            const point = radarPoint(index, items.length, clamp(item.score, 0, 100));
             const [x, y] = point.split(",");
             return `<circle class="radar-point" cx="${x}" cy="${y}" r="7" style="--point-color:${item.color}" />`;
           }).join("")}
           ${items.map((item, index) => {
-            const position = labelPositions[index] || labelPositions[0];
-            return `<text class="radar-label ${position.className}" x="${position.x}" y="${position.y}">${item.label}</text>`;
+            const [x, y] = radarPoint(index, items.length, 118).split(",");
+            return `<text class="radar-label" x="${x}" y="${y}">${item.label}</text>`;
           }).join("")}
         </svg>
         <div class="radar-score">
@@ -1632,36 +1719,36 @@ function lifeRadarChart(items) {
   `;
 }
 
-function radarPoint(index, score) {
+function radarPoint(index, count, score) {
   const center = 160;
   const radius = 124 * (score / 100);
-  const angles = [-90, 180, 0, 90];
-  const angle = (angles[index] * Math.PI) / 180;
+  const safeCount = Math.max(count, 3);
+  const angle = ((-90 + (360 / safeCount) * index) * Math.PI) / 180;
   const x = Math.round(center + Math.cos(angle) * radius);
   const y = Math.round(center + Math.sin(angle) * radius);
   return `${x},${y}`;
 }
 
 function moneyMixChart(entries) {
+  const categories = categoryTotals(entries);
+  const categoryExpense = categories.reduce((amount, item) => amount + item.amount, 0);
   const items = [
     { key: "income", icon: "income", label: "รายรับหลัก", value: sum(entries, "income"), color: "#a9dcc5" },
     { key: "sideIncome", icon: "side", label: "รายได้เสริม", value: sum(entries, "sideIncome"), color: "#c6b2f2" },
-    { key: "essential", icon: "expense", label: "รายจ่ายจำเป็น", value: sum(entries, "essential"), color: "#ffc39d" },
-    { key: "nonEssential", icon: "money", label: "รายจ่ายไม่จำเป็น", value: sum(entries, "sweetDrink"), color: "#f5a7c6" },
-    { key: "sweetDrink", icon: "sweet", label: "ค่าน้ำหวาน", value: sum(entries, "sweetDrink"), color: "#e874a8", duplicateOf: "nonEssential" }
+    { key: "expense", icon: "expense", label: "รายจ่ายรวม", value: categoryExpense, color: "#ffc39d" },
+    { key: "debt", icon: "debt", label: "จ่ายหนี้", value: sum(entries, "debtPaid"), color: "#f5a7c6" }
   ];
-  const visualItems = items.filter((item) => !item.duplicateOf);
-  const total = visualItems.reduce((amount, item) => amount + item.value, 0);
+  const total = items.reduce((amount, item) => amount + item.value, 0);
   let cursor = 0;
-  const stops = visualItems.map((item) => {
+  const stops = items.map((item) => {
     const start = cursor;
     const size = total ? (item.value / total) * 100 : 0;
     cursor += size;
     return `${item.color} ${start}% ${cursor}%`;
   }).join(", ");
   const incomeTotal = items[0].value + items[1].value;
-  const expenseTotal = items[2].value + items[3].value;
-  const net = incomeTotal - expenseTotal;
+  const outflowTotal = items[2].value + items[3].value + sum(entries, "saving") + sum(entries, "investment");
+  const net = incomeTotal - outflowTotal;
 
   return `
     <div class="card money-mix-card">
@@ -1691,8 +1778,16 @@ function moneyMixChart(entries) {
         </div>
         <div class="money-insight">
           ${miniSummary(iconLabel("income", "เงินเข้า"), `${money(incomeTotal)} บาท`)}
-          ${miniSummary(iconLabel("expense", "เงินออก"), `${money(expenseTotal)} บาท`)}
+          ${miniSummary(iconLabel("expense", "เงินออก"), `${money(outflowTotal)} บาท`)}
           ${miniSummary(iconLabel(net >= 0 ? "win" : "debt", net >= 0 ? "เหลือเก็บ" : "ติดลบ"), `${money(Math.abs(net))} บาท`)}
+        </div>
+        <div class="category-bars">
+          ${categories.slice(0, 5).map((item) => `
+            <div class="category-bar">
+              <div class="progress-meta"><span>${escapeHTML(item.category)}</span><strong>${money(item.amount)} บาท</strong></div>
+              <div class="bar"><span style="width:${progressValue(item.amount, Math.max(categories[0]?.amount || 1, 1))}%"></span></div>
+            </div>
+          `).join("") || `<p class="muted">ยังไม่มีรายจ่ายตามหมวด</p>`}
         </div>
       </div>
     </div>
@@ -1800,11 +1895,20 @@ function handleFeatureSettingsSubmit(event) {
 function openEntryModal(category = activePage) {
   const modal = $("#entryModal");
   const form = $("#entryForm");
-  const entry = getEntry();
   modalCategory = activeEntryCategory(category);
+  if (modalCategory === "goals" && !modal.open) selectedDate = toISO(new Date());
+  const entry = getEntry();
   const config = modalConfigs[modalCategory];
   const fields = featureFields(config.fields);
   $("#modalDateLabel").textContent = dateLabel(selectedDate);
+  const dateInput = $("#modalDateInput");
+  if (dateInput) {
+    dateInput.value = selectedDate;
+    dateInput.onchange = () => {
+      selectedDate = dateInput.value || toISO(new Date());
+      openEntryModal(modalCategory);
+    };
+  }
   $("#modalTitle").textContent = config.title;
   $("#modalDescription").textContent = config.description;
   $("#modalFields").innerHTML = fields.length
@@ -1826,7 +1930,7 @@ function openEntryModal(category = activePage) {
   [...form.querySelectorAll('input[name="skills"]')].forEach((input) => {
     input.checked = (entry.skills || []).includes(input.value);
   });
-  modal.showModal();
+  if (!modal.open) modal.showModal();
 }
 
 function handleSubmit(event) {
@@ -1931,9 +2035,12 @@ function renderField(field) {
     water: textInput("water", "น้ำที่ดื่ม (แก้ว)", "numeric", "[0-9]*"),
     exercise: textInput("exercise", "ออกกำลังกาย (นาที)", "numeric", "[0-9]*"),
     sleep: textInput("sleep", "นอน (ชั่วโมง)", "decimal"),
+    calories: textInput("calories", "แคลลอรี่", "numeric", "[0-9]*"),
     income: textInput("income", "รายรับ", "decimal"),
     expenseRows: renderExpenseRows(),
     debtPaid: textInput("debtPaid", "จ่ายหนี้วันนี้", "decimal"),
+    saving: textInput("saving", "ออมเงินวันนี้", "decimal"),
+    investment: textInput("investment", "ลงทุนวันนี้", "decimal"),
     sideIncome: textInput("sideIncome", "รายได้เสริม", "decimal"),
     languageMinutes: renderLanguageMinuteFields(),
     languageFocus: `
@@ -2201,6 +2308,32 @@ function renderPaymentMethodRow(method = "") {
   `;
 }
 
+function renderGoalMasterEditor(type) {
+  const master = type === "health" ? HEALTH_GOAL_MASTER : MONEY_GOAL_MASTER;
+  const selected = new Set(type === "health" ? settings().healthGoalIds : settings().moneyGoalIds);
+  const title = type === "health" ? "เป้าหมายสุขภาพจาก master data" : "เป้าหมายเงินและหนี้จาก master data";
+  return `
+    <section class="skill-editor wide-label">
+      <div class="skill-editor-head">
+        <div>
+          <span>${title}</span>
+          <small>เลือกเฉพาะเป้าหมายที่อยากติดตาม ระบบจะใช้รายการนี้สร้างฟอร์มและกราฟ</small>
+        </div>
+      </div>
+      <div class="master-goal-grid">
+        ${master.map((goal) => `
+          <label class="master-goal-card">
+            <input type="checkbox" name="${type}GoalId" value="${goal.id}" ${selected.has(goal.id) ? "checked" : ""} />
+            <span class="feature-icon">${hugeIcon(goal.icon)}</span>
+            <strong>${goal.label}</strong>
+            <small>${goal.period}</small>
+          </label>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function bindSideChannelRows() {
   const rows = $("[data-side-channel-rows]");
   if (!rows) return;
@@ -2380,19 +2513,30 @@ function textInput(name, label, inputMode, pattern = "") {
   `;
 }
 
+function visibleFieldsForSetting(config) {
+  return config.fields.filter((field) => {
+    if (["waterDailyTarget", "exerciseWeeklyTarget", "sleepTarget", "confidenceTarget", "calorieDailyTarget"].includes(field.key)) return isFeatureEnabled("health");
+    if (["debtMonthlyTarget", "savingMonthlyTarget", "investmentMonthlyTarget"].includes(field.key)) return isFeatureEnabled("money");
+    if (["sideIncomeMonthlyTarget", "sideIncomeWeeklyTarget", "sideIncomeYearlyTarget", "sideChannelMonthlyTarget"].includes(field.key)) return isFeatureEnabled("side");
+    if (["careerTargetDays", "skillTargetDays", "languageDailyTarget", "languageWeeklyTarget"].includes(field.key)) return isFeatureEnabled("skills");
+    return true;
+  });
+}
+
 function openSettingModal(group = "debt") {
   const config = settingGroups[group] || settingGroups.debt;
   settingGroup = group;
   $("#settingTitle").textContent = config.title;
   $("#settingDescription").textContent = config.description;
-  const genericFields = config.fields.map((field) => `
+  const visibleSettingFields = visibleFieldsForSetting(config);
+  const genericFields = visibleSettingFields.map((field) => `
     <label>
       ${field.label}
       <input name="${field.key}" type="text" inputmode="decimal" value="${settings()[field.key] ?? 0}" />
       <span class="field-hint">${field.suffix}</span>
     </label>
   `).join("");
-  $("#settingFields").innerHTML = `${genericFields}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}${group === "financeOptions" ? `${renderExpenseCategoryEditor()}${renderPaymentMethodEditor()}` : ""}`;
+  $("#settingFields").innerHTML = `${genericFields}${(group === "goals" || group === "health") && isFeatureEnabled("health") ? renderGoalMasterEditor("health") : ""}${group === "goals" && isFeatureEnabled("money") ? renderGoalMasterEditor("money") : ""}${group === "side" ? renderSideChannelEditor() : ""}${group === "skills" ? renderSkillEditor() : ""}${group === "language" ? renderLanguageEditor() : ""}${group === "financeOptions" ? `${renderExpenseCategoryEditor()}${renderPaymentMethodEditor()}` : ""}`;
   if (group === "side") bindSideChannelRows();
   if (group === "skills") bindSkillRows();
   if (group === "language") bindLanguageRows();
@@ -2407,7 +2551,7 @@ function handleSettingSubmit(event) {
   event.preventDefault();
   const config = settingGroups[settingGroup] || settingGroups.debt;
   const data = new FormData(event.currentTarget);
-  config.fields.forEach((field) => {
+  visibleFieldsForSetting(config).forEach((field) => {
     settings()[field.key] = Number(data.get(field.key) || 0);
   });
   if (settingGroup === "skills") {
@@ -2421,6 +2565,12 @@ function handleSettingSubmit(event) {
   if (settingGroup === "language") {
     const nextLanguages = [...new Set(data.getAll("languageName").map((language) => language.trim()).filter(Boolean))];
     settings().languageNames = nextLanguages;
+  }
+  if (settingGroup === "goals" || settingGroup === "health") {
+    settings().healthGoalIds = data.getAll("healthGoalId").filter((id) => HEALTH_GOAL_MASTER.some((goal) => goal.id === id));
+  }
+  if (settingGroup === "goals") {
+    settings().moneyGoalIds = data.getAll("moneyGoalId").filter((id) => MONEY_GOAL_MASTER.some((goal) => goal.id === id));
   }
   if (settingGroup === "financeOptions") {
     const nextCategories = [...new Set(data.getAll("expenseCategoryName").map((category) => category.trim()).filter(Boolean))];
@@ -2461,6 +2611,12 @@ function resetSettingGroup() {
     settings().expenseCategoryNames = [...DEFAULT_EXPENSE_CATEGORIES];
     settings().paymentMethodNames = [...DEFAULT_PAYMENT_METHODS];
     settings().debtPaymentMethods = [...DEFAULT_DEBT_PAYMENT_METHODS];
+  }
+  if (settingGroup === "goals" || settingGroup === "health") {
+    settings().healthGoalIds = HEALTH_GOAL_MASTER.map((item) => item.id);
+  }
+  if (settingGroup === "goals") {
+    settings().moneyGoalIds = MONEY_GOAL_MASTER.map((item) => item.id);
   }
   saveState();
   syncSettings();
@@ -2631,9 +2787,23 @@ async function signUpUser() {
   }
   const form = $("#authForm");
   const data = new FormData(form);
+  const name = (data.get("name") || "").trim();
   const email = (data.get("email") || "").trim();
   const password = data.get("password") || "";
-  const { error } = await supabaseClient.auth.signUp({ email, password });
+  const confirmPassword = data.get("confirmPassword") || "";
+  if (!name || !email || !password || !confirmPassword) {
+    setAuthMessage("กรอก name, email, password และ confirm password ให้ครบก่อนสมัคร", true);
+    return;
+  }
+  if (password !== confirmPassword) {
+    setAuthMessage("password และ confirm password ไม่ตรงกัน", true);
+    return;
+  }
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: { data: { name } }
+  });
   if (error) {
     setAuthMessage(error.message, true);
     return;
@@ -2682,7 +2852,7 @@ $("#clearDayButton").addEventListener("click", () => {
   $("#entryModal").close();
   render();
 });
-$("#clearTargetsButton").addEventListener("click", clearTargetValues);
+$("#clearTargetsButton")?.addEventListener("click", clearTargetValues);
 
 render();
 initSupabase();
