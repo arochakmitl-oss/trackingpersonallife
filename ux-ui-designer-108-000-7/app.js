@@ -183,8 +183,8 @@ function safeURL(value) {
 const modalConfigs = {
   dashboard: {
     title: "บันทึกภาพรวมวันนี้",
-    description: "รวมข้อมูลสำคัญของวันเดียวในฟอร์มเดียว เหมาะกับการอัปเดตเร็วจาก dashboard",
-    fields: ["mood", "water", "exercise", "income", "expenseRows", "debtPaid", "sideIncome", "win"]
+    description: "รวมข้อมูลสำคัญของวันเดียวในฟอร์มเดียว ครบทุกฟีเจอร์จากหน้าแรก และทุกช่องปล่อยว่างได้",
+    fields: ["mood", "water", "exercise", "sleep", "income", "expenseRows", "debtPaid", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
   },
   goals: {
     title: "อัปเดตเป้าหมาย",
@@ -498,23 +498,30 @@ function getEntry(iso = selectedDate) {
   return state.entries[iso] || {};
 }
 
+function summaryEndDate() {
+  return [toISO(new Date()), selectedDate, ...Object.keys(state.entries || {})]
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+}
+
 function entriesInRange(range = filter) {
-  const today = new Date(`${selectedDate}T00:00:00`);
-  let start = new Date(today);
-  if (range === "week") start.setDate(today.getDate() - 6);
-  if (range === "month") start = new Date(today.getFullYear(), today.getMonth(), 1);
-  if (range === "year") start = new Date(today.getFullYear(), 0, 1);
+  const end = new Date(`${summaryEndDate()}T00:00:00`);
+  let start = new Date(end);
+  if (range === "week") start.setDate(end.getDate() - 6);
+  if (range === "month") start = new Date(end.getFullYear(), end.getMonth(), 1);
+  if (range === "year") start = new Date(end.getFullYear(), 0, 1);
 
   return Object.entries(state.entries)
     .filter(([iso]) => {
       const day = new Date(`${iso}T00:00:00`);
-      return day >= start && day <= today;
+      return day >= start && day <= end;
     })
     .sort(([a], [b]) => a.localeCompare(b));
 }
 
 function lastDays(count) {
-  const end = new Date(`${selectedDate}T00:00:00`);
+  const end = new Date(`${summaryEndDate()}T00:00:00`);
   return Array.from({ length: count }, (_, index) => {
     const day = new Date(end);
     day.setDate(end.getDate() - (count - 1 - index));
@@ -524,7 +531,7 @@ function lastDays(count) {
 }
 
 function trendPeriod() {
-  const selected = new Date(`${selectedDate}T00:00:00`);
+  const selected = new Date(`${summaryEndDate()}T00:00:00`);
   if (filter === "year") {
     const labels = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
     const entries = Array.from({ length: 12 }, (_, month) => {
@@ -698,7 +705,7 @@ function render() {
 
 function renderDashboard() {
   const entries = entriesInRange();
-  const today = getEntry();
+  const today = getEntry(summaryEndDate());
   const cfg = settings();
   const guestEmpty = isGuestEmptyState();
   if (guestEmpty) {
@@ -1668,9 +1675,9 @@ function handleSubmit(event) {
       const categories = data.getAll("expenseCategory");
       const amounts = data.getAll("expenseAmount");
       const items = categories.map((category, index) => ({
-        category: expenseCategories.includes(category) ? category : expenseCategories[0],
+        category: expenseCategories.includes(category) ? category : "",
         amount: Number(amounts[index] || 0)
-      })).filter((item) => item.amount > 0);
+      })).filter((item) => item.category && item.amount > 0);
       const totals = expenseTotals(items);
       nextEntry.expenseItems = items;
       nextEntry.essential = totals.essential;
@@ -1730,6 +1737,7 @@ function renderField(field) {
       <label>
         อารมณ์
         <select name="mood">
+          <option value="">เลือกอารมณ์ (เว้นว่างได้)</option>
           <option value="สดใส">สดใส</option>
           <option value="นิ่งๆ">นิ่งๆ</option>
           <option value="เหนื่อย">เหนื่อย</option>
@@ -1750,6 +1758,7 @@ function renderField(field) {
       <label>
         โฟกัสการฝึก
         <select name="languageFocus">
+          <option value="">เลือกโฟกัส (เว้นว่างได้)</option>
           <option value="คำศัพท์">คำศัพท์</option>
           <option value="อ่าน">อ่าน</option>
           <option value="เขียน">เขียน</option>
@@ -1763,6 +1772,7 @@ function renderField(field) {
       <label>
         ช่องทางรายได้เสริม
         <select name="sideChannel">
+          <option value="">เลือกช่องทาง (เว้นว่างได้)</option>
           ${sideChannelsList().map((channel) => `<option value="${escapeHTML(channel)}">${escapeHTML(channel)}</option>`).join("")}
         </select>
         ${sideChannelsList().length ? "" : `<span class="field-hint">ยังไม่มีช่องทาง ไปที่แก้ไขช่องทางรายได้เสริมเพื่อเพิ่มเอง</span>`}
@@ -1814,7 +1824,7 @@ function renderLanguageMinuteFields() {
         ${languages.map((language) => `
           <label>
             ${escapeHTML(language)} (นาที)
-            <input name="languageMinutes:${escapeHTML(language)}" type="text" inputmode="numeric" pattern="[0-9]*" value="${getLanguageMinutes(entry, language) || ""}" />
+            <input name="languageMinutes:${escapeHTML(language)}" type="text" inputmode="numeric" pattern="[0-9]*" value="${getLanguageMinutes(entry, language) || ""}" placeholder="เว้นว่างได้" />
           </label>
         `).join("")}
       </div>
@@ -1823,7 +1833,7 @@ function renderLanguageMinuteFields() {
 }
 
 function renderExpenseRows(items = getExpenseItems(getEntry())) {
-  const rows = items.length ? items : [{ category: "น้ำหวาน", amount: 0 }];
+  const rows = items.length ? items : [{ category: "", amount: "" }];
   return `
     <section class="expense-editor wide-label">
       <div class="expense-editor-head">
@@ -1840,18 +1850,19 @@ function renderExpenseRows(items = getExpenseItems(getEntry())) {
   `;
 }
 
-function renderExpenseRow(item = { category: "น้ำหวาน", amount: 0 }) {
+function renderExpenseRow(item = { category: "", amount: "" }) {
   return `
     <div class="expense-row">
       <label>
         หมวดหมู่
         <select name="expenseCategory">
+          <option value="" ${item.category ? "" : "selected"}>เลือกหมวด (เว้นว่างได้)</option>
           ${expenseCategories.map((category) => `<option value="${category}" ${category === item.category ? "selected" : ""}>${category}</option>`).join("")}
         </select>
       </label>
       <label>
         จำนวนเงิน
-        <input name="expenseAmount" type="text" inputmode="decimal" value="${Number(item.amount || 0) || ""}" placeholder="0" />
+        <input name="expenseAmount" type="text" inputmode="decimal" value="${Number(item.amount || 0) || ""}" placeholder="เว้นว่างได้" />
       </label>
       <button class="icon-button expense-remove" type="button" data-remove-expense-row aria-label="ลบแถว">×</button>
     </div>
@@ -2057,7 +2068,7 @@ function textInput(name, label, inputMode, pattern = "") {
   return `
     <label>
       ${label}
-      <input name="${name}" type="text" inputmode="${inputMode}" ${pattern ? `pattern="${pattern}"` : ""} />
+      <input name="${name}" type="text" inputmode="${inputMode}" ${pattern ? `pattern="${pattern}"` : ""} placeholder="เว้นว่างได้" />
     </label>
   `;
 }
