@@ -41,7 +41,7 @@ const pages = [
   { id: "side", label: "รายได้เสริม", icon: "↗", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
   { id: "health", label: "สุขภาพ & ความสวย", icon: "♡", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
   { id: "skills", label: "ทักษะ & อาชีพ", icon: "▧", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
-  { id: "membership", label: "สมาชิก", icon: "◇", title: "สมัครสมาชิก", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
+  { id: "membership", label: "ค่ากาแฟ", icon: "◇", title: "Mood ช่วยค่ากาแฟ", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
   { id: "settings", label: "ตั้งค่า", icon: "⚙", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
 ];
 
@@ -316,6 +316,9 @@ function settings() {
   if (!Array.isArray(state.settings.debtPaymentMethods)) {
     state.settings.debtPaymentMethods = useDefaultLists ? [...DEFAULT_DEBT_PAYMENT_METHODS] : [];
   }
+  if (!Array.isArray(state.settings.dashboardSectionOrder)) {
+    state.settings.dashboardSectionOrder = ["balance", "debt", "day", "trend", "language", "moneyMix"];
+  }
   return state.settings;
 }
 
@@ -326,6 +329,54 @@ function enabledFeaturesList() {
 
 function isFeatureEnabled(pageId) {
   return CORE_PAGES.includes(pageId) || enabledFeaturesList().includes(pageId);
+}
+
+function featurePage(id) {
+  return pages.find((page) => page.id === id);
+}
+
+function featureFields(fields = []) {
+  const fieldMap = {
+    mood: "checkin",
+    win: "checkin",
+    water: "health",
+    exercise: "health",
+    sleep: "health",
+    confidence: "health",
+    income: "money",
+    expenseRows: "money",
+    debtPaid: "money",
+    sideIncome: "side",
+    sideChannel: "side",
+    skills: "skills",
+    languageMinutes: "skills",
+    languageFocus: "skills"
+  };
+  return fields.filter((field) => !fieldMap[field] || isFeatureEnabled(fieldMap[field]));
+}
+
+function activeEntryCategory(category = activePage) {
+  if (modalConfigs[category] && isFeatureEnabled(category)) return category;
+  if (category === "dashboard" || category === "settings" || category === "membership") return "dashboard";
+  return "checkin";
+}
+
+function dashboardSectionOrder() {
+  const defaults = ["balance", "debt", "day", "trend", "language", "moneyMix"];
+  const saved = Array.isArray(settings().dashboardSectionOrder) ? settings().dashboardSectionOrder : defaults;
+  return [...saved.filter((item) => defaults.includes(item)), ...defaults.filter((item) => !saved.includes(item))];
+}
+
+function moveDashboardSection(section, direction) {
+  const order = dashboardSectionOrder();
+  const index = order.indexOf(section);
+  const nextIndex = index + direction;
+  if (index < 0 || nextIndex < 0 || nextIndex >= order.length) return;
+  [order[index], order[nextIndex]] = [order[nextIndex], order[index]];
+  settings().dashboardSectionOrder = order;
+  saveState();
+  syncSettings();
+  render();
 }
 
 function skillsList() {
@@ -419,7 +470,6 @@ function renderGuestEmptyState(title, description) {
         <p class="muted">${description}</p>
       </div>
       <div class="button-row">
-        <button class="soft-button" type="button" data-mock-data>จำลองข้อมูล</button>
         <button class="primary-button" type="button" data-open-entry>เริ่มบันทึกเอง</button>
       </div>
     </div>
@@ -444,16 +494,19 @@ function setAuthMessage(message, isError = false) {
 
 function updateAuthUI() {
   const authButton = $("#authButton");
-  const mockButton = $("#mockDataButton");
+  const profileMenu = $("#profileMenu");
   if (!authButton) return;
   document.body.classList.toggle("is-authenticated", Boolean(currentUser));
+  authButton.classList.toggle("profile-avatar", Boolean(currentUser));
+  if (profileMenu) profileMenu.hidden = true;
   if (isCloudLoading) {
-    authButton.textContent = "กำลัง sync...";
-    if (mockButton) mockButton.hidden = false;
+    authButton.textContent = currentUser ? (currentUser.email || "U").trim().slice(0, 1).toUpperCase() : "กำลัง sync...";
+    authButton.title = "กำลัง sync...";
     return;
   }
-  authButton.textContent = currentUser ? `DB: ${currentUser.email}` : "เข้าสู่ระบบ";
-  if (mockButton) mockButton.hidden = false;
+  authButton.textContent = currentUser ? (currentUser.email || "U").trim().slice(0, 1).toUpperCase() : "เข้าสู่ระบบ";
+  authButton.title = currentUser ? currentUser.email : "เข้าสู่ระบบ";
+  authButton.setAttribute("aria-label", currentUser ? `โปรไฟล์ ${currentUser.email}` : "เข้าสู่ระบบ");
 }
 
 async function initSupabase() {
@@ -532,11 +585,6 @@ async function deleteCloudEntry(iso) {
   if (error) setAuthMessage(error.message, true);
 }
 
-async function clearCloudEntries() {
-  if (!supabaseClient || !currentUser) return;
-  const { error } = await supabaseClient.from("daily_entries").delete().eq("user_id", currentUser.id);
-  if (error) setAuthMessage(error.message, true);
-}
 
 async function syncSettings() {
   if (!supabaseClient || !currentUser) return;
@@ -793,7 +841,7 @@ function renderDashboard() {
         <button class="primary-button" type="button" data-open-entry>เริ่มบันทึกเอง</button>
       </div>
       <div class="grid two">
-        ${renderGuestEmptyState("ยังไม่มีข้อมูลสำหรับ guest", "หนี้ รายได้เสริม ทักษะ และภาษาเป้าหมายจะว่างทั้งหมด จนกว่าจะกดจำลองข้อมูลหรือเริ่มบันทึกเอง")}
+        ${renderGuestEmptyState("ยังไม่มีข้อมูลสำหรับ guest", "ข้อมูลจะเริ่มแสดงหลังจากเริ่มบันทึกเอง")}
         ${renderCalendar()}
       </div>
     `;
@@ -817,15 +865,19 @@ function renderDashboard() {
   const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
   const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
-  return `
-    <div class="section-head">
-      <div class="segmented" aria-label="ตัวกรองช่วงเวลา">
-        ${["week", "month", "year"].map((item) => `<button type="button" class="${filter === item ? "active" : ""}" data-filter="${item}">${item === "week" ? "สัปดาห์" : item === "month" ? "เดือน" : "ปี"}</button>`).join("")}
-      </div>
-      <button class="primary-button" type="button" data-open-entry>บันทึกวันที่เลือก</button>
-    </div>
-
-    <div class="grid two dashboard-visual-grid">
+  const radarItems = [
+    isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" } : null,
+    isFeatureEnabled("money") ? { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: "หนี้ + ค่าใช้จ่าย", color: "#ffc39d" } : null,
+    isFeatureEnabled("side") ? { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" } : null,
+    isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" } : null
+  ].filter(Boolean);
+  const trendCharts = [
+    isFeatureEnabled("health") ? trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว") : "",
+    isFeatureEnabled("health") ? trendChart("ออกกำลังกาย", "exercise", trend.entries, cfg.trendExerciseTarget, "นาที") : "",
+    isFeatureEnabled("money") ? trendChart("รายจ่ายไม่จำเป็น", "sweetDrink", trend.entries, cfg.trendNonEssentialLimit, "บาท", true) : ""
+  ].filter(Boolean).join("");
+  const sections = {
+    balance: radarItems.length ? dashboardSection("balance", `
       <div class="card">
         <div class="section-head">
           <div>
@@ -834,15 +886,11 @@ function renderDashboard() {
           </div>
           <button class="tiny-button" type="button" data-open-setting="dashboard">แก้ไขเป้ากราฟ</button>
         </div>
-        ${lifeRadarChart([
-          { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: "น้ำ นอน ออกกำลัง", color: "#a9dcc5" },
-          { key: "money", icon: "money", label: "เงิน", score: moneyScore, note: "หนี้ + ค่าใช้จ่าย", color: "#ffc39d" },
-          { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#c6b2f2" },
-          { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#f5a7c6" }
-        ])}
+        ${lifeRadarChart(radarItems)}
       </div>
-
-      ${guestEmpty ? renderGuestEmptyState("ยังไม่ได้ตั้งค่าหนี้และเป้าหมายเงิน", "guest จะเห็นพื้นที่ว่างก่อน เพื่อไม่ปนกับข้อมูลจริงของคนที่ login") : `<div class="card debt-visual-card">
+    `) : "",
+    debt: isFeatureEnabled("money") ? dashboardSection("debt", `
+      <div class="card debt-visual-card">
         <div>
           <p class="eyebrow">Debt visual</p>
           <h2>ปิดหนี้ ${money(cfg.debtTotal)} บาท</h2>
@@ -855,47 +903,66 @@ function renderDashboard() {
             <span class="muted">จ่ายแล้ว ${Math.round((debtPaid / Math.max(cfg.debtTotal, 1)) * 100)}%</span>
           </div>
         </div>
-      </div>`}
-    </div>
-
-    <div class="grid two">
-      ${renderCalendar()}
+      </div>
+    `) : "",
+    day: dashboardSection("day", `
+      <div class="grid two">
+        ${renderCalendar()}
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">${dateLabel(selectedDate)}</p>
+              <h2>ข้อมูลย้อนหลัง</h2>
+            </div>
+            ${featureFields(modalConfigs.checkin.fields).length ? `<button class="tiny-button" type="button" data-open-entry data-modal="checkin">แก้ไข</button>` : ""}
+          </div>
+          ${renderDayDetail(selectedDate)}
+        </div>
+      </div>
+    `),
+    trend: trendCharts ? dashboardSection("trend", `
       <div class="card">
         <div class="section-head">
           <div>
-            <p class="eyebrow">${dateLabel(selectedDate)}</p>
-            <h2>ข้อมูลย้อนหลัง</h2>
+            <p class="eyebrow">${trend.eyebrow}</p>
+            <h2>${trend.title}</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-entry data-modal="checkin">แก้ไข</button>
+          <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
         </div>
-        ${renderDayDetail(selectedDate)}
+        <div class="trend-grid">${trendCharts}</div>
       </div>
+    `) : "",
+    language: isFeatureEnabled("skills") ? dashboardSection("language", languageDashboard(entries)) : "",
+    moneyMix: isFeatureEnabled("money") ? dashboardSection("moneyMix", moneyMixChart(entries)) : ""
+  };
+  return `
+    <div class="section-head">
+      <div class="segmented" aria-label="ตัวกรองช่วงเวลา">
+        ${["week", "month", "year"].map((item) => `<button type="button" class="${filter === item ? "active" : ""}" data-filter="${item}">${item === "week" ? "สัปดาห์" : item === "month" ? "เดือน" : "ปี"}</button>`).join("")}
+      </div>
+      ${featureFields(modalConfigs.dashboard.fields).length ? `<button class="primary-button" type="button" data-open-entry>บันทึกวันที่เลือก</button>` : ""}
     </div>
-
-    <div class="card">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">${trend.eyebrow}</p>
-          <h2>${trend.title}</h2>
-        </div>
-        <span class="pill">${filter === "week" ? "สัปดาห์" : filter === "month" ? "เดือน" : "ปี"}</span>
-      </div>
-      <div class="trend-grid">
-        ${trendChart("น้ำ", "water", trend.entries, cfg.waterDailyTarget, "แก้ว")}
-        ${trendChart("ออกกำลังกาย", "exercise", trend.entries, cfg.trendExerciseTarget, "นาที")}
-        ${trendChart("รายจ่ายไม่จำเป็น", "sweetDrink", trend.entries, cfg.trendNonEssentialLimit, "บาท", true)}
-      </div>
+    <div class="dashboard-sections">
+      ${dashboardSectionOrder().map((key) => sections[key]).filter(Boolean).join("")}
     </div>
+  `;
+}
 
-    ${languageDashboard(entries)}
-
-    ${moneyMixChart(entries)}
+function dashboardSection(key, content) {
+  return `
+    <section class="dashboard-section" data-dashboard-section="${key}">
+      <div class="section-move-controls" aria-label="ย้าย section">
+        <button class="tiny-button" type="button" data-move-section="${key}" data-direction="-1">ขึ้น</button>
+        <button class="tiny-button" type="button" data-move-section="${key}" data-direction="1">ลง</button>
+      </div>
+      ${content}
+    </section>
   `;
 }
 
 function renderGoals() {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่ได้ตั้งค่าเป้าหมาย", "guest จะไม่เห็นเป้าหมายหนี้ รายได้เสริม ทักษะ หรือภาษา จนกว่าจะจำลองข้อมูลหรือเริ่มเพิ่มเป้าหมายเอง");
+    return renderGuestEmptyState("ยังไม่ได้ตั้งค่าเป้าหมาย", "guest จะเห็นเป้าหมายหลังจากเริ่มเพิ่มเป้าหมายเอง");
   }
   const entries = entriesInRange("month");
   const cfg = settings();
@@ -1049,7 +1116,7 @@ function renderCheckin() {
 
 function renderMoney() {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีข้อมูลหนี้และการเงิน", "ระบบจะไม่โชว์หนี้ 108,000 หรือยอดเงินใดๆ ให้ guest จนกว่าจะจำลองข้อมูลหรือเริ่มบันทึกเอง");
+    return renderGuestEmptyState("ยังไม่มีข้อมูลหนี้และการเงิน", "ระบบจะไม่โชว์ยอดเงินใดๆ จนกว่าจะเริ่มบันทึกเอง");
   }
   const all = Object.entries(state.entries);
   const entries = entriesInRange("month");
@@ -1104,7 +1171,7 @@ function renderMoney() {
 
 function renderSideIncome() {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้เสริม", "ช่องทางรายได้เสริมจะว่างสำหรับ guest จนกว่าจะจำลองข้อมูลหรือเพิ่มช่องทางเอง");
+    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้เสริม", "ช่องทางรายได้เสริมจะว่างจนกว่าจะเพิ่มช่องทางเอง");
   }
   const entries = entriesInRange("month");
   const cfg = settings();
@@ -1179,7 +1246,7 @@ function renderHealth() {
 
 function renderSkills() {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีทักษะและภาษาที่ตั้งไว้", "guest จะไม่เห็น skill default หรือภาษาเป้าหมายจนกว่าจะจำลองข้อมูลหรือเพิ่มรายการเอง");
+    return renderGuestEmptyState("ยังไม่มีทักษะและภาษาที่ตั้งไว้", "guest จะเห็น skill และภาษาเป้าหมายหลังจากเพิ่มรายการเอง");
   }
   const cfg = settings();
   const skills = skillsList();
@@ -1230,26 +1297,50 @@ function renderMembership() {
   if (!hadTrial) saveState();
   const status = trial.active ? `เหลือ ${trial.daysLeft} วัน` : "หมดช่วงใช้ฟรีแล้ว";
   return `
-    <div class="grid three">
-      ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
-      ${statCard("ฟีเจอร์ที่เปิดอยู่", `${enabledFeaturesList().length}/${DEFAULT_FEATURES.length}`, "ปรับได้ที่หน้า Settings")}
-      ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "sync กับ Supabase" : "ข้อมูลอยู่ในเครื่องนี้")}
-    </div>
-    <div class="card">
+    <div class="card membership-hero">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Membership</p>
-          <h2>สมัครสมาชิกและใช้ฟรีทุกฟีเจอร์ 7 วัน</h2>
+          <p class="eyebrow">Mood Support</p>
+          <h2>Mood ช่วยค่ากาแฟ</h2>
+          <p class="muted">ทดลองใช้ฟรี 7 วัน แล้วถ้าช่วยให้ชีวิตจัดระเบียบขึ้น ค่อยช่วยค่ากาแฟเดือนละ 99 บาท</p>
         </div>
         <button class="primary-button" type="button" data-open-auth>สมัคร / เข้าสู่ระบบ</button>
       </div>
-      <div class="summary-band">
-        ${DEFAULT_FEATURES.map((id) => {
-          const page = pages.find((item) => item.id === id);
-          return miniSummary(page?.label || id, isFeatureEnabled(id) ? "เปิดใช้งาน" : "ปิดไว้");
-        }).join("")}
+      <div class="grid three">
+        ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
+        ${statCard("ค่ากาแฟ", "99 บาท", "ต่อเดือน หลัง trial")}
+        ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "sync กับ Supabase" : "ข้อมูลอยู่ในเครื่องนี้")}
       </div>
     </div>
+    <div class="plan-compare">
+      ${renderPlanCard("ฟรี", "0 บาท", [
+        "บันทึกข้อมูลชีวิตประจำวันในเครื่องนี้",
+        "เปิด/ปิดฟีเจอร์ที่ใช้จริง",
+        "ดู dashboard พื้นฐานและปฏิทินย้อนหลัง",
+        "ทดลองทุกฟีเจอร์ครบ 7 วัน"
+      ])}
+      ${renderPlanCard("ช่วยค่ากาแฟ", "99 บาท / เดือน", [
+        "ใช้ทุกฟีเจอร์ต่อหลังครบ trial",
+        "sync ข้อมูลกับบัญชีผ่าน Supabase",
+        "ปรับหมวดรายจ่ายและวิธีจ่ายเงินเอง",
+        "จัดลำดับ section หน้าแรกให้เข้ากับ workflow"
+      ], true)}
+    </div>
+  `;
+}
+
+function renderPlanCard(title, price, items, featured = false) {
+  return `
+    <article class="plan-card ${featured ? "featured" : ""}">
+      <div>
+        <p class="eyebrow">${featured ? "Recommended" : "Start"}</p>
+        <h2>${title}</h2>
+        <strong class="plan-price">${price}</strong>
+      </div>
+      <ul>
+        ${items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+      </ul>
+    </article>
   `;
 }
 
@@ -1359,25 +1450,25 @@ function renderDayDetail(iso) {
   if (!Object.keys(entry).length) return `<p class="muted">ยังไม่มีข้อมูลของวันที่นี้ กดบันทึกเพื่อเพิ่มย้อนหลังได้</p>`;
   return `
     <div class="day-detail">
-      <span class="pill">${iconLabel("mood", `อารมณ์ ${entry.mood || "-"}`)}</span>
-      <span class="pill">${iconLabel("health", `น้ำ ${Number(entry.water || 0)} แก้ว`)}</span>
-      <span class="pill">${iconLabel("exercise", `ออกกำลัง ${Number(entry.exercise || 0)} นาที`)}</span>
-      <span class="pill">${iconLabel("income", `รายรับ ${money(entry.income)} บาท`)}</span>
-      <span class="pill">${iconLabel("expense", `รายจ่าย ${money(expenseTotal(entry))} บาท`)}</span>
-      <span class="pill">${iconLabel("side", `รายได้เสริม ${money(entry.sideIncome)} บาท`)}</span>
-      <span class="pill">${iconLabel("debt", `จ่ายหนี้ ${money(entry.debtPaid)} บาท`)}</span>
-      <span class="pill">${iconLabel("language", `ภาษา ${languageTotal(entry)} นาที`)}</span>
+      ${isFeatureEnabled("checkin") ? `<span class="pill">${iconLabel("mood", `อารมณ์ ${entry.mood || "-"}`)}</span>` : ""}
+      ${isFeatureEnabled("health") ? `<span class="pill">${iconLabel("health", `น้ำ ${Number(entry.water || 0)} แก้ว`)}</span>` : ""}
+      ${isFeatureEnabled("health") ? `<span class="pill">${iconLabel("exercise", `ออกกำลัง ${Number(entry.exercise || 0)} นาที`)}</span>` : ""}
+      ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("income", `รายรับ ${money(entry.income)} บาท`)}</span>` : ""}
+      ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("expense", `รายจ่าย ${money(expenseTotal(entry))} บาท`)}</span>` : ""}
+      ${isFeatureEnabled("side") ? `<span class="pill">${iconLabel("side", `รายได้เสริม ${money(entry.sideIncome)} บาท`)}</span>` : ""}
+      ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("debt", `จ่ายหนี้ ${money(entry.debtPaid)} บาท`)}</span>` : ""}
+      ${isFeatureEnabled("skills") ? `<span class="pill">${iconLabel("language", `ภาษา ${languageTotal(entry)} นาที`)}</span>` : ""}
     </div>
-    ${expenses.length ? `
+    ${isFeatureEnabled("money") && expenses.length ? `
       <div class="expense-list">
         ${expenses.map((item) => `
           <span>${escapeHTML(item.category)}${item.paymentMethod ? ` · ${escapeHTML(item.paymentMethod)}` : ""}<strong>${money(item.amount)} บาท</strong></span>
         `).join("")}
       </div>
     ` : ""}
-    <p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>
-    <p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>
-    <p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${languagesList().map((language) => iconLabel(language === "อาหรับ" ? "arabic" : language === "อังกฤษ" ? "thai" : "language", `${language} ${money(getLanguageMinutes(entry, language))} นาที`)).join(" / ") || "-"} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>
+    ${isFeatureEnabled("checkin") ? `<p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>` : ""}
+    ${isFeatureEnabled("skills") ? `<p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>` : ""}
+    ${isFeatureEnabled("skills") ? `<p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${languagesList().map((language) => iconLabel(language === "อาหรับ" ? "arabic" : language === "อังกฤษ" ? "thai" : "language", `${language} ${money(getLanguageMinutes(entry, language))} นาที`)).join(" / ") || "-"} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>` : ""}
   `;
 }
 
@@ -1397,7 +1488,7 @@ function miniSummary(label, value) {
 
 function languageDashboard(entries) {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาที่อยากเรียนจะยังว่างสำหรับ guest จนกว่าจะจำลองข้อมูลหรือเพิ่มภาษาเอง");
+    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาที่อยากเรียนจะยังว่างจนกว่าจะเพิ่มภาษาเอง");
   }
   const cfg = settings();
   const languageTotals = languagesList().map((language) => ({ language, minutes: sumLanguage(entries, language) }));
@@ -1458,6 +1549,12 @@ function languageProgress(label, progress, target, color) {
 function lifeRadarChart(items) {
   const points = items.map((item, index) => radarPoint(index, clamp(item.score, 0, 100))).join(" ");
   const averageScore = average(items.map((item) => item.score));
+  const labelPositions = [
+    { className: "top", x: 160, y: 22 },
+    { className: "left", x: 24, y: 166 },
+    { className: "right", x: 296, y: 166 },
+    { className: "bottom", x: 160, y: 310 }
+  ];
   return `
     <div class="life-radar">
       <div class="radar-panel" aria-label="กราฟแมงมุมพลังชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
@@ -1476,10 +1573,10 @@ function lifeRadarChart(items) {
             const [x, y] = point.split(",");
             return `<circle class="radar-point" cx="${x}" cy="${y}" r="7" style="--point-color:${item.color}" />`;
           }).join("")}
-          <text class="radar-label top" x="160" y="22">${items[0].label}</text>
-          <text class="radar-label right" x="296" y="166">${items[2].label}</text>
-          <text class="radar-label bottom" x="160" y="310">${items[3].label}</text>
-          <text class="radar-label left" x="24" y="166">${items[1].label}</text>
+          ${items.map((item, index) => {
+            const position = labelPositions[index] || labelPositions[0];
+            return `<text class="radar-label ${position.className}" x="${position.x}" y="${position.y}">${item.label}</text>`;
+          }).join("")}
         </svg>
         <div class="radar-score">
           <strong>${averageScore}%</strong>
@@ -1644,11 +1741,11 @@ function bindPageEvents() {
       render();
     });
   });
+  document.querySelectorAll("[data-move-section]").forEach((button) => {
+    button.addEventListener("click", () => moveDashboardSection(button.dataset.moveSection, Number(button.dataset.direction || 0)));
+  });
   const featureForm = $("#featureSettingsForm");
   if (featureForm) featureForm.addEventListener("submit", handleFeatureSettingsSubmit);
-  document.querySelectorAll("[data-mock-data]").forEach((button) => {
-    button.addEventListener("click", createMockData);
-  });
 }
 
 function handleFeatureSettingsSubmit(event) {
@@ -1664,12 +1761,15 @@ function openEntryModal(category = activePage) {
   const modal = $("#entryModal");
   const form = $("#entryForm");
   const entry = getEntry();
-  modalCategory = modalConfigs[category] ? category : "checkin";
+  modalCategory = activeEntryCategory(category);
   const config = modalConfigs[modalCategory];
+  const fields = featureFields(config.fields);
   $("#modalDateLabel").textContent = dateLabel(selectedDate);
   $("#modalTitle").textContent = config.title;
   $("#modalDescription").textContent = config.description;
-  $("#modalFields").innerHTML = renderModalFields(config.fields);
+  $("#modalFields").innerHTML = fields.length
+    ? renderModalFields(fields)
+    : `<p class="muted">ตอนนี้ยังไม่มี field ให้บันทึก เพราะฟีเจอร์ที่เกี่ยวข้องถูกปิดไว้ในหน้า Settings</p>`;
   $("#modalFields").querySelectorAll("[data-open-setting]").forEach((button) => {
     button.addEventListener("click", () => {
       modal.close();
@@ -1693,11 +1793,12 @@ function handleSubmit(event) {
   event.preventDefault();
   const data = new FormData(event.currentTarget);
   const config = modalConfigs[modalCategory] || modalConfigs.checkin;
+  const fields = featureFields(config.fields);
   const existing = getEntry();
   const nextEntry = { ...existing };
   let shouldSyncSettings = false;
 
-  config.fields.forEach((field) => {
+  fields.forEach((field) => {
     if (field === "skills") {
       nextEntry.skills = data.getAll("skills");
       return;
@@ -2327,23 +2428,6 @@ function resetSettingGroup() {
   render();
 }
 
-function clearEntryData() {
-  openConfirmModal(
-    "ล้างค่าข้อมูล",
-    "ล้างข้อมูลรายวันทั้งหมดให้เป็น 0 และหักยอดหนี้ที่เคยเพิ่มจากรายการบัตรออกจากค่าหนี้รวม",
-    () => {
-      const removedCardDebt = Object.values(state.entries || {}).reduce((total, entry) => total + cardDebtTotal(entry), 0);
-      if (removedCardDebt) settings().debtTotal = Math.max(0, Number(settings().debtTotal || 0) - removedCardDebt);
-      state.entries = {};
-      saveState();
-      if (removedCardDebt) syncSettings();
-      clearCloudEntries();
-      selectedDate = toISO(new Date());
-      calendarCursor = new Date();
-      render();
-    }
-  );
-}
 
 function clearTargetValues() {
   openConfirmModal(
@@ -2483,6 +2567,15 @@ function openAuthModal() {
   $("#authModal").showModal();
 }
 
+function handleAuthButtonClick() {
+  if (!currentUser) {
+    openAuthModal();
+    return;
+  }
+  const menu = $("#profileMenu");
+  if (menu) menu.hidden = !menu.hidden;
+}
+
 async function handleAuthSubmit(event) {
   event.preventDefault();
   if (!supabaseClient) {
@@ -2528,18 +2621,19 @@ async function signOutUser() {
   state = loadGuestState();
   updateAuthUI();
   setAuthMessage("ออกจากระบบแล้ว ตอนนี้กำลังดูข้อมูล guest แยกจากบัญชีที่ login");
-  $("#authModal").close();
+  if ($("#authModal").open) $("#authModal").close();
   render();
 }
 
 $("#entryForm").addEventListener("submit", handleSubmit);
 $("#settingForm").addEventListener("submit", handleSettingSubmit);
 $("#authForm").addEventListener("submit", handleAuthSubmit);
-$("#authButton").addEventListener("click", openAuthModal);
+$("#authButton").addEventListener("click", handleAuthButtonClick);
 $("#closeAuthButton").addEventListener("click", () => $("#authModal").close());
 $("#signUpButton").addEventListener("click", signUpUser);
 $("#signOutButton").addEventListener("click", signOutUser);
-$("#quickAddButton").addEventListener("click", () => openEntryModal(activePage));
+$("#profileLogoutButton")?.addEventListener("click", signOutUser);
+$("#quickAddButton").addEventListener("click", () => openEntryModal(activeEntryCategory(activePage)));
 $("#closeModalButton").addEventListener("click", () => $("#entryModal").close());
 $("#closeSettingButton").addEventListener("click", () => $("#settingModal").close());
 $("#cancelConfirmButton").addEventListener("click", () => $("#confirmModal").close());
@@ -2557,9 +2651,7 @@ $("#clearDayButton").addEventListener("click", () => {
   $("#entryModal").close();
   render();
 });
-$("#clearEntriesButton").addEventListener("click", clearEntryData);
 $("#clearTargetsButton").addEventListener("click", clearTargetValues);
-$("#mockDataButton").addEventListener("click", createMockData);
 $("#exportButton").addEventListener("click", exportData);
 
 render();
