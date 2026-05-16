@@ -1,0 +1,22 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/assets/(.*)",
+      "destination": "/ux-ui-designer-108-000-7/assets/$1"
+    },
+    {
+      "source": "/app.js",
+      "destination": "/ux-ui-designer-108-000-7/app.js"
+    },
+    {
+      "source": "/styles.css",
+      "destination": "/ux-ui-designer-108-000-7/styles.css"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/ux-ui-designer-108-000-7/index.html"
+    }
+  ]
+}
