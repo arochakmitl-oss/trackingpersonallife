@@ -34,15 +34,15 @@ EMPTY_SETTINGS.paymentMethodNames = [];
 EMPTY_SETTINGS.debtPaymentMethods = [];
 
 const pages = [
-  { id: "dashboard", label: "หน้าแรก", icon: "⌂", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
-  { id: "goals", label: "ตั้งค่าเป้าหมาย", icon: "◎", title: "ตั้งค่าเป้าหมาย", cover: "assets/goals.svg", kicker: "ออกแบบชีวิตแบบมี milestone", quote: "เป้าหมายที่ดีไม่กดดันเรา แต่มันชวนเราเดินต่ออย่างชัดเจน" },
-  { id: "checkin", label: "เช็คอินวันนี้", icon: "✓", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
-  { id: "money", label: "เงิน & หนี้", icon: "฿", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "ปิดหนี้ 108,000 บาท", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
-  { id: "side", label: "รายได้เสริม", icon: "↗", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
-  { id: "health", label: "สุขภาพ & ความสวย", icon: "♡", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
-  { id: "skills", label: "ทักษะ & อาชีพ", icon: "▧", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
-  { id: "membership", label: "ค่ากาแฟ", icon: "◇", title: "Mood ช่วยค่ากาแฟ", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
-  { id: "settings", label: "ตั้งค่า", icon: "⚙", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
+  { id: "dashboard", label: "หน้าแรก", icon: "home-01", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
+  { id: "goals", label: "ตั้งค่าเป้าหมาย", icon: "target-02", title: "ตั้งค่าเป้าหมาย", cover: "assets/goals.svg", kicker: "ออกแบบชีวิตแบบมี milestone", quote: "เป้าหมายที่ดีไม่กดดันเรา แต่มันชวนเราเดินต่ออย่างชัดเจน" },
+  { id: "checkin", label: "เช็คอินวันนี้", icon: "checkmark-circle-02", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
+  { id: "money", label: "เงิน & หนี้", icon: "wallet-01", title: "เงิน & หนี้", cover: "assets/money.svg", kicker: "ปิดหนี้ 108,000 บาท", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
+  { id: "side", label: "รายได้เสริม", icon: "arrow-up-right-01", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
+  { id: "health", label: "สุขภาพ & ความสวย", icon: "heart-check", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
+  { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "UX/UI Designer growth map", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
+  { id: "membership", label: "ค่ากาแฟ", icon: "coffee-02", title: "Mood ช่วยค่ากาแฟ", cover: "assets/goals.svg", kicker: "ใช้ฟรีทุกฟีเจอร์ 7 วัน", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
+  { id: "settings", label: "ตั้งค่า", icon: "settings-01", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
 ];
 
 const DEFAULT_SKILLS = ["UX Research", "UI Design", "Design System", "AI Tools", "Portfolio", "Case Study"];
@@ -138,6 +138,8 @@ let calendarCursor = new Date();
 let modalCategory = "checkin";
 let settingGroup = "debt";
 let pendingConfirmAction = null;
+let dashboardManageMode = false;
+let dashboardDraftOrder = null;
 let supabaseClient = null;
 let currentUser = null;
 let isCloudLoading = false;
@@ -146,6 +148,7 @@ const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const numericFields = ["water", "exercise", "sleep", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "sideIncome", "confidence", "thaiMinutes", "arabicMinutes"];
+const hugeIcon = (name) => `<i class="hgi hgi-stroke hgi-${name}" aria-hidden="true"></i>`;
 const categoryIcons = {
   health: `<svg viewBox="0 0 24 24"><path class="fill" d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M9.3 15.4c1.1 1.5 3.2 2 4.9.9"/></svg>`,
   money: `<svg viewBox="0 0 24 24"><rect class="fill" x="4" y="7" width="16" height="11" rx="3"/><path d="M5 7h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1Z"/><path d="M15 12h4v3h-4a1.5 1.5 0 0 1 0-3Z"/><path d="M7 7l8-3 2 3"/></svg>`,
@@ -368,14 +371,34 @@ function dashboardSectionOrder() {
 }
 
 function moveDashboardSection(section, direction) {
-  const order = dashboardSectionOrder();
+  if (!dashboardManageMode) return;
+  const order = dashboardDraftOrder || dashboardSectionOrder();
   const index = order.indexOf(section);
   const nextIndex = index + direction;
   if (index < 0 || nextIndex < 0 || nextIndex >= order.length) return;
   [order[index], order[nextIndex]] = [order[nextIndex], order[index]];
-  settings().dashboardSectionOrder = order;
+  dashboardDraftOrder = order;
+  render();
+}
+
+function startDashboardManage() {
+  dashboardManageMode = true;
+  dashboardDraftOrder = dashboardSectionOrder();
+  render();
+}
+
+function cancelDashboardManage() {
+  dashboardManageMode = false;
+  dashboardDraftOrder = null;
+  render();
+}
+
+function saveDashboardManage() {
+  if (dashboardDraftOrder) settings().dashboardSectionOrder = dashboardDraftOrder;
   saveState();
   syncSettings();
+  dashboardManageMode = false;
+  dashboardDraftOrder = null;
   render();
 }
 
@@ -785,7 +808,7 @@ function currentStreak(predicate = (entry) => Boolean(entry && Object.keys(entry
 function renderNav() {
   const navHTML = pages.filter((page) => isFeatureEnabled(page.id)).map((page) => `
     <button class="nav-item ${page.id === activePage ? "active" : ""}" type="button" data-page="${page.id}" title="${page.label}" aria-label="${page.label}">
-      <span class="nav-icon" aria-hidden="true">${page.icon}</span>
+      <span class="nav-icon" aria-hidden="true">${hugeIcon(page.icon)}</span>
       <span>${page.label}</span>
     </button>
   `).join("");
@@ -935,15 +958,22 @@ function renderDashboard() {
     language: isFeatureEnabled("skills") ? dashboardSection("language", languageDashboard(entries)) : "",
     moneyMix: isFeatureEnabled("money") ? dashboardSection("moneyMix", moneyMixChart(entries)) : ""
   };
+  const sectionOrder = dashboardManageMode && dashboardDraftOrder ? dashboardDraftOrder : dashboardSectionOrder();
   return `
     <div class="section-head">
       <div class="segmented" aria-label="ตัวกรองช่วงเวลา">
         ${["week", "month", "year"].map((item) => `<button type="button" class="${filter === item ? "active" : ""}" data-filter="${item}">${item === "week" ? "สัปดาห์" : item === "month" ? "เดือน" : "ปี"}</button>`).join("")}
       </div>
-      ${featureFields(modalConfigs.dashboard.fields).length ? `<button class="primary-button" type="button" data-open-entry>บันทึกวันที่เลือก</button>` : ""}
+      <div class="button-row">
+        ${dashboardManageMode ? `
+          <button class="ghost-button" type="button" data-dashboard-manage="cancel">ยกเลิก</button>
+          <button class="primary-button" type="button" data-dashboard-manage="save">บันทึก</button>
+        ` : `<button class="soft-button" type="button" data-dashboard-manage="start">${hugeIcon("layout-03")}<span>จัดการหน้าแรก</span></button>`}
+        ${featureFields(modalConfigs.dashboard.fields).length ? `<button class="primary-button" type="button" data-open-entry>${hugeIcon("plus-sign")}<span>บันทึกวันที่เลือก</span></button>` : ""}
+      </div>
     </div>
     <div class="dashboard-sections">
-      ${dashboardSectionOrder().map((key) => sections[key]).filter(Boolean).join("")}
+      ${sectionOrder.map((key) => sections[key]).filter(Boolean).join("")}
     </div>
   `;
 }
@@ -951,10 +981,12 @@ function renderDashboard() {
 function dashboardSection(key, content) {
   return `
     <section class="dashboard-section" data-dashboard-section="${key}">
-      <div class="section-move-controls" aria-label="ย้าย section">
-        <button class="tiny-button" type="button" data-move-section="${key}" data-direction="-1">ขึ้น</button>
-        <button class="tiny-button" type="button" data-move-section="${key}" data-direction="1">ลง</button>
-      </div>
+      ${dashboardManageMode ? `
+        <div class="section-move-controls" aria-label="ย้าย section">
+          <button class="icon-button mini-icon-button" type="button" data-move-section="${key}" data-direction="-1" aria-label="ย้ายขึ้น">${hugeIcon("arrow-up-01")}</button>
+          <button class="icon-button mini-icon-button" type="button" data-move-section="${key}" data-direction="1" aria-label="ย้ายลง">${hugeIcon("arrow-down-01")}</button>
+        </div>
+      ` : ""}
       ${content}
     </section>
   `;
@@ -1276,7 +1308,7 @@ function renderSkills() {
       <div class="section-head">
         <div>
           <p class="eyebrow">Language learning</p>
-          <h2>${iconLabel("language", "ฝึกภาษา")}</h2>
+          <h2>ฝึกภาษา</h2>
         </div>
         <div class="button-row">
           <button class="tiny-button" type="button" data-open-setting="language">แก้ไขเป้าภาษา</button>
@@ -1360,6 +1392,7 @@ function renderSettingsPage() {
           return `
             <label class="feature-toggle">
               <input type="checkbox" name="enabledFeature" value="${id}" ${isFeatureEnabled(id) ? "checked" : ""} />
+              <span class="feature-icon">${hugeIcon(page?.icon || "checkmark-circle-02")}</span>
               <span>
                 <strong>${page?.label || id}</strong>
                 <small>${page?.kicker || ""}</small>
@@ -1457,7 +1490,7 @@ function renderDayDetail(iso) {
       ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("expense", `รายจ่าย ${money(expenseTotal(entry))} บาท`)}</span>` : ""}
       ${isFeatureEnabled("side") ? `<span class="pill">${iconLabel("side", `รายได้เสริม ${money(entry.sideIncome)} บาท`)}</span>` : ""}
       ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("debt", `จ่ายหนี้ ${money(entry.debtPaid)} บาท`)}</span>` : ""}
-      ${isFeatureEnabled("skills") ? `<span class="pill">${iconLabel("language", `ภาษา ${languageTotal(entry)} นาที`)}</span>` : ""}
+      ${isFeatureEnabled("skills") ? `<span class="pill">ภาษา ${languageTotal(entry)} นาที</span>` : ""}
     </div>
     ${isFeatureEnabled("money") && expenses.length ? `
       <div class="expense-list">
@@ -1468,7 +1501,7 @@ function renderDayDetail(iso) {
     ` : ""}
     ${isFeatureEnabled("checkin") ? `<p style="margin:14px 0 0;"><strong>${iconLabel("win", "ชัยชนะเล็กๆ:")}</strong> ${entry.win || "ยังไม่ได้บันทึก"}</p>` : ""}
     ${isFeatureEnabled("skills") ? `<p class="muted" style="margin:8px 0 0;">${iconLabel("career", `ทักษะ: ${(entry.skills || []).join(", ") || "-"}`)}</p>` : ""}
-    ${isFeatureEnabled("skills") ? `<p class="muted" style="margin:8px 0 0;">${iconLabel("language", "ภาษา:")} ${languagesList().map((language) => iconLabel(language === "อาหรับ" ? "arabic" : language === "อังกฤษ" ? "thai" : "language", `${language} ${money(getLanguageMinutes(entry, language))} นาที`)).join(" / ") || "-"} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>` : ""}
+    ${isFeatureEnabled("skills") ? `<p class="muted" style="margin:8px 0 0;">ภาษา: ${languagesList().map((language) => `${escapeHTML(language)} ${money(getLanguageMinutes(entry, language))} นาที`).join(" / ") || "-"} ${entry.languageFocus ? `(${entry.languageFocus})` : ""}</p>` : ""}
   `;
 }
 
@@ -1516,12 +1549,12 @@ function languageDashboard(entries) {
             <strong>${money(total)}</strong>
             <span>นาที</span>
           </div>
-          <span class="language-badge thai">${iconLabel(primaryLanguage?.language === "อังกฤษ" ? "thai" : "language", primaryLanguage?.language || "ภาษา")}</span>
-          <span class="language-badge arabic">${iconLabel(secondaryLanguage?.language === "อาหรับ" ? "arabic" : "language", secondaryLanguage?.language || "เพิ่มภาษา")}</span>
+          <span class="language-badge thai">${escapeHTML(primaryLanguage?.language || "ภาษา")}</span>
+          <span class="language-badge arabic">${escapeHTML(secondaryLanguage?.language || "เพิ่มภาษา")}</span>
         </div>
         <div class="language-progress">
-          ${languageTotals.map((item, index) => languageProgress(iconLabel(item.language === "อังกฤษ" ? "thai" : item.language === "อาหรับ" ? "arabic" : "language", item.language), item.minutes, cfg.languageWeeklyTarget, index % 2 ? "#c6b2f2" : "#a9dcc5")).join("")}
-          ${languageProgress(iconLabel("language", "รวมสัปดาห์นี้"), weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
+          ${languageTotals.map((item, index) => languageProgress(escapeHTML(item.language), item.minutes, cfg.languageWeeklyTarget, index % 2 ? "#c6b2f2" : "#a9dcc5")).join("")}
+          ${languageProgress("รวมสัปดาห์นี้", weekTotal, cfg.languageWeeklyTarget, "#f5a7c6")}
         </div>
         <div class="language-stats">
           ${miniSummary("🔥 streak ภาษา", `${streak} วัน`)}
@@ -1744,6 +1777,13 @@ function bindPageEvents() {
   document.querySelectorAll("[data-move-section]").forEach((button) => {
     button.addEventListener("click", () => moveDashboardSection(button.dataset.moveSection, Number(button.dataset.direction || 0)));
   });
+  document.querySelectorAll("[data-dashboard-manage]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.dashboardManage === "start") startDashboardManage();
+      if (button.dataset.dashboardManage === "cancel") cancelDashboardManage();
+      if (button.dataset.dashboardManage === "save") saveDashboardManage();
+    });
+  });
   const featureForm = $("#featureSettingsForm");
   if (featureForm) featureForm.addEventListener("submit", handleFeatureSettingsSubmit);
 }
@@ -1879,7 +1919,7 @@ function renderField(field) {
       <label>
         อารมณ์
         <select name="mood">
-          <option value="">เลือกอารมณ์ (เว้นว่างได้)</option>
+          <option value="">เลือกอารมณ์ (กรอกข้อมูล)</option>
           <option value="สดใส">สดใส</option>
           <option value="นิ่งๆ">นิ่งๆ</option>
           <option value="เหนื่อย">เหนื่อย</option>
@@ -1900,7 +1940,7 @@ function renderField(field) {
       <label>
         โฟกัสการฝึก
         <select name="languageFocus">
-          <option value="">เลือกโฟกัส (เว้นว่างได้)</option>
+          <option value="">เลือกโฟกัส (กรอกข้อมูล)</option>
           <option value="คำศัพท์">คำศัพท์</option>
           <option value="อ่าน">อ่าน</option>
           <option value="เขียน">เขียน</option>
@@ -1914,7 +1954,7 @@ function renderField(field) {
       <label>
         ช่องทางรายได้เสริม
         <select name="sideChannel">
-          <option value="">เลือกช่องทาง (เว้นว่างได้)</option>
+          <option value="">เลือกช่องทาง (กรอกข้อมูล)</option>
           ${sideChannelsList().map((channel) => `<option value="${escapeHTML(channel)}">${escapeHTML(channel)}</option>`).join("")}
         </select>
         ${sideChannelsList().length ? "" : `<span class="field-hint">ยังไม่มีช่องทาง ไปที่แก้ไขช่องทางรายได้เสริมเพื่อเพิ่มเอง</span>`}
@@ -1966,7 +2006,7 @@ function renderLanguageMinuteFields() {
         ${languages.map((language) => `
           <label>
             ${escapeHTML(language)} (นาที)
-            <input name="languageMinutes:${escapeHTML(language)}" type="text" inputmode="numeric" pattern="[0-9]*" value="${getLanguageMinutes(entry, language) || ""}" placeholder="เว้นว่างได้" />
+            <input name="languageMinutes:${escapeHTML(language)}" type="text" inputmode="numeric" pattern="[0-9]*" value="${getLanguageMinutes(entry, language) || ""}" placeholder="กรอกข้อมูล" />
           </label>
         `).join("")}
       </div>
@@ -1998,20 +2038,20 @@ function renderExpenseRow(item = { category: "", amount: "" }) {
       <label>
         หมวดหมู่
         <select name="expenseCategory">
-          <option value="" ${item.category ? "" : "selected"}>เลือกหมวด (เว้นว่างได้)</option>
+          <option value="" ${item.category ? "" : "selected"}>เลือกหมวด (กรอกข้อมูล)</option>
           ${expenseCategoriesList().map((category) => `<option value="${escapeHTML(category)}" ${category === item.category ? "selected" : ""}>${escapeHTML(category)}</option>`).join("")}
         </select>
       </label>
       <label>
         วิธีจ่ายเงิน
         <select name="expensePaymentMethod">
-          <option value="" ${item.paymentMethod ? "" : "selected"}>เลือกวิธีจ่าย (เว้นว่างได้)</option>
+          <option value="" ${item.paymentMethod ? "" : "selected"}>เลือกวิธีจ่าย (กรอกข้อมูล)</option>
           ${paymentMethodsList().map((method) => `<option value="${escapeHTML(method)}" ${method === item.paymentMethod ? "selected" : ""}>${escapeHTML(method)}${isDebtPaymentMethod(method) ? " • เพิ่มหนี้" : ""}</option>`).join("")}
         </select>
       </label>
       <label>
         จำนวนเงิน
-        <input name="expenseAmount" type="text" inputmode="decimal" value="${Number(item.amount || 0) || ""}" placeholder="เว้นว่างได้" />
+        <input name="expenseAmount" type="text" inputmode="decimal" value="${Number(item.amount || 0) || ""}" placeholder="กรอกข้อมูล" />
       </label>
       <button class="icon-button expense-remove" type="button" data-remove-expense-row aria-label="ลบแถว">×</button>
     </div>
@@ -2335,7 +2375,7 @@ function textInput(name, label, inputMode, pattern = "") {
   return `
     <label>
       ${label}
-      <input name="${name}" type="text" inputmode="${inputMode}" ${pattern ? `pattern="${pattern}"` : ""} placeholder="เว้นว่างได้" />
+      <input name="${name}" type="text" inputmode="${inputMode}" ${pattern ? `pattern="${pattern}"` : ""} placeholder="กรอกข้อมูล" />
     </label>
   `;
 }
@@ -2549,15 +2589,6 @@ function runPendingConfirmAction() {
   if (action) action();
 }
 
-function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `bloom-ux-life-tracker-${toISO(new Date())}.json`;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
 
 function openAuthModal() {
   setAuthMessage(currentUser ? `กำลังเชื่อมกับ ${currentUser.email}` : "ยังไม่ได้เข้าสู่ระบบ ข้อมูลจะอยู่ในเครื่องนี้จนกว่าจะ login");
@@ -2652,7 +2683,6 @@ $("#clearDayButton").addEventListener("click", () => {
   render();
 });
 $("#clearTargetsButton").addEventListener("click", clearTargetValues);
-$("#exportButton").addEventListener("click", exportData);
 
 render();
 initSupabase();
