@@ -70,12 +70,12 @@ const MONEY_GOAL_MASTER = [
 ];
 const FEATURE_SETTING_GROUPS = {
   money: [
-    { group: "moneyGoals", label: "Master + เป้าหมายการเงิน", icon: "target-02" },
-    { group: "financeOptions", label: "หมวดรายจ่าย / วิธีจ่าย", icon: "wallet-01" },
-    { group: "debt", label: "ยอดหนี้ปัจจุบัน", icon: "credit-card" }
+    { group: "moneyGoals", label: "ตั้งค่าข้อมูลและเป้าหมาย", icon: "target-02" },
+    { group: "financeOptions", label: "ตั้งค่าหมวดรายจ่ายและวิธีชำระ", icon: "wallet-01" },
+    { group: "debt", label: "ตั้งค่ายอดหนี้", icon: "credit-card" }
   ],
   side: [{ group: "side", label: "ช่องทาง + เป้ารายได้เสริม", icon: "arrow-up-right-01" }],
-  health: [{ group: "health", label: "Master + เป้าสุขภาพ", icon: "heart-check" }],
+  health: [{ group: "health", label: "ตั้งค่าข้อมูลและเป้าสุขภาพ", icon: "heart-check" }],
   skills: [
     { group: "skills", label: "ทักษะ + เป้าการฝึก", icon: "pencil-edit-02" },
     { group: "language", label: "ภาษา + เป้านาที", icon: "translation" }
@@ -84,13 +84,13 @@ const FEATURE_SETTING_GROUPS = {
 const trialDays = 7;
 const settingGroups = {
   debt: {
-    title: "แก้ไขค่าหนี้",
+    title: "ตั้งค่ายอดหนี้",
     description: "ตั้งยอดหนี้ปัจจุบันของคุณเอง หรือปล่อยไว้เป็น 0 แล้วให้ระบบเพิ่มจากวิธีจ่ายที่เลือกเป็นหนี้",
     fields: [{ key: "debtTotal", label: "หนี้ทั้งหมด", suffix: "บาท" }]
   },
   goals: {
     title: "ตั้งค่าเป้าหมาย",
-    description: "เลือกเป้าหมายจาก master data และตั้งค่าตัวเลขที่ใช้คำนวณกราฟ",
+    description: "เลือกข้อมูลที่อยากติดตามและตั้งค่าตัวเลขที่ใช้คำนวณกราฟ",
     fields: [
       { key: "waterDailyTarget", label: "น้ำต่อวัน", suffix: "แก้ว" },
       { key: "exerciseWeeklyTarget", label: "ออกกำลังกายต่อสัปดาห์", suffix: "นาที" },
@@ -105,8 +105,8 @@ const settingGroups = {
     ]
   },
   moneyGoals: {
-    title: "ตั้งค่า master สุขภาพทางการเงิน",
-    description: "เลือก master การเงินที่อยากติดตาม แล้วตั้งค่าเป้าหมายใต้ master แต่ละตัว",
+    title: "ตั้งค่าข้อมูลสุขภาพทางการเงิน",
+    description: "เลือกข้อมูลการเงินที่อยากติดตาม แล้วตั้งค่าเป้าหมายแต่ละตัว",
     fields: [
       { key: "debtMonthlyTarget", label: "ปิดหนี้ต่อเดือน", suffix: "บาท" },
       { key: "savingMonthlyTarget", label: "ออมเงินต่อเดือน", suffix: "บาท" },
@@ -166,7 +166,7 @@ const settingGroups = {
     ]
   },
   financeOptions: {
-    title: "แก้ไขหมวดรายจ่ายและวิธีจ่าย",
+    title: "ตั้งค่าหมวดรายจ่ายและวิธีชำระ",
     description: "เพิ่มหมวดรายจ่ายเอง และเลือกว่าวิธีจ่ายไหนต้องบวกยอดเข้าเป็นหนี้ เช่น บัตรเครดิต",
     fields: []
   }
@@ -1025,7 +1025,7 @@ function renderDashboard() {
         <div class="section-head">
           <div>
             <p class="eyebrow">Financial health</p>
-            <h2>สุขภาพทางการเงินตาม master</h2>
+            <h2>สุขภาพทางการเงินตามข้อมูลที่ตั้งไว้</h2>
           </div>
           <span class="pill">${moneyGoalsList().length} เป้าหมาย</span>
         </div>
@@ -1037,7 +1037,7 @@ function renderDashboard() {
                 <div>${hugeIcon(goal.icon)}<strong>${money(value)}</strong><span>${goal.label}</span></div>
               </div>
             `;
-          }).join("") || `<p class="muted">ยังไม่ได้เลือก master การเงินใน Settings</p>`}
+          }).join("") || `<p class="muted">ยังไม่ได้เลือกข้อมูลการเงินใน Settings</p>`}
         </div>
         ${cfg.debtTotal ? `
           <div class="debt-inline">
@@ -1263,8 +1263,8 @@ function renderCheckinSummary() {
   return `
     <div class="grid four">
       ${statCard("🔥 เช็คอินต่อเนื่อง", `${currentStreak()} วัน`, "นับจากวันที่มีบันทึก")}
-      ${healthGoal ? statCard(iconLabel(healthGoal.id === "water" ? "health" : healthGoal.id, healthGoal.label), `${money(healthValue)} ${healthGoal.unit}`, `${healthGoal.period} เป้า ${money(cfg[healthGoal.targetKey])}`) : statCard("เป้าสุขภาพ", "ยังไม่ตั้ง", "เลือก master ใน Settings")}
-      ${moneyGoal ? statCard(iconLabel("money", moneyGoal.label), `${money(moneyValue)} ${moneyGoal.unit}`, `${moneyGoal.period} เป้า ${money(cfg[moneyGoal.targetKey])}`) : statCard("เป้าการเงิน", "ยังไม่ตั้ง", "เลือก master ใน Settings")}
+      ${healthGoal ? statCard(iconLabel(healthGoal.id === "water" ? "health" : healthGoal.id, healthGoal.label), `${money(healthValue)} ${healthGoal.unit}`, `${healthGoal.period} เป้า ${money(cfg[healthGoal.targetKey])}`) : statCard("เป้าสุขภาพ", "ยังไม่ตั้ง", "เลือกข้อมูลใน Settings")}
+      ${moneyGoal ? statCard(iconLabel("money", moneyGoal.label), `${money(moneyValue)} ${moneyGoal.unit}`, `${moneyGoal.period} เป้า ${money(cfg[moneyGoal.targetKey])}`) : statCard("เป้าการเงิน", "ยังไม่ตั้ง", "เลือกข้อมูลใน Settings")}
       ${statCard(iconLabel("win", "ชัยชนะวันนี้"), getEntry().win || "ยังรอชัยชนะเล็กๆ", "คลิกบันทึกเพื่อเติมเรื่องดีๆ")}
     </div>
     <div class="card">
@@ -1461,7 +1461,7 @@ function renderHealth() {
   const valueForGoal = (goal) => goal.id === "exercise" ? sum(week, "exercise") : Number(entry[goal.field] || 0);
   return `
     <div class="grid four">
-      ${goals.length ? goals.slice(0, 4).map((goal) => statCard(iconLabel(goal.id === "water" ? "health" : goal.id, goal.label), `${money(valueForGoal(goal))} ${goal.unit}`, `${goal.period} เป้า ${money(cfg[goal.targetKey])}`)).join("") : renderGuestEmptyState("ยังไม่ได้เลือกเป้าหมายสุขภาพ", "ไปที่ Settings > ตั้งค่าเป้าหมาย เพื่อเลือกจาก master data")}
+      ${goals.length ? goals.slice(0, 4).map((goal) => statCard(iconLabel(goal.id === "water" ? "health" : goal.id, goal.label), `${money(valueForGoal(goal))} ${goal.unit}`, `${goal.period} เป้า ${money(cfg[goal.targetKey])}`)).join("") : renderGuestEmptyState("ยังไม่ได้เลือกเป้าหมายสุขภาพ", "ไปที่ Settings > ตั้งค่าข้อมูล เพื่อเลือกสิ่งที่อยากติดตาม")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -1611,7 +1611,7 @@ function renderFeatureSettingCard(id) {
           <small>${enabled ? "เปิดใช้งาน" : "ปิดอยู่"}</small>
         </span>
       </label>
-      ${enabled ? renderFeatureConfigPanel(id) : `<p class="muted setting-muted">เปิดเพื่อกำหนด master และเป้าหมาย</p>`}
+      ${enabled ? renderFeatureConfigPanel(id) : `<p class="muted setting-muted">เปิดเพื่อกำหนดข้อมูลและเป้าหมาย</p>`}
     </article>
   `;
 }
@@ -1623,7 +1623,7 @@ function renderFeatureConfigPanel(id) {
     <div class="feature-config-panel">
       <table class="settings-table">
         <tbody>
-          ${summary.map((item) => `<tr><th>${escapeHTML(item.split(":")[0])}</th><td>${escapeHTML(item.includes(":") ? item.split(":").slice(1).join(":").trim() : item)}</td></tr>`).join("") || `<tr><th>Master</th><td>ยังไม่มีข้อมูล</td></tr>`}
+          ${summary.map((item) => `<tr><th>${escapeHTML(item.split(":")[0])}</th><td>${escapeHTML(item.includes(":") ? item.split(":").slice(1).join(":").trim() : item)}</td></tr>`).join("") || `<tr><th>ข้อมูล</th><td>ยังไม่มีข้อมูล</td></tr>`}
         </tbody>
       </table>
       <div class="settings-submenu">
@@ -2415,19 +2415,19 @@ function renderPaymentMethodRow(method = "") {
 }
 
 function renderGoalMasterEditor(type) {
-  const master = type === "health" ? HEALTH_GOAL_MASTER : MONEY_GOAL_MASTER;
+  const goalOptions = type === "health" ? HEALTH_GOAL_MASTER : MONEY_GOAL_MASTER;
   const selected = new Set(type === "health" ? settings().healthGoalIds : settings().moneyGoalIds);
-  const title = type === "health" ? "เป้าหมายสุขภาพจาก master data" : "เป้าหมายเงินและหนี้จาก master data";
+  const title = type === "health" ? "ตั้งค่าข้อมูลสุขภาพ" : "ตั้งค่าข้อมูลสุขภาพทางการเงิน";
   return `
     <section class="skill-editor wide-label">
       <div class="skill-editor-head">
         <div>
           <span>${title}</span>
-          <small>เลือกเฉพาะเป้าหมายที่อยากติดตาม ระบบจะใช้รายการนี้สร้างฟอร์มและกราฟ</small>
+          <small>เลือกเฉพาะข้อมูลที่อยากติดตาม ระบบจะใช้รายการนี้สร้างฟอร์มและกราฟ</small>
         </div>
       </div>
       <div class="master-goal-grid" role="table">
-        ${master.map((goal) => `
+        ${goalOptions.map((goal) => `
           <div class="master-goal-card" role="row">
             <label class="master-check">
               <input type="checkbox" name="${type}GoalId" value="${goal.id}" ${selected.has(goal.id) ? "checked" : ""} />
