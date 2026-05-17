@@ -1835,9 +1835,9 @@ function lifeRadarChart(items) {
   return `
     <div class="life-radar">
       <div class="body-dashboard-panel" aria-label="ภาพคนแสดงระดับสมดุลชีวิตเฉลี่ย ${averageScore} เปอร์เซ็นต์">
+        <img src="assets/dashboard.png" alt="" />
         <div class="body-silhouette-base" aria-hidden="true"></div>
         <div class="body-level-stack" aria-hidden="true">${bodyLayers}</div>
-        <img src="assets/dashboard.png" alt="" />
         <div class="radar-score">
           <strong>${averageScore}%</strong>
           <span>สมดุลรวม</span>
