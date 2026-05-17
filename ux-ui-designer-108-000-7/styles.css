@@ -804,10 +804,11 @@ h3 {
 
 .body-silhouette-base {
   z-index: 1;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.9);
   filter:
-    drop-shadow(0 0 14px rgba(255, 255, 255, 0.92))
-    drop-shadow(0 0 22px rgba(184, 183, 255, 0.18));
+    drop-shadow(0 0 1px rgba(112, 89, 104, 0.55))
+    drop-shadow(0 0 7px rgba(255, 255, 255, 0.88))
+    drop-shadow(0 16px 24px rgba(112, 89, 104, 0.16));
 }
 
 .body-level-stack {
