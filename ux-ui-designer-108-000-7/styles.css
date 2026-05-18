@@ -2199,6 +2199,28 @@ input[type="checkbox"]:focus-visible {
   gap: 10px;
 }
 
+.scale-stepper {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+}
+
+.scale-step-button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(232, 116, 168, 0.24);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.78);
+  color: #9f5f7e;
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 10px 20px rgba(244, 167, 198, 0.14);
+}
+
 .scale-labels {
   display: flex;
   align-items: center;

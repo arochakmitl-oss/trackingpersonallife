@@ -86,7 +86,6 @@ const FEATURE_SETTING_GROUPS = {
   money: [
     { group: "moneyGoals", label: "ตั้งค่าข้อมูลและเป้าหมาย", icon: "target-02" },
     { group: "financeOptions", label: "ตั้งค่าหมวดรายจ่ายและวิธีชำระ", icon: "wallet-01" },
-    { group: "debt", label: "ตั้งค่ายอดหนี้", icon: "credit-card" },
     { group: "side", label: "ช่องทาง + เป้ารายได้", icon: "arrow-up-right-01" }
   ],
   health: [{ group: "health", label: "ตั้งค่าข้อมูลและเป้าสุขภาพ", icon: "heart-check" }],
@@ -408,13 +407,11 @@ function moneyGoalsList() {
 }
 
 function activeHealthGoals() {
-  const goals = healthGoalsList();
-  return goals.length ? goals : HEALTH_GOAL_MASTER;
+  return healthGoalsList();
 }
 
 function activeMoneyGoals() {
-  const goals = moneyGoalsList();
-  return goals.length ? goals : MONEY_GOAL_MASTER;
+  return moneyGoalsList();
 }
 
 function settingFieldLabel(field) {
@@ -1156,7 +1153,7 @@ function renderDashboard() {
         ${lifeRadarChart(radarItems)}
       </div>
     `) : "",
-    financialGoals: isFeatureEnabled("money") ? dashboardSection("financialGoals", `
+    financialGoals: isFeatureEnabled("money") && activeMoneyGoals().length ? dashboardSection("financialGoals", `
       <div class="card">
         <div class="section-head">
           <div>
@@ -1677,6 +1674,7 @@ function renderHealth() {
   const cfg = settings();
   const goals = activeHealthGoals();
   const valueForGoal = (goal) => goal.id === "exercise" ? sum(week, "exercise") : Number(entry[goal.field] || 0);
+  const healthFields = featureFields(modalConfigs.health.fields);
   return `
     <div class="grid four">
       ${goals.length ? goals.slice(0, 4).map((goal) => statCard(iconLabel(goal.id === "water" ? "health" : goal.id, goal.label), `${money(valueForGoal(goal))} ${goal.unit}`, `${goal.period} เป้า ${money(cfg[goal.targetKey])}`)).join("") : renderGuestEmptyState("ยังไม่ได้เลือกเป้าหมายสุขภาพ", "ไปที่ Settings > ตั้งค่าข้อมูล เพื่อเลือกสิ่งที่อยากติดตาม")}
@@ -1687,9 +1685,9 @@ function renderHealth() {
           <p class="eyebrow">Health & Beauty rhythm</p>
           <h2>🔥 streak การดูแลตัวเอง</h2>
         </div>
-        <div class="button-row">
+        ${healthFields.length ? `<div class="button-row">
           <button class="primary-button" type="button" data-open-entry data-entry-tab="health">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
-        </div>
+        </div>` : ""}
       </div>
       <div class="progress-list">
         ${goals.map((goal) => renderProgress({ name: goal.label, type: goal.period, progress: valueForGoal(goal), target: cfg[goal.targetKey] })).join("") || `<p class="muted">ยังไม่มีเป้าหมายสุขภาพที่เลือกไว้</p>`}
@@ -2327,6 +2325,14 @@ function openEntryModal(category = "dashboard", initialTab = "emotion") {
       if (valueLabel) valueLabel.textContent = `${input.value}/10 ${scaleScoreDescription(input.name, input.value)}`;
     });
   });
+  form.querySelectorAll("[data-scale-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = form.elements[button.dataset.scaleStep];
+      if (!input) return;
+      input.value = clamp(Number(input.value || 0) + Number(button.dataset.step || 0), 0, 10);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
   if (!modal.open) modal.showModal();
 }
 
@@ -2520,7 +2526,11 @@ function scaleField(name, label, lowLabel, highLabel) {
   return `
     <label class="scale-field">
       <span>${label}</span>
-      <input name="${name}" class="pastel-scale" type="range" min="0" max="10" step="1" value="${value}" />
+      <span class="scale-stepper">
+        <button class="scale-step-button" type="button" data-scale-step="${name}" data-step="-1" aria-label="ลด ${label}">−</button>
+        <input name="${name}" class="pastel-scale" type="range" min="0" max="10" step="1" value="${value}" />
+        <button class="scale-step-button" type="button" data-scale-step="${name}" data-step="1" aria-label="เพิ่ม ${label}">+</button>
+      </span>
       <span class="scale-labels"><small>${lowLabel}</small><strong>${value}/10 ${scaleScoreDescription(name, value)}</strong><small>${highLabel}</small></span>
     </label>
   `;
