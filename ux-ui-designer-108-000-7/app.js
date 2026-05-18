@@ -43,8 +43,8 @@ const pages = [
   { id: "checkin", label: "เช็คอินวันนี้", icon: "checkmark-circle-02", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
   { id: "money", label: "สุขภาพทางการเงิน", icon: "wallet-01", title: "สุขภาพทางการเงิน", cover: "assets/money.svg", kicker: "สุขภาพการเงินรายวัน", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
   { id: "side", label: "รายได้", icon: "arrow-up-right-01", title: "รายได้", cover: "assets/side.svg", kicker: "รายได้หลักและช่องทางเพิ่ม", quote: "เห็นที่มาของรายได้ชัดขึ้น จะวางแผนเงินได้มั่นคงขึ้น" },
-  { id: "emotion", label: "อารมณ์และความเครียด", icon: "sentiment-satisfied", title: "อารมณ์และความเครียด", cover: "assets/checkin.svg", kicker: "เช็คพลังใจรายวัน", quote: "การเห็นอารมณ์ตัวเองชัดขึ้น คือจุดเริ่มต้นของการดูแลตัวเองที่อ่อนโยน" },
-  { id: "health", label: "สุขภาพ & ความสวย", icon: "heart-check", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
+  { id: "emotion", label: "อารมณ์และความเครียด", icon: "heart-check", title: "อารมณ์และความเครียด", cover: "assets/checkin.svg", kicker: "เช็คพลังใจรายวัน", quote: "การเห็นอารมณ์ตัวเองชัดขึ้น คือจุดเริ่มต้นของการดูแลตัวเองที่อ่อนโยน" },
+  { id: "health", label: "สุขภาพ & ความสวย", icon: "body-part-muscle", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
   { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "แผนเติบโตในแบบของคุณ", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
   { id: "membership", label: "ใช้แบบไม่จำกัด", icon: "coffee-02", title: "ใช้แบบไม่จำกัด", cover: "assets/goals.svg", kicker: "อุดหนุนค่ากาแฟผู้พัฒนา", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
   { id: "settings", label: "ตั้งค่า", icon: "settings-01", title: "ตั้งค่าแอป", cover: "assets/dashboard.svg", kicker: "เลือกฟีเจอร์และข้อมูลพื้นฐาน", quote: "ระบบที่ดีควรปรับให้เข้ากับเรา ไม่ใช่ให้เราฝืนเข้ากับระบบ" }
@@ -70,6 +70,18 @@ const MONEY_GOAL_MASTER = [
   { id: "saving", label: "ออมเงิน", icon: "safe", field: "saving", targetKey: "savingMonthlyTarget", unit: "บาท", period: "รายเดือน" },
   { id: "investment", label: "ลงทุน", icon: "chart-line-data-01", field: "investment", targetKey: "investmentMonthlyTarget", unit: "บาท", period: "รายเดือน" }
 ];
+const GUEST_PREVIEW_SETTINGS = {
+  ...EMPTY_SETTINGS,
+  enabledFeatures: [...DEFAULT_FEATURES],
+  skillNames: [...DEFAULT_SKILLS],
+  languageNames: [...DEFAULT_LANGUAGES],
+  sideChannelNames: [...DEFAULT_SIDE_CHANNELS],
+  expenseCategoryNames: [...DEFAULT_EXPENSE_CATEGORIES],
+  paymentMethodNames: [...DEFAULT_PAYMENT_METHODS],
+  debtPaymentMethods: [...DEFAULT_DEBT_PAYMENT_METHODS],
+  healthGoalIds: HEALTH_GOAL_MASTER.map((item) => item.id),
+  moneyGoalIds: MONEY_GOAL_MASTER.map((item) => item.id)
+};
 const FEATURE_SETTING_GROUPS = {
   money: [
     { group: "moneyGoals", label: "ตั้งค่าข้อมูลและเป้าหมาย", icon: "target-02" },
@@ -301,7 +313,7 @@ function readStoredState(key, defaults = DEFAULT_SETTINGS) {
 }
 
 function loadGuestState() {
-  return normalizeState({ meta: { kind: "guest" } }, DEFAULT_SETTINGS);
+  return normalizeState({ meta: { kind: "guest" }, settings: GUEST_PREVIEW_SETTINGS }, GUEST_PREVIEW_SETTINGS);
 }
 
 function loadUserCache(userId) {
@@ -340,7 +352,7 @@ function normalizeState(saved = {}, defaults = DEFAULT_SETTINGS) {
 }
 
 function defaultSettingsForState() {
-  return DEFAULT_SETTINGS;
+  return currentUser ? DEFAULT_SETTINGS : GUEST_PREVIEW_SETTINGS;
 }
 
 function settings() {
@@ -1739,13 +1751,10 @@ function renderMembership() {
   const trial = trialInfo();
   const support = supportInfo();
   if (!hadTrial) saveState();
-  const status = trial.active ? `เหลือ ${trial.daysLeft} วัน` : "หมดช่วงใช้ฟรีแล้ว";
-  const supportStatus = support.active && support.end
-    ? `แผนไม่จำกัด เหลือ ${support.daysLeft} วัน`
-    : "ยังไม่ได้เปิดใช้";
-  const supportDetail = support.active && support.end
-    ? `หมดรอบ ${dateLabel(toISO(support.end), "medium")}`
-    : "อุดหนุน 39 บาท / เดือน";
+  const accessTitle = support.active ? "Unlimited Support" : "ทดลองใช้ฟรี";
+  const accessDays = support.active ? support.daysLeft : trial.active ? trial.daysLeft : 0;
+  const accessEnd = support.active && support.end ? support.end : trial.end;
+  const accessDetail = accessDays > 0 ? `หมดรอบ ${dateLabel(toISO(accessEnd), "medium")}` : "หมดสิทธิ์ใช้งานแล้ว";
   return `
     <div class="card membership-hero">
       <div class="section-head">
@@ -1755,10 +1764,9 @@ function renderMembership() {
           <p class="muted">ทดลองใช้ฟรี 7 วัน แล้วถ้าช่วยให้ชีวิตจัดระเบียบขึ้น ค่อยอุดหนุนค่ากาแฟเดือนละ 39 บาท</p>
         </div>
       </div>
-      <div class="grid three">
-        ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
+      <div class="grid two">
+        ${statCard(accessTitle, `เหลือ ${accessDays} วัน`, accessDetail)}
         ${statCard("ค่ากาแฟ", `<span class="price-drop"><del>99</del> 39 บาท</span>`, "ต่อเดือน หลัง trial")}
-        ${statCard("Unlimited Support", supportStatus, supportDetail)}
       </div>
     </div>
     <div class="plan-compare">
@@ -2178,10 +2186,16 @@ function bindPageEvents() {
     });
   });
   document.querySelectorAll("[data-open-entry]").forEach((button) => {
-    button.addEventListener("click", () => openEntryModal(button.dataset.modal || activePage));
+    button.addEventListener("click", () => {
+      if (requireLoginForGuest()) return;
+      openEntryModal(button.dataset.modal || activePage);
+    });
   });
   document.querySelectorAll("[data-open-setting]").forEach((button) => {
-    button.addEventListener("click", () => openSettingModal(button.dataset.openSetting));
+    button.addEventListener("click", () => {
+      if (requireLoginForGuest()) return;
+      openSettingModal(button.dataset.openSetting);
+    });
   });
   document.querySelectorAll("[data-open-auth]").forEach((button) => {
     button.addEventListener("click", openAuthModal);
@@ -2203,6 +2217,7 @@ function bindPageEvents() {
   });
   document.querySelectorAll("[data-dashboard-manage]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (requireLoginForGuest()) return;
       if (button.dataset.dashboardManage === "start") startDashboardManage();
       if (button.dataset.dashboardManage === "cancel") cancelDashboardManage();
       if (button.dataset.dashboardManage === "save") saveDashboardManage();
@@ -2210,6 +2225,12 @@ function bindPageEvents() {
   });
   const featureForm = $("#featureSettingsForm");
   if (featureForm) featureForm.addEventListener("submit", handleFeatureSettingsSubmit);
+}
+
+function requireLoginForGuest() {
+  if (currentUser) return false;
+  openAuthModal();
+  return true;
 }
 
 async function startSupportCheckout() {
@@ -2306,7 +2327,7 @@ function openEntryModal(category = activePage) {
   form.querySelectorAll(".scale-field input").forEach((input) => {
     input.addEventListener("input", () => {
       const valueLabel = input.closest(".scale-field")?.querySelector(".scale-labels strong");
-      if (valueLabel) valueLabel.textContent = `${input.value}/10`;
+      if (valueLabel) valueLabel.textContent = `${input.value}/10 ${scaleScoreDescription(input.name, input.value)}`;
     });
   });
   if (!modal.open) modal.showModal();
@@ -2379,6 +2400,11 @@ function handleSubmit(event) {
 }
 
 function renderModalFields(fields) {
+  if (modalCategory === "dashboard") return renderDashboardModalTabs(fields);
+  return renderPlainModalFields(fields);
+}
+
+function renderPlainModalFields(fields) {
   const fieldHTML = fields
     .filter((field) => !["win", "skills", "expenseRows", "languageMinutes"].includes(field))
     .map(renderField)
@@ -2393,6 +2419,29 @@ function renderModalFields(fields) {
     ${languageHTML}
     ${winHTML}
     ${skillsHTML}
+  `;
+}
+
+function renderDashboardModalTabs(fields) {
+  const groups = [
+    { id: "emotion", label: "อารมณ์", fields: ["moodScore", "mood", "confidence", "energy"] },
+    { id: "money", label: "การเงิน", fields: ["income", "sideIncome", "sideChannel", "expenseRows", "debtPaid", "saving", "investment"] },
+    { id: "health", label: "สุขภาพ", fields: ["water", "exercise", "sleep", "calories"] },
+    { id: "skills", label: "อาชีพ", fields: ["languageMinutes", "languageFocus", "skills"] },
+    { id: "note", label: "บันทึก", fields: ["win"] }
+  ].map((group) => ({ ...group, fields: group.fields.filter((field) => fields.includes(field)) })).filter((group) => group.fields.length);
+  return `
+    <div class="entry-tabs">
+      ${groups.map((group, index) => `<input id="entryTab${group.id}" type="radio" name="entryTab" ${index === 0 ? "checked" : ""} />`).join("")}
+      <div class="entry-tab-list">
+        ${groups.map((group) => `<label for="entryTab${group.id}">${group.label}</label>`).join("")}
+      </div>
+      ${groups.map((group) => `
+        <section class="entry-tab-panel" data-tab-panel="${group.id}">
+          ${renderPlainModalFields(group.fields)}
+        </section>
+      `).join("")}
+    </div>
   `;
 }
 
@@ -2472,10 +2521,26 @@ function scaleField(name, label, lowLabel, highLabel) {
   return `
     <label class="scale-field">
       <span>${label}</span>
-      <input name="${name}" type="range" min="0" max="10" step="1" value="${value}" />
-      <span class="scale-labels"><small>${lowLabel}</small><strong>${value}/10</strong><small>${highLabel}</small></span>
+      <span class="scale-options" role="radiogroup" aria-label="${label}">
+        ${Array.from({ length: 11 }, (_, score) => `
+          <span class="scale-option">
+            <input type="radio" name="${name}" value="${score}" ${score === value ? "checked" : ""} />
+            <span>${score}</span>
+          </span>
+        `).join("")}
+      </span>
+      <span class="scale-labels"><small>${lowLabel}</small><strong>${value}/10 ${scaleScoreDescription(name, value)}</strong><small>${highLabel}</small></span>
     </label>
   `;
+}
+
+function scaleScoreDescription(name, score) {
+  const descriptions = {
+    moodScore: ["รู้สึกหนักมาก", "เริ่มนิ่งขึ้น", "โอเคพอใช้", "ดีขึ้นชัดเจน", "ยิ้มร่าเริง"],
+    confidence: ["ไม่มั่นใจเลย", "ยังลังเล", "พอไหว", "มั่นใจขึ้น", "มั่นใจมาก"],
+    energy: ["หมดแรง", "พลังน้อย", "พอมีแรง", "กระฉับกระเฉง", "พลังเต็ม"]
+  };
+  return descriptions[name]?.[Math.min(4, Math.floor(Number(score || 0) / 3))] || "";
 }
 
 function renderLanguageMinuteFields() {
@@ -3273,7 +3338,10 @@ $("#closeAuthButton").addEventListener("click", () => $("#authModal").close());
 $("#signUpButton").addEventListener("click", () => setAuthMode(authMode === "signup" ? "login" : "signup"));
 $("#signOutButton").addEventListener("click", signOutUser);
 $("#profileLogoutButton")?.addEventListener("click", signOutUser);
-$("#quickAddButton").addEventListener("click", () => openEntryModal(activeEntryCategory(activePage)));
+$("#quickAddButton").addEventListener("click", () => {
+  if (requireLoginForGuest()) return;
+  openEntryModal(activeEntryCategory(activePage));
+});
 $("#closeModalButton").addEventListener("click", () => $("#entryModal").close());
 $("#closeSettingButton").addEventListener("click", () => $("#settingModal").close());
 $("#cancelConfirmButton").addEventListener("click", () => $("#confirmModal").close());

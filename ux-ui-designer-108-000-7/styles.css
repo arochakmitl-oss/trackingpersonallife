@@ -2199,16 +2199,42 @@ input[type="checkbox"]:focus-visible {
   gap: 10px;
 }
 
-.scale-field input[type="range"] {
-  width: 100%;
-  accent-color: #e874a8;
-}
-
 .scale-labels {
   display: flex;
   align-items: center;
   justify-content: space-between;
   color: var(--muted);
+}
+
+.scale-options {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.scale-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scale-option span {
+  display: grid;
+  place-items: center;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.scale-option input:checked + span {
+  background: linear-gradient(135deg, #e874a8, #9f84e8);
+  color: white;
+  box-shadow: 0 10px 22px rgba(159, 132, 232, 0.18);
 }
 
 .scale-labels strong {
@@ -2246,6 +2272,62 @@ input[type="checkbox"]:focus-visible {
 .emotion-meter .bar span {
   width: var(--meter);
   background: linear-gradient(90deg, var(--meter-color), #fff1d7);
+}
+
+.entry-tabs {
+  display: grid;
+  gap: 16px;
+}
+
+.entry-tabs > input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.entry-tab-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.entry-tab-list label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--muted);
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.entry-tab-panel {
+  display: none;
+}
+
+#entryTabemotion:checked ~ .entry-tab-list label[for="entryTabemotion"],
+#entryTabmoney:checked ~ .entry-tab-list label[for="entryTabmoney"],
+#entryTabhealth:checked ~ .entry-tab-list label[for="entryTabhealth"],
+#entryTabskills:checked ~ .entry-tab-list label[for="entryTabskills"],
+#entryTabnote:checked ~ .entry-tab-list label[for="entryTabnote"] {
+  color: white;
+  background: linear-gradient(135deg, #e874a8, #9f84e8);
+  border-color: transparent;
+}
+
+#entryTabemotion:checked ~ [data-tab-panel="emotion"],
+#entryTabmoney:checked ~ [data-tab-panel="money"],
+#entryTabhealth:checked ~ [data-tab-panel="health"],
+#entryTabskills:checked ~ [data-tab-panel="skills"],
+#entryTabnote:checked ~ [data-tab-panel="note"] {
+  display: grid;
+  gap: 14px;
 }
 
 .expense-remove,
