@@ -752,8 +752,8 @@ h3 {
   display: block;
   filter: drop-shadow(0 18px 24px rgba(53, 43, 52, 0.12));
   z-index: 4;
-  mix-blend-mode: screen;
-  opacity: 0.96;
+  mix-blend-mode: normal;
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -804,11 +804,7 @@ h3 {
 
 .body-silhouette-base {
   z-index: 1;
-  background: rgba(255, 255, 255, 0.9);
-  filter:
-    drop-shadow(0 0 1px rgba(112, 89, 104, 0.55))
-    drop-shadow(0 0 7px rgba(255, 255, 255, 0.88))
-    drop-shadow(0 16px 24px rgba(112, 89, 104, 0.16));
+  display: none;
 }
 
 .body-level-stack {
