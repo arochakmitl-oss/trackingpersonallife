@@ -2206,35 +2206,28 @@ input[type="checkbox"]:focus-visible {
   color: var(--muted);
 }
 
-.scale-options {
-  display: grid;
-  grid-template-columns: repeat(11, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.scale-option input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.scale-option span {
-  display: grid;
-  place-items: center;
-  min-height: 36px;
-  border: 1px solid var(--line);
+.pastel-scale {
+  width: 100%;
+  height: 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-  color: var(--muted);
-  font-weight: 800;
+  accent-color: #e874a8;
   cursor: pointer;
-  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
-.scale-option input:checked + span {
-  background: linear-gradient(135deg, #e874a8, #9f84e8);
-  color: white;
-  box-shadow: 0 10px 22px rgba(159, 132, 232, 0.18);
+.pastel-scale::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f7d47a, #f5a7c6, #c6b2f2, #a9dcc5);
+}
+
+.pastel-scale::-webkit-slider-thumb {
+  width: 28px;
+  height: 28px;
+  margin-top: -8px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #e874a8;
+  box-shadow: 0 8px 18px rgba(159, 132, 232, 0.24);
 }
 
 .scale-labels strong {
@@ -2315,6 +2308,7 @@ input[type="checkbox"]:focus-visible {
 #entryTabmoney:checked ~ .entry-tab-list label[for="entryTabmoney"],
 #entryTabhealth:checked ~ .entry-tab-list label[for="entryTabhealth"],
 #entryTabskills:checked ~ .entry-tab-list label[for="entryTabskills"],
+#entryTablanguage:checked ~ .entry-tab-list label[for="entryTablanguage"],
 #entryTabnote:checked ~ .entry-tab-list label[for="entryTabnote"] {
   color: white;
   background: linear-gradient(135deg, #e874a8, #9f84e8);
@@ -2325,6 +2319,7 @@ input[type="checkbox"]:focus-visible {
 #entryTabmoney:checked ~ [data-tab-panel="money"],
 #entryTabhealth:checked ~ [data-tab-panel="health"],
 #entryTabskills:checked ~ [data-tab-panel="skills"],
+#entryTablanguage:checked ~ [data-tab-panel="language"],
 #entryTabnote:checked ~ [data-tab-panel="note"] {
   display: grid;
   gap: 14px;

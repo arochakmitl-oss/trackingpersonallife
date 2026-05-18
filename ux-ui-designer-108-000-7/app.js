@@ -200,6 +200,7 @@ let supabaseClient = null;
 let currentUser = null;
 let isCloudLoading = false;
 let authMode = "login";
+let entryInitialTab = "emotion";
 
 const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
@@ -678,7 +679,7 @@ function renderGuestEmptyState(title, description) {
         <p class="muted">${description}</p>
       </div>
       <div class="button-row">
-        <button class="primary-button" type="button" data-open-entry>เริ่มบันทึกเอง</button>
+        <button class="primary-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูล</span></button>
       </div>
     </div>
   `;
@@ -1044,7 +1045,10 @@ function renderNav() {
   $("#desktopNav").innerHTML = mainNavHTML;
   $("#mobileNav").innerHTML = mainNavHTML;
   const coffeeButton = document.querySelector(".coffee-top-button");
-  if (coffeeButton) coffeeButton.classList.toggle("active", activePage === "membership");
+  if (coffeeButton) {
+    coffeeButton.classList.toggle("active", activePage === "membership");
+    coffeeButton.hidden = !currentUser;
+  }
   document.querySelectorAll("[data-page]").forEach((button) => {
     button.addEventListener("click", () => {
       activePage = button.dataset.page;
@@ -1105,7 +1109,7 @@ function renderDashboard() {
         <div class="segmented" aria-label="ตัวกรองช่วงเวลา">
           ${["week", "month", "year"].map((item) => `<button type="button" class="${filter === item ? "active" : ""}" data-filter="${item}">${item === "week" ? "สัปดาห์" : item === "month" ? "เดือน" : "ปี"}</button>`).join("")}
         </div>
-        <button class="primary-button" type="button" data-open-entry>เริ่มบันทึกเอง</button>
+        <button class="primary-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูล</span></button>
       </div>
       <div class="grid two">
         ${renderGuestEmptyState("ยังไม่มีข้อมูลสำหรับ guest", "ข้อมูลจะเริ่มแสดงหลังจากเริ่มบันทึกเอง")}
@@ -1186,7 +1190,7 @@ function renderDashboard() {
               <p class="eyebrow">${dateLabel(selectedDate)}</p>
               <h2>ข้อมูลย้อนหลัง</h2>
             </div>
-            ${featureFields(modalConfigs.checkin.fields).length ? `<button class="tiny-button" type="button" data-open-entry data-modal="checkin">แก้ไข</button>` : ""}
+            ${featureFields(modalConfigs.checkin.fields).length ? `<button class="tiny-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>` : ""}
           </div>
           ${renderDayDetail(selectedDate)}
         </div>
@@ -1200,7 +1204,7 @@ function renderDashboard() {
             <p class="eyebrow">Mood & stress</p>
             <h2>อารมณ์และพลังใจวันนี้</h2>
           </div>
-          <button class="tiny-button" type="button" data-open-entry data-modal="emotion">บันทึก</button>
+          <button class="tiny-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
         </div>
         <div class="emotion-meter-grid">
           ${emotionMeter("Mood", Number(getEntry(selectedDate).moodScore || 0), "#f5a7c6")}
@@ -1234,8 +1238,8 @@ function renderDashboard() {
         ${dashboardManageMode ? `
           <button class="ghost-button" type="button" data-dashboard-manage="cancel">ยกเลิก</button>
           <button class="primary-button" type="button" data-dashboard-manage="save">บันทึก</button>
-        ` : `<button class="soft-button" type="button" data-dashboard-manage="start">${hugeIcon("layout-03")}<span>จัดการหน้าแรก</span></button>`}
-        ${featureFields(modalConfigs.dashboard.fields).length ? `<button class="primary-button" type="button" data-open-entry>${hugeIcon("plus-sign")}<span>บันทึกวันที่เลือก</span></button>` : ""}
+        ` : `<button class="soft-button" type="button" data-dashboard-manage="start">${hugeIcon("pencil-edit-02")}<span>จัดการหน้าแรก</span></button>`}
+        ${featureFields(modalConfigs.dashboard.fields).length ? `<button class="primary-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูล</span></button>` : ""}
       </div>
     </div>
     <div class="dashboard-sections">
@@ -1291,7 +1295,7 @@ function renderGoals() {
           </div>
           <div class="button-row">
             <span class="pill">ตั้งค่าจาก Settings</span>
-            <button class="primary-button" type="button" data-open-entry>อัปเดตวันนี้</button>
+            <button class="primary-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูล</span></button>
           </div>
         </div>
         <div class="progress-list">
@@ -1399,17 +1403,9 @@ function renderCheckin() {
 
 function renderCheckinSummary() {
   const today = getEntry();
-  const week = entriesInRange("week");
-  const cfg = settings();
-  const healthGoal = activeHealthGoals()[0];
-  const moneyGoal = activeMoneyGoals()[0];
-  const healthValue = healthGoal ? (healthGoal.id === "exercise" ? sum(week, "exercise") : Number(today[healthGoal.field] || 0)) : 0;
-  const moneyValue = moneyGoal ? sum(entriesInRange("month"), moneyGoal.field) : 0;
   return `
-    <div class="grid four">
+    <div class="grid two">
       ${statCard("🔥 เช็คอินต่อเนื่อง", `${currentStreak()} วัน`, "นับจากวันที่มีบันทึก")}
-      ${healthGoal ? statCard(iconLabel(healthGoal.id === "water" ? "health" : healthGoal.id, healthGoal.label), `${money(healthValue)} ${healthGoal.unit}`, `${healthGoal.period} เป้า ${money(cfg[healthGoal.targetKey])}`) : statCard("เป้าสุขภาพ", "ยังไม่ตั้ง", "เลือกข้อมูลใน Settings")}
-      ${moneyGoal ? statCard(iconLabel("money", moneyGoal.label), `${money(moneyValue)} ${moneyGoal.unit}`, `${moneyGoal.period} เป้า ${money(cfg[moneyGoal.targetKey])}`) : statCard("เป้าการเงิน", "ยังไม่ตั้ง", "เลือกข้อมูลใน Settings")}
       ${statCard(iconLabel("win", "ชัยชนะวันนี้"), getEntry().win || "ยังรอชัยชนะเล็กๆ", "คลิกบันทึกเพื่อเติมเรื่องดีๆ")}
     </div>
     <div class="card">
@@ -1418,7 +1414,7 @@ function renderCheckinSummary() {
           <p class="eyebrow">${dateLabel(selectedDate)}</p>
           <h2>เช็คอินวันนี้</h2>
         </div>
-        <button class="primary-button" type="button" data-open-entry>เปิดแบบบันทึก</button>
+        <button class="primary-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูล</span></button>
       </div>
       ${renderDayDetail(selectedDate)}
     </div>
@@ -1453,6 +1449,7 @@ function renderMoney() {
   const netCashflow = income + sum(entries, "sideIncome") - monthExpense - monthDebtPaid - saving - investment;
   const savingsRate = income > 0 ? Math.round(((saving + investment) / income) * 100) : 0;
   const debtRatio = income > 0 ? Math.round((monthDebtPaid / income) * 100) : 0;
+  const financialScore = entries.length ? clamp(50 + savingsRate - Math.min(debtRatio, 40), 0, 100) : 0;
   return `
     <div class="financial-health-hero">
       <div>
@@ -1461,7 +1458,7 @@ function renderMoney() {
         <p class="muted">${dateLabel(selectedDate)} จากข้อมูลที่บันทึกไว้</p>
       </div>
       <div class="financial-score">
-        <strong>${clamp(50 + savingsRate - Math.min(debtRatio, 40), 0, 100)}</strong>
+        <strong>${financialScore}</strong>
         <span>คะแนน</span>
       </div>
     </div>
@@ -1479,7 +1476,7 @@ function renderMoney() {
             <h2>เป้าหมายเงิน หนี้ และรายได้</h2>
           </div>
           <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry>บันทึกการเงิน</button>
+          <button class="primary-button" type="button" data-open-entry data-entry-tab="money">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
           </div>
         </div>
         <div class="money-goal-rings">
@@ -1587,7 +1584,7 @@ function renderSideIncome() {
           <h2>บันทึกการทดลอง</h2>
         </div>
         <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry>เพิ่มรายได้</button>
+          <button class="primary-button" type="button" data-open-entry data-entry-tab="money">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
         </div>
       </div>
       <div class="timeline">
@@ -1635,7 +1632,7 @@ function renderEmotion() {
           <p class="eyebrow">Monthly pattern</p>
           <h2>ค่าเฉลี่ยเดือนนี้</h2>
         </div>
-        <button class="primary-button" type="button" data-open-entry>บันทึกอารมณ์วันนี้</button>
+        <button class="primary-button" type="button" data-open-entry data-entry-tab="emotion">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
       </div>
       <div class="emotion-meter-grid">
         ${emotionMeter("Mood", avgMood, "#f5a7c6")}
@@ -1691,7 +1688,7 @@ function renderHealth() {
           <h2>🔥 streak การดูแลตัวเอง</h2>
         </div>
         <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry>บันทึกสุขภาพ</button>
+          <button class="primary-button" type="button" data-open-entry data-entry-tab="health">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
         </div>
       </div>
       <div class="progress-list">
@@ -1721,7 +1718,7 @@ function renderSkills() {
           <h2>แผนเติบโตทักษะตามอาชีพ</h2>
         </div>
         <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry>บันทึกทักษะวันนี้</button>
+          <button class="primary-button" type="button" data-open-entry data-entry-tab="skills">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
         </div>
       </div>
       <div class="progress-list">
@@ -1735,7 +1732,7 @@ function renderSkills() {
           <h2>ฝึกภาษา</h2>
         </div>
         <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
+          <button class="primary-button" type="button" data-open-entry data-entry-tab="language">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
         </div>
       </div>
       <div class="progress-list">
@@ -1950,16 +1947,16 @@ function miniSummary(label, value) {
 }
 
 function languageDashboard(entries) {
-  if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาที่อยากเรียนจะยังว่างจนกว่าจะเพิ่มภาษาเอง");
-  }
   const cfg = settings();
   const languageTotals = languagesList().map((language) => ({ language, minutes: sumLanguage(entries, language) }));
+  if (!languageTotals.length) {
+    return renderGuestEmptyState("ยังไม่มีภาษาเป้าหมาย", "ภาษาที่อยากเรียนจะยังว่างจนกว่าจะเพิ่มภาษาเอง");
+  }
   const total = languageTotals.reduce((amount, item) => amount + item.minutes, 0);
   const week = entriesInRange("week");
   const weekTotal = week.reduce((amount, [, entry]) => amount + languageTotal(entry), 0);
   const streak = currentStreak((entry) => languageTotal(entry) > 0);
-  const [primaryLanguage, secondaryLanguage] = languageTotals;
+  const [primaryLanguage] = languageTotals;
 
   return `
     <div class="card language-card">
@@ -1969,17 +1966,16 @@ function languageDashboard(entries) {
           <h2>ฝึกภาษา</h2>
         </div>
         <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry data-modal="language">บันทึกภาษา</button>
+          <button class="primary-button" type="button" data-open-entry data-entry-tab="language">${hugeIcon("plus-sign")}<span>บันทึกข้อมูลส่วนนี้</span></button>
         </div>
       </div>
       <div class="language-layout">
-        <div class="language-orbit" style="--thai:${progressValue(primaryLanguage?.minutes || 0, total || cfg.languageWeeklyTarget)}%;--arabic:${progressValue(secondaryLanguage?.minutes || 0, total || cfg.languageWeeklyTarget)}%">
+        <div class="language-orbit single-language" style="--thai:${progressValue(primaryLanguage.minutes || 0, total || cfg.languageWeeklyTarget)}%;--arabic:0%">
           <div class="language-core">
             <strong>${money(total)}</strong>
             <span>นาที</span>
           </div>
-          <span class="language-badge thai">${escapeHTML(primaryLanguage?.language || "ภาษา")}</span>
-          <span class="language-badge arabic">${escapeHTML(secondaryLanguage?.language || "เพิ่มภาษา")}</span>
+          <span class="language-badge thai">${escapeHTML(primaryLanguage.language)}</span>
         </div>
         <div class="language-progress">
           ${languageTotals.map((item, index) => languageProgress(escapeHTML(item.language), item.minutes, cfg.languageWeeklyTarget, index % 2 ? "#c6b2f2" : "#a9dcc5")).join("")}
@@ -2188,7 +2184,7 @@ function bindPageEvents() {
   document.querySelectorAll("[data-open-entry]").forEach((button) => {
     button.addEventListener("click", () => {
       if (requireLoginForGuest()) return;
-      openEntryModal(button.dataset.modal || activePage);
+      openEntryModal(button.dataset.modal || "dashboard", button.dataset.entryTab || "emotion");
     });
   });
   document.querySelectorAll("[data-open-setting]").forEach((button) => {
@@ -2285,9 +2281,10 @@ function handleFeatureSettingsSubmit(event) {
   render();
 }
 
-function openEntryModal(category = activePage) {
+function openEntryModal(category = "dashboard", initialTab = "emotion") {
   const modal = $("#entryModal");
   const form = $("#entryForm");
+  entryInitialTab = initialTab || "emotion";
   modalCategory = activeEntryCategory(category);
   if (modalCategory === "goals" && !modal.open) selectedDate = toISO(new Date());
   const entry = getEntry();
@@ -2427,12 +2424,14 @@ function renderDashboardModalTabs(fields) {
     { id: "emotion", label: "อารมณ์", fields: ["moodScore", "mood", "confidence", "energy"] },
     { id: "money", label: "การเงิน", fields: ["income", "sideIncome", "sideChannel", "expenseRows", "debtPaid", "saving", "investment"] },
     { id: "health", label: "สุขภาพ", fields: ["water", "exercise", "sleep", "calories"] },
-    { id: "skills", label: "อาชีพ", fields: ["languageMinutes", "languageFocus", "skills"] },
+    { id: "skills", label: "อาชีพ", fields: ["skills"] },
+    { id: "language", label: "ภาษา", fields: ["languageMinutes", "languageFocus"] },
     { id: "note", label: "บันทึก", fields: ["win"] }
   ].map((group) => ({ ...group, fields: group.fields.filter((field) => fields.includes(field)) })).filter((group) => group.fields.length);
+  const activeTab = groups.some((group) => group.id === entryInitialTab) ? entryInitialTab : groups[0]?.id;
   return `
     <div class="entry-tabs">
-      ${groups.map((group, index) => `<input id="entryTab${group.id}" type="radio" name="entryTab" ${index === 0 ? "checked" : ""} />`).join("")}
+      ${groups.map((group) => `<input id="entryTab${group.id}" type="radio" name="entryTab" ${group.id === activeTab ? "checked" : ""} />`).join("")}
       <div class="entry-tab-list">
         ${groups.map((group) => `<label for="entryTab${group.id}">${group.label}</label>`).join("")}
       </div>
@@ -2521,14 +2520,7 @@ function scaleField(name, label, lowLabel, highLabel) {
   return `
     <label class="scale-field">
       <span>${label}</span>
-      <span class="scale-options" role="radiogroup" aria-label="${label}">
-        ${Array.from({ length: 11 }, (_, score) => `
-          <span class="scale-option">
-            <input type="radio" name="${name}" value="${score}" ${score === value ? "checked" : ""} />
-            <span>${score}</span>
-          </span>
-        `).join("")}
-      </span>
+      <input name="${name}" class="pastel-scale" type="range" min="0" max="10" step="1" value="${value}" />
       <span class="scale-labels"><small>${lowLabel}</small><strong>${value}/10 ${scaleScoreDescription(name, value)}</strong><small>${highLabel}</small></span>
     </label>
   `;
@@ -2547,16 +2539,7 @@ function renderLanguageMinuteFields() {
   const languages = languagesList();
   const entry = getEntry();
   if (!languages.length) {
-    return `
-      <section class="skill-editor wide-label">
-        <div class="skill-editor-head">
-          <div>
-            <span>ยังไม่ได้เพิ่มภาษาที่อยากเรียน</span>
-            <small>เพิ่มภาษาได้จากหน้า Settings</small>
-          </div>
-        </div>
-      </section>
-    `;
+    return "";
   }
   return `
     <section class="skill-editor wide-label">
@@ -3340,7 +3323,7 @@ $("#signOutButton").addEventListener("click", signOutUser);
 $("#profileLogoutButton")?.addEventListener("click", signOutUser);
 $("#quickAddButton").addEventListener("click", () => {
   if (requireLoginForGuest()) return;
-  openEntryModal(activeEntryCategory(activePage));
+  openEntryModal("dashboard", "emotion");
 });
 $("#closeModalButton").addEventListener("click", () => $("#entryModal").close());
 $("#closeSettingButton").addEventListener("click", () => $("#settingModal").close());
