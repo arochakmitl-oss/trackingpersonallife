@@ -1,9 +1,11 @@
 const LEGACY_STORAGE_KEY = "bloom-ux-life-tracker-v2";
 const GUEST_STORAGE_KEY = "bloom-ux-life-tracker-guest-v1";
+const SUPPORT_STORAGE_KEY = "life-tracker-unlimited-support";
 const userStorageKey = (userId) => `bloom-ux-life-tracker-user-${userId}`;
 const SUPABASE_URL = "https://rxbipastbsfmxyyksdxm.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_N1cDxWxXCS8nlXS7iZg8DQ_gJNvboZz";
-const COFFEE_STRIPE_URL = "https://buy.stripe.com/";
+const COFFEE_STRIPE_URL = "";
+const UNLIMITED_SUPPORT_DAYS = 30;
 const DEFAULT_SETTINGS = {
   debtTotal: 0,
   waterDailyTarget: 8,
@@ -564,6 +566,50 @@ function trialInfo() {
     daysLeft: Math.max(0, Math.ceil(remainingMs / 86400000)),
     active: remainingMs > 0
   };
+}
+
+function supportInfo() {
+  const storedSupport = readStoredSupport();
+  const untilValue = state.meta?.unlimitedSupportUntil || storedSupport?.unlimitedSupportUntil;
+  const until = untilValue ? new Date(untilValue) : null;
+  const active = until && !Number.isNaN(until.getTime()) && until.getTime() > Date.now();
+  return {
+    active,
+    end: until,
+    daysLeft: active ? Math.max(0, Math.ceil((until.getTime() - Date.now()) / 86400000)) : 0
+  };
+}
+
+function markSupportActive(days = UNLIMITED_SUPPORT_DAYS) {
+  const end = new Date();
+  end.setDate(end.getDate() + days);
+  state.meta = {
+    ...(state.meta || {}),
+    unlimitedSupportUntil: end.toISOString(),
+    unlimitedSupportStartedAt: state.meta?.unlimitedSupportStartedAt || new Date().toISOString()
+  };
+  localStorage.setItem(SUPPORT_STORAGE_KEY, JSON.stringify({
+    unlimitedSupportUntil: state.meta.unlimitedSupportUntil,
+    unlimitedSupportStartedAt: state.meta.unlimitedSupportStartedAt
+  }));
+  saveState();
+}
+
+function readStoredSupport() {
+  try {
+    return JSON.parse(localStorage.getItem(SUPPORT_STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function handleSupportReturn() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("support") !== "success") return;
+  markSupportActive();
+  params.delete("support");
+  const nextQuery = params.toString();
+  window.history.replaceState({}, "", `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${window.location.hash}`);
 }
 
 function hasAnyEntryData() {
@@ -1563,8 +1609,15 @@ function renderSkills() {
 function renderMembership() {
   const hadTrial = Boolean(state.meta?.trialStartedAt);
   const trial = trialInfo();
+  const support = supportInfo();
   if (!hadTrial) saveState();
   const status = trial.active ? `เหลือ ${trial.daysLeft} วัน` : "หมดช่วงใช้ฟรีแล้ว";
+  const supportStatus = support.active && support.end
+    ? `แผนไม่จำกัด เหลือ ${support.daysLeft} วัน`
+    : "ยังไม่ได้เปิดใช้";
+  const supportDetail = support.active && support.end
+    ? `หมดรอบ ${dateLabel(toISO(support.end), "medium")}`
+    : "อุดหนุน 39 บาท / เดือน";
   return `
     <div class="card membership-hero">
       <div class="section-head">
@@ -1573,15 +1626,11 @@ function renderMembership() {
           <h2>ใช้งานแบบไม่จำกัดและอุดหนุนค่ากาแฟผู้พัฒนา</h2>
           <p class="muted">ทดลองใช้ฟรี 7 วัน แล้วถ้าช่วยให้ชีวิตจัดระเบียบขึ้น ค่อยอุดหนุนค่ากาแฟเดือนละ 39 บาท</p>
         </div>
-        <div class="button-row">
-          <button class="ghost-button" type="button" data-open-auth>สมัคร / เข้าสู่ระบบ</button>
-          <a class="primary-button" href="${COFFEE_STRIPE_URL}" target="_blank" rel="noreferrer">ใช้แบบไม่จำกัด</a>
-        </div>
       </div>
       <div class="grid three">
         ${statCard("ทดลองใช้ฟรี", status, `ถึง ${dateLabel(toISO(trial.end), "medium")}`)}
         ${statCard("ค่ากาแฟ", `<span class="price-drop"><del>99</del> 39 บาท</span>`, "ต่อเดือน หลัง trial")}
-        ${statCard("สถานะบัญชี", currentUser ? currentUser.email : "ยังไม่ได้เข้าสู่ระบบ", currentUser ? "จัดเก็บข้อมูลในบัญชี" : "ข้อมูลอยู่ในเครื่องนี้")}
+        ${statCard("Unlimited Support", supportStatus, supportDetail)}
       </div>
     </div>
     <div class="plan-compare">
@@ -1590,19 +1639,24 @@ function renderMembership() {
         "เปิด/ปิดฟีเจอร์ที่ใช้จริง",
         "ดู dashboard พื้นฐานและปฏิทินย้อนหลัง",
         "ทดลองทุกฟีเจอร์ครบ 7 วัน"
-      ])}
+      ], false, support)}
       ${renderPlanCard("ใช้แบบไม่จำกัด", `<span class="price-drop"><del>99</del> 39 บาท / เดือน</span>`, [
         "ใช้ทุกฟีเจอร์ต่อหลังครบ trial",
         "จัดเก็บข้อมูลกับบัญชีของคุณ",
         "ปรับหมวดรายจ่ายและวิธีจ่ายเงินเอง",
         "จัดลำดับ section หน้าแรกให้เข้ากับ workflow",
         "อุดหนุนผู้พัฒนาเพื่อให้แอปเติบโตต่อ"
-      ], true)}
+      ], true, support)}
     </div>
   `;
 }
 
-function renderPlanCard(title, price, items, featured = false) {
+function renderPlanCard(title, price, items, featured = false, support = supportInfo()) {
+  const cta = featured
+    ? support.active
+      ? `<button class="danger-button" type="button" data-cancel-support>${hugeIcon("cancel-01")}<span>ยกเลิกแผน</span></button>`
+      : `<button class="primary-button" type="button" data-start-support>${hugeIcon("coffee-02")}<span>อุดหนุนค่ากาแฟ</span></button>`
+    : `<button class="ghost-button plan-current" type="button" disabled>${hugeIcon(support.active ? "checkmark-circle-02" : "tick-02")}<span>${support.active ? "เลือกแผนนี้" : "คุณกำลังใช้แผนนี้"}</span></button>`;
   return `
     <article class="plan-card ${featured ? "featured" : ""}">
       <div>
@@ -1613,6 +1667,7 @@ function renderPlanCard(title, price, items, featured = false) {
       <ul>
         ${items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
       </ul>
+      <div class="plan-action">${cta}</div>
     </article>
   `;
 }
@@ -2001,6 +2056,12 @@ function bindPageEvents() {
   document.querySelectorAll("[data-open-auth]").forEach((button) => {
     button.addEventListener("click", openAuthModal);
   });
+  document.querySelectorAll("[data-start-support]").forEach((button) => {
+    button.addEventListener("click", startSupportCheckout);
+  });
+  document.querySelectorAll("[data-cancel-support]").forEach((button) => {
+    button.addEventListener("click", cancelSupportPlan);
+  });
   document.querySelectorAll("[data-jump-page]").forEach((button) => {
     button.addEventListener("click", () => {
       activePage = button.dataset.jumpPage;
@@ -2019,6 +2080,36 @@ function bindPageEvents() {
   });
   const featureForm = $("#featureSettingsForm");
   if (featureForm) featureForm.addEventListener("submit", handleFeatureSettingsSubmit);
+}
+
+async function startSupportCheckout() {
+  try {
+    const response = await fetch("/api/create-checkout-session", { method: "POST" });
+    const payload = await response.json().catch(() => ({}));
+    if (response.ok && payload.url) {
+      window.location.href = payload.url;
+      return;
+    }
+    if (COFFEE_STRIPE_URL) {
+      window.location.href = COFFEE_STRIPE_URL;
+      return;
+    }
+    alert(payload.error || "ยังไม่ได้ตั้งค่า Stripe บน Vercel");
+  } catch (error) {
+    if (COFFEE_STRIPE_URL) {
+      window.location.href = COFFEE_STRIPE_URL;
+      return;
+    }
+    alert("เชื่อมต่อ Stripe ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+  }
+}
+
+function cancelSupportPlan() {
+  state.meta = { ...(state.meta || {}) };
+  delete state.meta.unlimitedSupportUntil;
+  localStorage.removeItem(SUPPORT_STORAGE_KEY);
+  saveState();
+  render();
 }
 
 function handleFeatureSettingsSubmit(event) {
@@ -2051,9 +2142,11 @@ function openEntryModal(category = activePage) {
   const entry = getEntry();
   const config = modalConfigs[modalCategory];
   const fields = featureFields(config.fields);
+  form.reset();
   const dateInput = $("#modalDateInput");
   if (dateInput) {
     dateInput.value = selectedDate;
+    dateInput.defaultValue = selectedDate;
     dateInput.setAttribute("aria-label", `วันที่บันทึก ${dateLabel(selectedDate)}`);
     dateInput.onchange = () => {
       selectedDate = dateInput.value || toISO(new Date());
@@ -2072,7 +2165,6 @@ function openEntryModal(category = activePage) {
     });
   });
   bindExpenseRows();
-  form.reset();
   Object.entries(entry).forEach(([key, value]) => {
     if (["skills", "expenseItems", "languageMinutes"].includes(key)) return;
     const input = form.elements[key];
@@ -3050,5 +3142,6 @@ $("#clearDayButton").addEventListener("click", () => {
 });
 $("#clearTargetsButton")?.addEventListener("click", clearTargetValues);
 
+handleSupportReturn();
 render();
 initSupabase();

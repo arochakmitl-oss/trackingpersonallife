@@ -214,6 +214,7 @@ h3 {
 
 .icon-button,
 .primary-button,
+.danger-button,
 .soft-button,
 .ghost-button,
 .segmented button,
@@ -225,6 +226,7 @@ h3 {
 }
 
 .primary-button,
+.danger-button,
 .soft-button,
 .ghost-button,
 .tiny-button {
@@ -276,6 +278,14 @@ h3 {
   box-shadow: 0 14px 28px rgba(159, 132, 232, 0.24);
 }
 
+.danger-button {
+  padding: 0 20px;
+  background: linear-gradient(135deg, #e04f68, #b92f46);
+  color: white;
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(185, 47, 70, 0.2);
+}
+
 .soft-button,
 .ghost-button,
 .tiny-button {
@@ -289,6 +299,17 @@ h3 {
   background: rgba(255, 255, 255, 0.54);
   box-shadow: none;
   border: 1px solid var(--line);
+}
+
+.primary-button:disabled,
+.danger-button:disabled,
+.soft-button:disabled,
+.ghost-button:disabled,
+.tiny-button:disabled {
+  cursor: default;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: none;
 }
 
 .tiny-button {
@@ -2140,6 +2161,17 @@ input[type="checkbox"]:focus-visible {
   height: 10px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f5a7c6, #c6b2f2);
+}
+
+.plan-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.plan-current {
+  color: #7a6572;
+  background: rgba(255, 255, 255, 0.48);
 }
 
 .expense-remove,
