@@ -42,7 +42,8 @@ const pages = [
   { id: "dashboard", label: "หน้าแรก", icon: "home-01", title: "แดชบอร์ด", cover: "assets/dashboard.svg", kicker: "ภาพรวมวันนี้", quote: "ทุกบันทึกเล็กๆ คือหลักฐานว่าเรากำลังดูแลอนาคตของตัวเอง" },
   { id: "checkin", label: "เช็คอินวันนี้", icon: "checkmark-circle-02", title: "เช็คอินวันนี้", cover: "assets/checkin.svg", kicker: "บันทึกตัวเองอย่างอ่อนโยน", quote: "วันนี้ไม่ต้องสมบูรณ์แบบ แค่ซื่อสัตย์กับตัวเองก็พอ" },
   { id: "money", label: "สุขภาพทางการเงิน", icon: "wallet-01", title: "สุขภาพทางการเงิน", cover: "assets/money.svg", kicker: "สุขภาพการเงินรายวัน", quote: "เงินทุกบาทที่เห็นชัด จะเริ่มมีทิศทางและมีพลังมากขึ้น" },
-  { id: "side", label: "รายได้เสริม", icon: "arrow-up-right-01", title: "รายได้เสริม", cover: "assets/side.svg", kicker: "ทดลอง สร้าง วัดผล", quote: "รายได้เสริมเริ่มจากรอบทดลองเล็กๆ ที่ทำซ้ำได้" },
+  { id: "side", label: "รายได้", icon: "arrow-up-right-01", title: "รายได้", cover: "assets/side.svg", kicker: "รายได้หลักและช่องทางเพิ่ม", quote: "เห็นที่มาของรายได้ชัดขึ้น จะวางแผนเงินได้มั่นคงขึ้น" },
+  { id: "emotion", label: "อารมณ์และความเครียด", icon: "sentiment-satisfied", title: "อารมณ์และความเครียด", cover: "assets/checkin.svg", kicker: "เช็คพลังใจรายวัน", quote: "การเห็นอารมณ์ตัวเองชัดขึ้น คือจุดเริ่มต้นของการดูแลตัวเองที่อ่อนโยน" },
   { id: "health", label: "สุขภาพ & ความสวย", icon: "heart-check", title: "สุขภาพ & ความสวย", cover: "assets/health.svg", kicker: "ดูแลร่างกายเหมือนดูแลระบบสำคัญ", quote: "ความมั่นใจโตจากการดูแลตัวเองแบบไม่ทอดทิ้งกัน" },
   { id: "skills", label: "ทักษะ & อาชีพ", icon: "pencil-edit-02", title: "ทักษะ & อาชีพ", cover: "assets/skills.svg", kicker: "แผนเติบโตในแบบของคุณ", quote: "งานที่ดีขึ้นมาจากทักษะที่ค่อยๆ คมขึ้นทีละวัน" },
   { id: "membership", label: "ใช้แบบไม่จำกัด", icon: "coffee-02", title: "ใช้แบบไม่จำกัด", cover: "assets/goals.svg", kicker: "อุดหนุนค่ากาแฟผู้พัฒนา", quote: "เริ่มจากทดลองใช้ให้เข้ากับชีวิตจริง แล้วค่อยตัดสินใจอย่างสบายใจ" },
@@ -52,8 +53,8 @@ const pages = [
 const DEFAULT_SKILLS = ["การสื่อสาร", "การวางแผน", "การจัดการเวลา", "AI Tools", "การเงินส่วนตัว", "สุขภาพ"];
 const DEFAULT_LANGUAGES = ["อังกฤษ"];
 const LEGACY_SIDE_CHANNELS = ["AI Kids Song YouTube", "ร้านเสื้อผ้ามือสอง", "TikTok Cat Affiliate"];
-const DEFAULT_SIDE_CHANNELS = ["ขายของออนไลน์", "รับงานเสริม", "คอนเทนต์ออนไลน์"];
-const DEFAULT_FEATURES = ["money", "side", "health", "skills"];
+const DEFAULT_SIDE_CHANNELS = ["เงินเดือน", "ขายของออนไลน์", "รับงานเสริม", "คอนเทนต์ออนไลน์"];
+const DEFAULT_FEATURES = ["money", "emotion", "health", "skills"];
 const CORE_PAGES = ["dashboard", "checkin", "membership", "settings"];
 const DEFAULT_EXPENSE_CATEGORIES = ["กาแฟ", "ข้าวเที่ยง", "น้ำหวาน", "ข้าวเย็น", "ค่ารถ", "ค่าใช้จ่ายภายในบ้าน", "ขนม7-11"];
 const DEFAULT_PAYMENT_METHODS = ["เงินสด", "บัตรเครดิต", "บัตรเดบิต", "โอนเงิน"];
@@ -62,7 +63,6 @@ const HEALTH_GOAL_MASTER = [
   { id: "water", label: "กินน้ำ", icon: "droplet", field: "water", targetKey: "waterDailyTarget", unit: "แก้ว", period: "รายวัน" },
   { id: "exercise", label: "ออกกำลังกาย", icon: "body-part-muscle", field: "exercise", targetKey: "exerciseWeeklyTarget", unit: "นาที", period: "รายสัปดาห์" },
   { id: "sleep", label: "นอน", icon: "moon-02", field: "sleep", targetKey: "sleepTarget", unit: "ชั่วโมง", period: "รายวัน" },
-  { id: "confidence", label: "ความมั่นใจ", icon: "heart-check", field: "confidence", targetKey: "confidenceTarget", unit: "คะแนน", period: "รายวัน" },
   { id: "calories", label: "นับแคลลอรี่", icon: "fire", field: "calories", targetKey: "calorieDailyTarget", unit: "kcal", period: "รายวัน" }
 ];
 const MONEY_GOAL_MASTER = [
@@ -74,9 +74,9 @@ const FEATURE_SETTING_GROUPS = {
   money: [
     { group: "moneyGoals", label: "ตั้งค่าข้อมูลและเป้าหมาย", icon: "target-02" },
     { group: "financeOptions", label: "ตั้งค่าหมวดรายจ่ายและวิธีชำระ", icon: "wallet-01" },
-    { group: "debt", label: "ตั้งค่ายอดหนี้", icon: "credit-card" }
+    { group: "debt", label: "ตั้งค่ายอดหนี้", icon: "credit-card" },
+    { group: "side", label: "ช่องทาง + เป้ารายได้", icon: "arrow-up-right-01" }
   ],
-  side: [{ group: "side", label: "ช่องทาง + เป้ารายได้เสริม", icon: "arrow-up-right-01" }],
   health: [{ group: "health", label: "ตั้งค่าข้อมูลและเป้าสุขภาพ", icon: "heart-check" }],
   skills: [
     { group: "skills", label: "ทักษะ + เป้าการฝึก", icon: "pencil-edit-02" },
@@ -102,7 +102,7 @@ const settingGroups = {
       { key: "debtMonthlyTarget", label: "จ่ายหนี้ต่อเดือน", suffix: "บาท" },
       { key: "savingMonthlyTarget", label: "ออมเงินต่อเดือน", suffix: "บาท" },
       { key: "investmentMonthlyTarget", label: "ลงทุนต่อเดือน", suffix: "บาท" },
-      { key: "sideIncomeMonthlyTarget", label: "รายได้เสริมต่อเดือน", suffix: "บาท" },
+      { key: "sideIncomeMonthlyTarget", label: "รายได้ต่อเดือน", suffix: "บาท" },
       { key: "careerTargetDays", label: "วันฝึกทักษะอาชีพ", suffix: "วัน" }
     ]
   },
@@ -126,9 +126,9 @@ const settingGroups = {
       { key: "debtMonthlyTarget", label: "เงิน: เป้าปิดหนี้ต่อเดือน", suffix: "บาท" },
       { key: "savingMonthlyTarget", label: "เงิน: เป้าออมต่อเดือน", suffix: "บาท" },
       { key: "investmentMonthlyTarget", label: "เงิน: เป้าลงทุนต่อเดือน", suffix: "บาท" },
-      { key: "sideIncomeWeeklyTarget", label: "รายได้เสริม: เป้าสัปดาห์", suffix: "บาท" },
-      { key: "sideIncomeMonthlyTarget", label: "รายได้เสริม: เป้าเดือน", suffix: "บาท" },
-      { key: "sideIncomeYearlyTarget", label: "รายได้เสริม: เป้าปี", suffix: "บาท" },
+      { key: "sideIncomeWeeklyTarget", label: "รายได้: เป้าสัปดาห์", suffix: "บาท" },
+      { key: "sideIncomeMonthlyTarget", label: "รายได้: เป้าเดือน", suffix: "บาท" },
+      { key: "sideIncomeYearlyTarget", label: "รายได้: เป้าปี", suffix: "บาท" },
       { key: "skillTargetDays", label: "อาชีพ: เป้าวันต่อ skill", suffix: "วัน" }
     ]
   },
@@ -145,8 +145,8 @@ const settingGroups = {
     ]
   },
   side: {
-    title: "แก้ไขเป้ารายได้เสริม",
-    description: "เพิ่ม/ลดช่องทางรายได้เสริม และตั้งเป้ารายได้ต่อช่วงเวลา",
+    title: "แก้ไขเป้ารายได้",
+    description: "เพิ่ม/ลดช่องทางรายได้หลักหรือรายได้เพิ่ม และตั้งเป้ารายได้ต่อช่วงเวลา",
     fields: [
       { key: "sideIncomeWeeklyTarget", label: "เป้ารายสัปดาห์", suffix: "บาท" },
       { key: "sideIncomeMonthlyTarget", label: "เป้ารายเดือน", suffix: "บาท" },
@@ -192,7 +192,7 @@ let authMode = "login";
 const $ = (selector) => document.querySelector(selector);
 const money = (value) => Number(value || 0).toLocaleString("th-TH");
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-const numericFields = ["water", "exercise", "sleep", "calories", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "saving", "investment", "sideIncome", "confidence", "thaiMinutes", "arabicMinutes"];
+const numericFields = ["water", "exercise", "sleep", "calories", "income", "essential", "nonEssential", "sweetDrink", "debtPaid", "saving", "investment", "sideIncome", "moodScore", "confidence", "energy", "thaiMinutes", "arabicMinutes"];
 const hugeIcon = (name) => `<i class="hgi hgi-stroke hgi-${name}" aria-hidden="true"></i>`;
 const categoryIcons = {
   health: `<svg viewBox="0 0 24 24"><path class="fill" d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11Z"/><path d="M9.3 15.4c1.1 1.5 3.2 2 4.9.9"/></svg>`,
@@ -247,32 +247,37 @@ const modalConfigs = {
   dashboard: {
     title: "บันทึกภาพรวมวันนี้",
     description: "รวมข้อมูลสำคัญของวันเดียวในฟอร์มเดียว ครบทุกฟีเจอร์จากหน้าแรก และทุกช่องกรอกข้อมูล",
-    fields: ["mood", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
+    fields: ["moodScore", "mood", "confidence", "energy", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "languageMinutes", "languageFocus", "skills", "win"]
   },
   goals: {
     title: "อัปเดตเป้าหมาย",
     description: "กรอกเฉพาะตัวเลขที่ส่งผลต่อ progress bar รายวัน/สัปดาห์/เดือน/ระยะยาว",
-    fields: ["water", "exercise", "sleep", "calories", "confidence", "debtPaid", "saving", "investment", "sideIncome", "skills", "win"]
+    fields: ["water", "exercise", "sleep", "calories", "debtPaid", "saving", "investment", "sideIncome", "skills", "win"]
   },
   checkin: {
     title: "เช็คอินชีวิตวันนี้",
     description: "บันทึกความรู้สึก ค่าใช้จ่าย สุขภาพ ชัยชนะเล็กๆ และ streak ของวันนี้",
-    fields: ["mood", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "confidence", "languageMinutes", "languageFocus", "skills", "win"]
+    fields: ["moodScore", "mood", "confidence", "energy", "water", "exercise", "sleep", "calories", "income", "expenseRows", "debtPaid", "saving", "investment", "sideIncome", "sideChannel", "languageMinutes", "languageFocus", "skills", "win"]
   },
   money: {
     title: "บันทึกสุขภาพทางการเงิน",
     description: "แยกรายรับ รายจ่ายเป็นแถวตามหมวด และเงินที่จ่ายหนี้",
-    fields: ["income", "expenseRows", "debtPaid", "saving", "investment", "win"]
+    fields: ["income", "sideIncome", "sideChannel", "expenseRows", "debtPaid", "saving", "investment", "win"]
   },
   side: {
-    title: "บันทึกรายได้เสริม",
-    description: "เก็บยอดและช่องทางของการทดลองหาเงินเสริมในวันนี้",
+    title: "บันทึกรายได้",
+    description: "เก็บยอดและช่องทางของรายได้หลักหรือรายได้เพิ่มในวันนี้",
     fields: ["sideIncome", "sideChannel", "win"]
+  },
+  emotion: {
+    title: "บันทึกอารมณ์และความเครียด",
+    description: "ให้คะแนน mood ความมั่นใจ พลังงาน และเลือกหมวดอารมณ์วันนี้แบบกดง่าย",
+    fields: ["moodScore", "confidence", "energy", "mood", "win"]
   },
   health: {
     title: "บันทึกสุขภาพ & ความสวย",
     description: "โฟกัสเป้าหมายสุขภาพที่เลือกไว้ เช่น น้ำ การนอน ออกกำลังกาย และความมั่นใจ",
-    fields: ["water", "sleep", "exercise", "confidence", "calories", "win"]
+    fields: ["water", "sleep", "exercise", "calories", "win"]
   },
   skills: {
     title: "บันทึกทักษะ & อาชีพ",
@@ -352,6 +357,11 @@ function settings() {
   }
   if (!Array.isArray(state.settings.enabledFeatures)) {
     state.settings.enabledFeatures = useDefaultLists ? [...DEFAULT_FEATURES] : [];
+  } else {
+    const migrated = state.settings.enabledFeatures.includes("side")
+      ? [...state.settings.enabledFeatures.filter((id) => id !== "side"), "money", "emotion"]
+      : state.settings.enabledFeatures;
+    state.settings.enabledFeatures = [...new Set(migrated)].filter((id) => DEFAULT_FEATURES.includes(id));
   }
   if (!Array.isArray(state.settings.expenseCategoryNames)) {
     state.settings.expenseCategoryNames = useDefaultLists ? [...DEFAULT_EXPENSE_CATEGORIES] : [];
@@ -369,7 +379,7 @@ function settings() {
     state.settings.moneyGoalIds = useDefaultLists ? MONEY_GOAL_MASTER.map((item) => item.id) : [];
   }
   if (!Array.isArray(state.settings.dashboardSectionOrder)) {
-    state.settings.dashboardSectionOrder = ["balance", "checkin", "financialGoals", "day", "trend", "language", "moneyMix"];
+    state.settings.dashboardSectionOrder = ["balance", "checkin", "emotion", "financialGoals", "day", "trend", "language", "moneyMix"];
   }
   return state.settings;
 }
@@ -415,6 +425,9 @@ function featureSettingSummary(id) {
       settingFieldLabel({ key: "sideIncomeMonthlyTarget", label: "เป้าเดือน", suffix: "บาท" })
     ];
   }
+  if (id === "emotion") {
+    return ["Mood 0-10", "ความมั่นใจ 0-10", "Energy 0-10"];
+  }
   if (id === "skills") {
     return [
       `${skillsList().length} ทักษะ`,
@@ -431,6 +444,8 @@ function enabledFeaturesList() {
 }
 
 function isFeatureEnabled(pageId) {
+  if (pageId === "settings" && !currentUser) return false;
+  if (pageId === "side") return false;
   return CORE_PAGES.includes(pageId) || enabledFeaturesList().includes(pageId);
 }
 
@@ -440,20 +455,22 @@ function featurePage(id) {
 
 function featureFields(fields = []) {
   const fieldMap = {
-    mood: "checkin",
+    mood: "emotion",
+    moodScore: "emotion",
+    energy: "emotion",
     win: "checkin",
     water: "health",
     exercise: "health",
     sleep: "health",
     calories: "health",
-    confidence: "health",
+    confidence: "emotion",
     income: "money",
     expenseRows: "money",
     debtPaid: "money",
     saving: "money",
     investment: "money",
-    sideIncome: "side",
-    sideChannel: "side",
+    sideIncome: "money",
+    sideChannel: "money",
     skills: "skills",
     languageMinutes: "skills",
     languageFocus: "skills"
@@ -475,7 +492,7 @@ function activeEntryCategory(category = activePage) {
 }
 
 function dashboardSectionOrder() {
-  const defaults = ["balance", "checkin", "financialGoals", "day", "trend", "language", "moneyMix"];
+  const defaults = ["balance", "checkin", "emotion", "financialGoals", "day", "trend", "language", "moneyMix"];
   const legacyMap = { debt: "financialGoals" };
   const saved = Array.isArray(settings().dashboardSectionOrder) ? settings().dashboardSectionOrder : defaults;
   const normalized = saved.map((item) => legacyMap[item] || item);
@@ -700,9 +717,9 @@ function updateAuthUI() {
     authButton.title = "กำลัง sync...";
     return;
   }
-  authButton.textContent = currentUser ? displayName.trim().slice(0, 1).toUpperCase() : "เข้าสู่ระบบ";
-  authButton.title = currentUser ? displayName : "เข้าสู่ระบบ";
-  authButton.setAttribute("aria-label", currentUser ? `โปรไฟล์ ${displayName}` : "เข้าสู่ระบบ");
+  authButton.textContent = currentUser ? displayName.trim().slice(0, 1).toUpperCase() : "เข้าสู่ระบบ/ลงทะเบียน";
+  authButton.title = currentUser ? displayName : "เข้าสู่ระบบ/ลงทะเบียน";
+  authButton.setAttribute("aria-label", currentUser ? `โปรไฟล์ ${displayName}` : "เข้าสู่ระบบ/ลงทะเบียน");
 }
 
 async function initSupabase() {
@@ -1042,14 +1059,27 @@ function render() {
     checkin: renderCheckin,
     money: renderMoney,
     side: renderSideIncome,
+    emotion: renderEmotion,
     health: renderHealth,
     skills: renderSkills,
     membership: renderMembership,
     settings: renderSettingsPage
   }[activePage]();
 
-  $("#pageContent").innerHTML = content;
+  $("#pageContent").innerHTML = withGuestAccessGate(content);
   bindPageEvents();
+}
+
+function withGuestAccessGate(content) {
+  if (currentUser || activePage === "membership") return content;
+  return `
+    <div class="guest-gated-content">
+      ${content}
+      <div class="guest-gate-fade">
+        <button class="primary-button" type="button" data-open-auth>${hugeIcon("login-03")}<span>เข้าสู่ระบบเพื่อใช้งาน</span></button>
+      </div>
+    </div>
+  `;
 }
 
 function renderDashboard() {
@@ -1081,13 +1111,14 @@ function renderDashboard() {
   const healthScore = healthGoalScores.length ? average(healthGoalScores) : 0;
   const moneyGoalScores = activeMoneyGoals().map((goal) => progressValue(sum(entries, goal.field), rangeMoneyTarget(goal)));
   const moneyScore = hasRangeData ? average(moneyGoalScores.length ? moneyGoalScores : [progressValue(debtPaid, cfg.debtMonthlyTarget)]) : 0;
+  const incomeTotal = sum(entries, "income") + sum(entries, "sideIncome");
   const sideIncome = sum(entries, "sideIncome");
-  const sideScore = progressValue(sideIncome, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
+  const sideScore = progressValue(incomeTotal, filter === "week" ? cfg.sideIncomeWeeklyTarget : filter === "year" ? cfg.sideIncomeYearlyTarget : cfg.sideIncomeMonthlyTarget);
   const careerSkills = skillsList();
   const careerScore = progressValue(careerSkills.reduce((total, skill) => total + countSkillDays(skill), 0), careerSkills.length * cfg.skillTargetDays);
   const radarItems = [
     isFeatureEnabled("money") ? { key: "finance", icon: "money", label: "การเงิน", score: moneyScore, note: activeMoneyGoals().map((item) => item.label).join(", "), color: "#F7D47A" } : null,
-    isFeatureEnabled("side") ? { key: "side", icon: "side", label: "รายได้เสริม", score: sideScore, note: `${money(sideIncome)} บาท`, color: "#F4A7C6" } : null,
+    isFeatureEnabled("money") ? { key: "side", icon: "side", label: "รายได้", score: sideScore, note: `${money(incomeTotal)} บาท`, color: "#F4A7C6" } : null,
     isFeatureEnabled("health") ? { key: "health", icon: "health", label: "สุขภาพ", score: healthScore, note: activeHealthGoals().map((item) => item.label).join(", "), color: "#9FE6C8" } : null,
     isFeatureEnabled("skills") ? { key: "career", icon: "career", label: "อาชีพ", score: careerScore, note: "skill days", color: "#B8B7FF" } : null
   ].filter(Boolean);
@@ -1150,6 +1181,22 @@ function renderDashboard() {
       </div>
     `),
     checkin: dashboardSection("checkin", checkinSummary),
+    emotion: isFeatureEnabled("emotion") ? dashboardSection("emotion", `
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Mood & stress</p>
+            <h2>อารมณ์และพลังใจวันนี้</h2>
+          </div>
+          <button class="tiny-button" type="button" data-open-entry data-modal="emotion">บันทึก</button>
+        </div>
+        <div class="emotion-meter-grid">
+          ${emotionMeter("Mood", Number(getEntry(selectedDate).moodScore || 0), "#f5a7c6")}
+          ${emotionMeter("ความมั่นใจ", Number(getEntry(selectedDate).confidence || 0), "#b8b7ff")}
+          ${emotionMeter("Energy", Number(getEntry(selectedDate).energy || 0), "#a9dcc5")}
+        </div>
+      </div>
+    `) : "",
     trend: trendCharts ? dashboardSection("trend", `
       <div class="card">
         <div class="section-head">
@@ -1209,7 +1256,7 @@ function renderGoals() {
     { name: `ดื่มน้ำ ${money(cfg.waterDailyTarget)} แก้ว`, type: "รายวัน", target: cfg.waterDailyTarget, metric: "water" },
     { name: `ออกกำลังกาย ${money(cfg.exerciseWeeklyTarget)} นาที`, type: "รายสัปดาห์", target: cfg.exerciseWeeklyTarget, metric: "exercise" },
     { name: `จ่ายหนี้เดือนนี้ ${money(cfg.debtMonthlyTarget)} บาท`, type: "รายเดือน", target: cfg.debtMonthlyTarget, metric: "debtPaid" },
-    { name: `สร้างรายได้เสริม ${money(cfg.sideIncomeMonthlyTarget)} บาท`, type: "รายเดือน", target: cfg.sideIncomeMonthlyTarget, metric: "sideIncome" },
+    { name: `สร้างรายได้ ${money(cfg.sideIncomeMonthlyTarget)} บาท`, type: "รายเดือน", target: cfg.sideIncomeMonthlyTarget, metric: "sideIncome" },
     { name: "ฝึกทักษะอาชีพให้ต่อเนื่อง", type: "ระยะยาว", target: cfg.careerTargetDays, metric: "careerDays" }
   ];
   const goals = goalTemplates.map((goal) => {
@@ -1300,10 +1347,10 @@ function renderWeeklyFocus(goals) {
 
   insights.push({
     icon: "side",
-    title: "รายได้เสริม",
+    title: "รายได้",
     text: bestChannel?.value > 0
-      ? `${bestChannel.channel} ทำเงินนำอยู่ ${money(bestChannel.value)} บาท เดือนนี้ รวมรายได้เสริม ${money(sideMonth)} บาท`
-      : "ยังไม่มีรายได้เสริมเดือนนี้ เลือก 1 ช่องทางมาทดลองเล็ก ๆ ก่อน"
+      ? `${bestChannel.channel} ทำเงินนำอยู่ ${money(bestChannel.value)} บาท เดือนนี้ รวมรายได้ ${money(sideMonth)} บาท`
+      : "ยังไม่มีรายได้เดือนนี้ เลือก 1 ช่องทางมาทดลองเล็ก ๆ ก่อน"
   });
 
   insights.push({
@@ -1407,7 +1454,7 @@ function renderMoney() {
       </div>
     </div>
     <div class="grid four">
-      ${statCard(iconLabel("income", "เงินเข้า"), `${money(dayInflow)} บาท`, `หลัก ${money(dayIncome)} / เสริม ${money(daySideIncome)}`)}
+      ${statCard(iconLabel("income", "เงินเข้า"), `${money(dayInflow)} บาท`, `รายรับ ${money(dayIncome)} / รายได้ ${money(daySideIncome)}`)}
       ${statCard(iconLabel("expense", "รายจ่าย"), `${money(dayExpense)} บาท`, getExpenseItems(dayEntry)[0] ? `ล่าสุด: ${escapeHTML(getExpenseItems(dayEntry)[0].category)}` : "ยังไม่มีรายจ่ายวันนี้")}
       ${statCard(iconLabel("debt", "หนี้/บัตร"), `${money(dayDebtPaid)} บาท`, dayDebtPaid ? "รวมรายการที่จ่ายด้วยบัตร" : "ยังไม่มีหนี้วันนี้")}
       ${statCard(iconLabel(dayNet >= 0 ? "win" : "debt", "คงเหลือวันนี้"), `${money(dayNet)} บาท`, dayNet >= 0 ? "เงินเข้าเกินเงินออก" : "เงินออกมากกว่าเงินเข้า")}
@@ -1415,9 +1462,9 @@ function renderMoney() {
     <div class="money-split">
       <div class="card financial-goals-card">
         <div class="section-head">
-          <div>
-            <p class="eyebrow">Financial goals</p>
-            <h2>เป้าหมายเงินและหนี้</h2>
+        <div>
+          <p class="eyebrow">Financial goals</p>
+            <h2>เป้าหมายเงิน หนี้ และรายได้</h2>
           </div>
           <div class="button-row">
           <button class="primary-button" type="button" data-open-entry>บันทึกการเงิน</button>
@@ -1459,6 +1506,30 @@ function renderMoney() {
     <div class="card">
       <div class="section-head">
         <div>
+          <p class="eyebrow">Income channels</p>
+          <h2>รายได้ตามช่องทาง</h2>
+        </div>
+        <span class="pill">${sideChannelsList().length} ช่องทาง</span>
+      </div>
+      <div class="grid three">
+        ${sideChannelsList().map((channel) => {
+          const channelEntries = entries.filter(([, entry]) => entry.sideChannel === channel);
+          const incomeValue = sum(channelEntries, "sideIncome");
+          return `
+            <div class="channel-card">
+              <div class="channel-row">
+                <h3>${escapeHTML(channel)}</h3>
+                <span class="pill">${money(incomeValue)} บาท</span>
+              </div>
+              ${renderProgress({ name: "เป้าหมายเดือนนี้", type: "ช่องทาง", progress: incomeValue, target: cfg.sideChannelMonthlyTarget })}
+            </div>
+          `;
+        }).join("") || `<p class="muted">ยังไม่มีช่องทางรายได้</p>`}
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <div>
           <p class="eyebrow">Cashflow story</p>
           <h2>เงินไหลเข้าออก</h2>
         </div>
@@ -1476,7 +1547,7 @@ function renderMoney() {
 
 function renderSideIncome() {
   if (isGuestEmptyState()) {
-    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้เสริม", "ช่องทางรายได้เสริมจะว่างจนกว่าจะเพิ่มช่องทางเอง");
+    return renderGuestEmptyState("ยังไม่มีข้อมูลรายได้", "ช่องทางรายได้จะว่างจนกว่าจะเพิ่มช่องทางเอง");
   }
   const entries = entriesInRange("month");
   const cfg = settings();
@@ -1495,7 +1566,7 @@ function renderSideIncome() {
             ${renderProgress({ name: "เป้าหมายเดือนนี้", type: "ช่องทาง", progress: income, target: cfg.sideChannelMonthlyTarget })}
           </div>
         `;
-      }).join("") : renderGuestEmptyState("ยังไม่มีช่องทางรายได้เสริม", "เพิ่มช่องทางได้จากหน้า Settings เช่น ขายของออนไลน์ รับงานเสริม หรือคอนเทนต์ออนไลน์")}
+      }).join("") : renderGuestEmptyState("ยังไม่มีช่องทางรายได้", "เพิ่มช่องทางได้จากหน้า Settings เช่น ขายของออนไลน์ รับงานเสริม หรือคอนเทนต์ออนไลน์")}
     </div>
     <div class="card">
       <div class="section-head">
@@ -1504,14 +1575,71 @@ function renderSideIncome() {
           <h2>บันทึกการทดลอง</h2>
         </div>
         <div class="button-row">
-          <button class="primary-button" type="button" data-open-entry>เพิ่มรายได้เสริม</button>
+          <button class="primary-button" type="button" data-open-entry>เพิ่มรายได้</button>
         </div>
       </div>
       <div class="timeline">
         ${entries.filter(([, entry]) => Number(entry.sideIncome || 0) > 0).reverse().map(([iso, entry]) => `
           <div class="timeline-item"><strong>${dateLabel(iso, "medium")}</strong> ${entry.sideChannel}: ${money(entry.sideIncome)} บาท</div>
-        `).join("") || `<p class="muted">ยังไม่มีรายได้เสริมเดือนนี้</p>`}
+        `).join("") || `<p class="muted">ยังไม่มีรายได้เดือนนี้</p>`}
       </div>
+    </div>
+  `;
+}
+
+function renderEmotion() {
+  const entries = entriesInRange("month");
+  const entry = getEntry(selectedDate);
+  const moodScore = Number(entry.moodScore || 0);
+  const confidence = Number(entry.confidence || 0);
+  const energy = Number(entry.energy || 0);
+  const avgMood = entries.length ? Math.round(average(entries.map(([, item]) => Number(item.moodScore || 0))) * 10) / 10 : 0;
+  const avgConfidence = entries.length ? Math.round(average(entries.map(([, item]) => Number(item.confidence || 0))) * 10) / 10 : 0;
+  const avgEnergy = entries.length ? Math.round(average(entries.map(([, item]) => Number(item.energy || 0))) * 10) / 10 : 0;
+  const categoryCounts = entries.reduce((acc, [, item]) => {
+    const mood = item.mood || "ไม่ระบุ";
+    acc[mood] = (acc[mood] || 0) + 1;
+    return acc;
+  }, {});
+  const dominantMood = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+  return `
+    <div class="emotion-hero card">
+      <div>
+        <p class="eyebrow">Mood & stress</p>
+        <h2>ภาพรวมอารมณ์และพลังใจ</h2>
+        <p class="muted">${dateLabel(selectedDate)} mood ${money(moodScore)}/10 · ${entry.mood || "ยังไม่ได้เลือกหมวดอารมณ์"}</p>
+      </div>
+      <div class="emotion-face" aria-label="คะแนน mood">${moodScore >= 7 ? "☺" : moodScore >= 4 ? "•_•" : "☹"}</div>
+    </div>
+    <div class="grid four">
+      ${statCard(iconLabel("mood", "Mood"), `${money(moodScore)} / 10`, "0 หน้าบึ้ง · 10 ยิ้มร่าเริง")}
+      ${statCard(iconLabel("confidence", "ความมั่นใจ"), `${money(confidence)} / 10`, "คะแนนวันนี้")}
+      ${statCard(iconLabel("health", "Energy"), `${money(energy)} / 10`, "พลังงานวันนี้")}
+      ${statCard("หมวดอารมณ์", escapeHTML(entry.mood || "-"), `เดือนนี้เจอบ่อย: ${escapeHTML(dominantMood)}`)}
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Monthly pattern</p>
+          <h2>ค่าเฉลี่ยเดือนนี้</h2>
+        </div>
+        <button class="primary-button" type="button" data-open-entry>บันทึกอารมณ์วันนี้</button>
+      </div>
+      <div class="emotion-meter-grid">
+        ${emotionMeter("Mood", avgMood, "#f5a7c6")}
+        ${emotionMeter("ความมั่นใจ", avgConfidence, "#b8b7ff")}
+        ${emotionMeter("Energy", avgEnergy, "#a9dcc5")}
+      </div>
+    </div>
+  `;
+}
+
+function emotionMeter(label, value, color) {
+  const percent = progressValue(value, 10);
+  return `
+    <div class="emotion-meter" style="--meter:${percent}%;--meter-color:${color}">
+      <div class="progress-meta"><span>${label}</span><strong>${money(value)} / 10</strong></div>
+      <div class="bar"><span></span></div>
     </div>
   `;
 }
@@ -1775,12 +1903,14 @@ function renderDayDetail(iso) {
   if (!Object.keys(entry).length) return `<p class="muted">ยังไม่มีข้อมูลของวันที่นี้ กดบันทึกเพื่อเพิ่มย้อนหลังได้</p>`;
   return `
     <div class="day-detail">
-      ${isFeatureEnabled("checkin") ? `<span class="pill">${iconLabel("mood", `อารมณ์ ${entry.mood || "-"}`)}</span>` : ""}
+      ${isFeatureEnabled("emotion") ? `<span class="pill">${iconLabel("mood", `Mood ${Number(entry.moodScore || 0)}/10`)}</span>` : ""}
+      ${isFeatureEnabled("emotion") ? `<span class="pill">${iconLabel("confidence", `มั่นใจ ${Number(entry.confidence || 0)}/10`)}</span>` : ""}
+      ${isFeatureEnabled("emotion") ? `<span class="pill">${iconLabel("health", `Energy ${Number(entry.energy || 0)}/10`)}</span>` : ""}
       ${isFeatureEnabled("health") ? `<span class="pill">${iconLabel("health", `น้ำ ${Number(entry.water || 0)} แก้ว`)}</span>` : ""}
       ${isFeatureEnabled("health") ? `<span class="pill">${iconLabel("exercise", `ออกกำลัง ${Number(entry.exercise || 0)} นาที`)}</span>` : ""}
       ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("income", `รายรับ ${money(entry.income)} บาท`)}</span>` : ""}
       ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("expense", `รายจ่าย ${money(expenseTotal(entry))} บาท`)}</span>` : ""}
-      ${isFeatureEnabled("side") ? `<span class="pill">${iconLabel("side", `รายได้เสริม ${money(entry.sideIncome)} บาท`)}</span>` : ""}
+      ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("side", `รายได้ ${money(entry.sideIncome)} บาท`)}</span>` : ""}
       ${isFeatureEnabled("money") ? `<span class="pill">${iconLabel("debt", `จ่ายหนี้ ${money(entry.debtPaid)} บาท`)}</span>` : ""}
       ${isFeatureEnabled("skills") ? `<span class="pill">ภาษา ${languageTotal(entry)} นาที</span>` : ""}
     </div>
@@ -2173,6 +2303,12 @@ function openEntryModal(category = activePage) {
   [...form.querySelectorAll('input[name="skills"]')].forEach((input) => {
     input.checked = (entry.skills || []).includes(input.value);
   });
+  form.querySelectorAll(".scale-field input").forEach((input) => {
+    input.addEventListener("input", () => {
+      const valueLabel = input.closest(".scale-field")?.querySelector(".scale-labels strong");
+      if (valueLabel) valueLabel.textContent = `${input.value}/10`;
+    });
+  });
   if (!modal.open) modal.showModal();
 }
 
@@ -2262,16 +2398,19 @@ function renderModalFields(fields) {
 
 function renderField(field) {
   const fields = {
+    moodScore: scaleField("moodScore", "Mood วันนี้", "☹", "☺"),
     mood: `
       <label>
-        อารมณ์
+        หมวดอารมณ์วันนี้
         <select name="mood">
-          <option value="">เลือกอารมณ์ (กรอกข้อมูล)</option>
+          <option value="">เลือกหมวดอารมณ์ (กรอกข้อมูล)</option>
           <option value="สดใส">สดใส</option>
           <option value="นิ่งๆ">นิ่งๆ</option>
           <option value="เหนื่อย">เหนื่อย</option>
           <option value="กังวล">กังวล</option>
           <option value="ภูมิใจ">ภูมิใจ</option>
+          <option value="เครียด">เครียด</option>
+          <option value="มีพลัง">มีพลัง</option>
         </select>
       </label>
     `,
@@ -2284,7 +2423,7 @@ function renderField(field) {
     debtPaid: textInput("debtPaid", "จ่ายหนี้วันนี้", "decimal"),
     saving: textInput("saving", "ออมเงินวันนี้", "decimal"),
     investment: textInput("investment", "ลงทุนวันนี้", "decimal"),
-    sideIncome: textInput("sideIncome", "รายได้เสริม", "decimal"),
+    sideIncome: textInput("sideIncome", "รายได้", "decimal"),
     languageMinutes: renderLanguageMinuteFields(),
     languageFocus: `
       <label>
@@ -2302,7 +2441,7 @@ function renderField(field) {
     `,
     sideChannel: `
       <label>
-        ช่องทางรายได้เสริม
+        ช่องทางรายได้
         <select name="sideChannel">
           <option value="">เลือกช่องทาง (กรอกข้อมูล)</option>
           ${sideChannelsList().map((channel) => `<option value="${escapeHTML(channel)}">${escapeHTML(channel)}</option>`).join("")}
@@ -2310,7 +2449,8 @@ function renderField(field) {
         ${sideChannelsList().length ? "" : `<span class="field-hint">ยังไม่มีช่องทาง เพิ่มได้จากหน้า Settings</span>`}
       </label>
     `,
-    confidence: textInput("confidence", "ความมั่นใจ (1-10)", "numeric", "[0-9]*"),
+    confidence: scaleField("confidence", "ความมั่นใจ", "0", "10"),
+    energy: scaleField("energy", "Energy", "0", "10"),
     win: `
       <label class="wide-label">
         ชัยชนะเล็กๆ / note ของหมวดนี้
@@ -2325,6 +2465,17 @@ function renderField(field) {
     `
   };
   return fields[field] || "";
+}
+
+function scaleField(name, label, lowLabel, highLabel) {
+  const value = clamp(Number(getEntry()[name] || 0), 0, 10);
+  return `
+    <label class="scale-field">
+      <span>${label}</span>
+      <input name="${name}" type="range" min="0" max="10" step="1" value="${value}" />
+      <span class="scale-labels"><small>${lowLabel}</small><strong>${value}/10</strong><small>${highLabel}</small></span>
+    </label>
+  `;
 }
 
 function renderLanguageMinuteFields() {
@@ -2468,7 +2619,7 @@ function renderSideChannelEditor() {
     <section class="skill-editor wide-label">
       <div class="skill-editor-head">
         <div>
-          <span>ช่องทางรายได้เสริม</span>
+          <span>ช่องทางรายได้</span>
           <small>เพิ่มช่องทางเองได้ เช่น YouTube, ร้านออนไลน์, รับ freelance, affiliate หรืออื่นๆ</small>
         </div>
         <button class="tiny-button" type="button" data-add-side-channel-row>เพิ่มช่องทาง</button>
@@ -2787,7 +2938,7 @@ function visibleFieldsForSetting(config) {
   return config.fields.filter((field) => {
     if (["waterDailyTarget", "exerciseWeeklyTarget", "sleepTarget", "confidenceTarget", "calorieDailyTarget"].includes(field.key)) return isFeatureEnabled("health");
     if (["debtMonthlyTarget", "savingMonthlyTarget", "investmentMonthlyTarget"].includes(field.key)) return isFeatureEnabled("money");
-    if (["sideIncomeMonthlyTarget", "sideIncomeWeeklyTarget", "sideIncomeYearlyTarget", "sideChannelMonthlyTarget"].includes(field.key)) return isFeatureEnabled("side");
+    if (["sideIncomeMonthlyTarget", "sideIncomeWeeklyTarget", "sideIncomeYearlyTarget", "sideChannelMonthlyTarget"].includes(field.key)) return isFeatureEnabled("money");
     if (["careerTargetDays", "skillTargetDays", "languageDailyTarget", "languageWeeklyTarget"].includes(field.key)) return isFeatureEnabled("skills");
     return true;
   });
@@ -2796,7 +2947,7 @@ function visibleFieldsForSetting(config) {
 function openSettingModal(group = "debt") {
   const config = settingGroups[group] || settingGroups.debt;
   settingGroup = group;
-  const ownerFeature = group === "health" ? "health" : ["moneyGoals", "financeOptions", "debt"].includes(group) ? "money" : group === "side" ? "side" : ["skills", "language"].includes(group) ? "skills" : "";
+  const ownerFeature = group === "health" ? "health" : ["moneyGoals", "financeOptions", "debt", "side"].includes(group) ? "money" : ["skills", "language"].includes(group) ? "skills" : "";
   const disabledByFeature = ownerFeature && !isFeatureEnabled(ownerFeature);
   $("#settingTitle").textContent = config.title;
   $("#settingDescription").textContent = config.description;

@@ -406,6 +406,26 @@ h3 {
   gap: 18px;
 }
 
+.guest-gated-content {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  max-height: min(1420px, calc(100vh + 560px));
+  overflow: hidden;
+}
+
+.guest-gate-fade {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 80px 16px 22px;
+  margin-top: -90px;
+  background: linear-gradient(180deg, rgba(255, 246, 250, 0), rgba(255, 246, 250, 0.86) 48%, rgba(255, 246, 250, 0.98));
+  backdrop-filter: blur(2px);
+}
+
 .grid {
   display: grid;
   gap: 16px;
@@ -2172,6 +2192,60 @@ input[type="checkbox"]:focus-visible {
 .plan-current {
   color: #7a6572;
   background: rgba(255, 255, 255, 0.48);
+}
+
+.scale-field {
+  display: grid;
+  gap: 10px;
+}
+
+.scale-field input[type="range"] {
+  width: 100%;
+  accent-color: #e874a8;
+}
+
+.scale-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+}
+
+.scale-labels strong {
+  color: var(--ink);
+}
+
+.emotion-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background:
+    radial-gradient(circle at 88% 20%, rgba(244, 167, 198, 0.24), transparent 32%),
+    rgba(255, 255, 255, 0.72);
+}
+
+.emotion-face {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245, 167, 198, 0.32), rgba(198, 178, 242, 0.28));
+  color: #7a4e64;
+  font-size: 2.5rem;
+  font-weight: 900;
+  box-shadow: var(--soft-shadow);
+}
+
+.emotion-meter-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.emotion-meter .bar span {
+  width: var(--meter);
+  background: linear-gradient(90deg, var(--meter-color), #fff1d7);
 }
 
 .expense-remove,
